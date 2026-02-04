@@ -3,7 +3,7 @@ import {
   Calculator, ArrowRight, Sun, Anchor, FileText, 
   Menu, X, BookOpen, HelpCircle, Info, Clock, MapPin
 } from 'lucide-react';
-import { toDecimal, formatDMS, rad, calculateRun, calculateSightReduction, calculateTrueAltitude, calculateMeripass } from '../utils/navigationMath';
+import { toDecimal, formatDMS, calculateRun, calculateSightReduction, calculateTrueAltitude, calculateMeripass } from '../utils/navigationMath';
 
 // --- Types ---
 interface DMSValue {
@@ -22,6 +22,7 @@ interface DMSInputProps {
 
 interface CalculationResult {
   lat1: number; lon1: number;
+  gha1: number;
   lha1: number; hc1: number; z1: number; intercept1: number;
   dLat: number; dep: number; dLong: number; lat2_DR: number; lon2_DR: number;
   ho1: number; ho2: number;
