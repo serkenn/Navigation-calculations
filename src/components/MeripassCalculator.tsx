@@ -29,6 +29,7 @@ interface CalculationResult {
   deltaL_miles: number; dLongCorr: number; lon2_Obs: number;
   lmtPass: number; gmtPass: number; ztPass: number;
   dec1: number; dec2: number;
+  zoneOffset: number; // 計算された時差
 }
 
 // --- Helper Component ---
@@ -79,6 +80,7 @@ const GuideView = () => (
       <p>海技試験の「メリパス計算」および実務での視正午船位決定を支援します。</p>
       <h3 className="font-bold text-slate-800 border-b pb-1 mt-4">手順</h3>
       <ol className="list-decimal pl-5 space-y-2">
+        <li><strong>Date & Zone:</strong> 日付と標準子午線の経度（例: 135° E）を入力します。</li>
         <li><strong>Morning Sight:</strong> 午前観測の推測位置、高度、GHA、赤緯等を入力します。</li>
         <li><strong>Run to Noon:</strong> 正中時までの針路と航程を入力します。</li>
         <li><strong>Noon Sight:</strong> 正中時の観測高度、赤緯、均時差を入力します。</li>
@@ -111,7 +113,11 @@ const MeripassCalculator = () => {
   const [currentView, setCurrentView] = useState<'calculator' | 'guide' | 'theory'>('calculator');
 
   // Input States
-  const [meta, setMeta] = useState({ month: 8, day: 19, zone: -9 });
+  const [meta, setMeta] = useState({ 
+    month: 8, day: 19, 
+    zoneLong: 135, // 標準子午線の経度
+    zoneDir: 1     // 1=E, -1=W
+  });
   
   const [morning, setMorning] = useState({
     drLat: { d: 37, m: 20, dir: 1 },
@@ -182,14 +188,18 @@ const MeripassCalculator = () => {
     const eqtHours = (noon.eqTime.m + noon.eqTime.s/60) / 60 * noon.eqTime.sign;
     const lmtPass = 12 - eqtHours;
     const gmtPass = lmtPass - (lon2_DR / 15);
-    const ztPass = gmtPass + meta.zone;
+    
+    // Calculate Zone Offset from Longitude (approx 15 deg per hour)
+    // East is (+), West is (-) for UTC Offset in this context
+    const zoneOffset = Math.round(meta.zoneLong / 15) * meta.zoneDir;
+    const ztPass = gmtPass + zoneOffset;
 
     setResult({
       lat1, lon1, gha1, lha1, dec1, ho1, hc1, z1, intercept1,
       dLat, dep, dLong, lat2_DR, lon2_DR,
       ho2, dec2, lat2_Obs,
       deltaL_miles, dLongCorr, lon2_Obs,
-      lmtPass, gmtPass, ztPass
+      lmtPass, gmtPass, ztPass, zoneOffset
     });
 
     if(window.innerWidth < 1024) setIsMenuOpen(false);
@@ -238,9 +248,11 @@ const MeripassCalculator = () => {
       {/* Main Content */}
       <main className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
         <div className="w-full lg:w-5/12 p-4 md:p-6 overflow-y-auto border-r border-slate-200 bg-white h-full scrollbar-thin">
-          {currentView === 'guide' && <GuideView />}
-          {currentView === 'theory' && <TheoryView />}
-          {currentView === 'calculator' && (
+          {currentView !== 'calculator' ? (
+             <div className="prose prose-sm text-slate-600 p-4">
+               {currentView === 'guide' ? <GuideView /> : <TheoryView />}
+             </div>
+          ) : (
           <div className="space-y-8 pb-20">
             <header>
               <h2 className="text-2xl font-bold text-slate-800 border-l-4 border-blue-600 pl-3">Input Data</h2>
@@ -252,10 +264,23 @@ const MeripassCalculator = () => {
               <div className="flex items-center gap-2 mb-3 text-slate-700 font-bold text-sm uppercase tracking-wider">
                 <Clock size={16} /> Date & Zone
               </div>
-              <div className="grid grid-cols-3 gap-3">
-                <input type="number" className="p-2 border rounded text-center" value={meta.month} onChange={e => setMeta({...meta, month: +e.target.value})} placeholder="月" />
-                <input type="number" className="p-2 border rounded text-center" value={meta.day} onChange={e => setMeta({...meta, day: +e.target.value})} placeholder="日" />
-                <div className="flex items-center"><span className="text-xs mr-1">UT</span><input type="number" className="w-full p-2 border rounded text-center" value={meta.zone} onChange={e => setMeta({...meta, zone: +e.target.value})} /></div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex gap-2">
+                  <input type="number" className="w-full p-2 border rounded text-center" value={meta.month} onChange={e => setMeta({...meta, month: +e.target.value})} placeholder="月" />
+                  <span className="self-center">/</span>
+                  <input type="number" className="w-full p-2 border rounded text-center" value={meta.day} onChange={e => setMeta({...meta, day: +e.target.value})} placeholder="日" />
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-500 block">標準子午線 (Zone)</span>
+                  <div className="flex items-center gap-1 bg-white border border-slate-300 rounded p-1">
+                     <input type="number" className="w-full text-right outline-none font-bold" value={meta.zoneLong} onChange={e => setMeta({...meta, zoneLong: +e.target.value})} />
+                     <span className="text-xs">°</span>
+                     <select className="bg-transparent font-bold text-sm outline-none" value={meta.zoneDir} onChange={e => setMeta({...meta, zoneDir: +e.target.value})}>
+                        <option value={1}>E</option>
+                        <option value={-1}>W</option>
+                     </select>
+                  </div>
+                </div>
               </div>
             </section>
 
@@ -401,6 +426,7 @@ const MeripassCalculator = () => {
                                 <div className="text-center p-4 border-2 border-double border-slate-400">
                                     <div className="text-xs text-slate-500 mb-1">Standard Time (ZT)</div>
                                     <div className="text-xl font-bold">{Math.floor(result.ztPass)}h {Math.floor((result.ztPass%1)*60)}m {Math.floor((result.ztPass*3600)%60)}s</div>
+                                    <div className="text-xs text-slate-500 mt-1">Zone Offset: {result.zoneOffset > 0 ? '+' : ''}{result.zoneOffset}</div>
                                 </div>
                             </div>
                         </div>
@@ -413,8 +439,9 @@ const MeripassCalculator = () => {
                             <h3 className="text-sm font-bold bg-blue-700 text-white inline-block px-3 py-1 mb-3">3. Morning Sight</h3>
                             <div className="bg-white border border-slate-300 p-4 text-sm space-y-1 shadow-sm">
                                 <div className="flex justify-between"><span>hs</span> <span>{morning.hs.d}-{morning.hs.m}</span></div>
-                                <div className="flex justify-between text-xs text-slate-500"><span>(Total Corr)</span> <span>{morning.totalCorrSign>=0?'+':''}{morning.totalCorr}'</span></div>
+                                <div className="flex justify-between text-xs text-slate-500"><span>(Total Corr)</span> <span>{morning.totalCorrSign>=0?'+':'-'}{morning.totalCorr}'</span></div>
                                 <div className="flex justify-between font-bold border-b border-slate-300 pb-1 mb-1"><span>Ho</span> <span>{formatDMS(result.ho1, 'angle')}</span></div>
+                                
                                 <div className="flex justify-between"><span>GHA</span> <span>{morning.gha.d}° {morning.gha.m}'</span></div>
                                 <div className="flex justify-between"><span>Long</span> <span>{result.lon1>=0?'+':'-'}{formatDMS(Math.abs(result.lon1), 'angle')}</span></div>
                                 <div className="flex justify-between font-bold"><span>LHA (t)</span> <span>{result.lha1.toFixed(1)}°</span></div>
@@ -435,7 +462,7 @@ const MeripassCalculator = () => {
                             <h3 className="text-sm font-bold bg-orange-700 text-white inline-block px-3 py-1 mb-3">4. Noon Sight</h3>
                             <div className="bg-white border border-slate-300 p-4 text-sm space-y-1 shadow-sm">
                                 <div className="flex justify-between"><span>hs</span> <span>{noon.hs.d}-{noon.hs.m}</span></div>
-                                <div className="flex justify-between text-xs text-slate-500"><span>(Corr)</span> <span>{noon.totalCorrSign>=0?'+':''}{noon.totalCorr}'</span></div>
+                                <div className="flex justify-between text-xs text-slate-500"><span>(Corr)</span> <span>{noon.totalCorrSign>=0?'+':'-'}{noon.totalCorr}'</span></div>
                                 <div className="flex justify-between font-bold border-b border-slate-300 pb-1 mb-1"><span>Ho</span> <span>{formatDMS(result.ho2, 'angle')}</span></div>
                                 <div className="flex justify-between"><span>90° - Ho</span> <span>{formatDMS(90 - result.ho2, 'angle')} (z)</span></div>
                                 <div className="flex justify-between"><span>Dec</span> <span>{formatDMS(result.dec2, 'lat')}</span></div>
@@ -470,6 +497,7 @@ const MeripassCalculator = () => {
                 </div>
             )}
         </div>
+
       </main>
     </div>
   );
