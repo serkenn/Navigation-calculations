@@ -1,8 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-/* 既存のスタイルがあれば下に残しても良いですが、一旦これだけでOKです */
+/* 以下は維持 */
 body {
   margin: 0;
   font-family: system-ui, -apple-system, sans-serif;
