@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { toDecimal, formatDMS, rad, calculateRun, calculateSightReduction, calculateTrueAltitude, calculateMeripass } from '../utils/navigationMath';
 
-// --- ヘルパー: 度分秒入力用コンポーネント ---
+// --- ヘルパー: 度分秒入力用 ---
 const DMSInput = ({ value, onChange, label, showSign = false, signType = 'NS' }: any) => (
   <div className="flex flex-col">
     <span className="text-[10px] text-slate-500 font-semibold uppercase">{label}</span>
@@ -46,111 +46,101 @@ const DMSInput = ({ value, onChange, label, showSign = false, signType = 'NS' }:
 // --- メインコンポーネント ---
 const MeripassCalculator = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [currentView, setCurrentView] = useState<'calculator' | 'guide'>('calculator');
+  const [currentView, setCurrentView] = useState<'calculator' | 'guide' | 'theory'>('calculator');
 
   // --- State: 入力データ ---
-  // 日時・タイムゾーン
-  const [meta, setMeta] = useState({
-    month: 8, day: 19,
-    zone: -9, // JST
-    approxTime: 900 // 09:00
-  });
+  const [meta, setMeta] = useState({ month: 8, day: 19, zone: -9 });
 
-  // 1. 出発地点 (Morning Sight)
+  // 1. Morning Sight
   const [morning, setMorning] = useState({
     drLat: { d: 37, m: 20, dir: 1 },
     drLong: { d: 146, m: 15, dir: 1 },
-    hs: { d: 48, m: 10.2 }, // 器械高度
-    ie: 1.5, // 器差 (Index Error)
-    dip: 15, // 眼高 (m)
-    sunCorr: 14.3, // 太陽高度改正総数
-    gha: { d: 315, m: 10.5 }, // GHA
-    dec: { d: 13, m: 2.8, dir: 1 } // 赤緯
+    hs: { d: 48, m: 10.2 },
+    totalCorr: 9.6,      // 改正総数 (Corr)
+    totalCorrSign: 1,    // 符号 (+1 or -1)
+    gha: { d: 315, m: 10.5 },
+    dec: { d: 13, m: 2.8, dir: 1 } 
   });
 
-  // 2. 航走 (Run)
-  const [run, setRun] = useState({
-    course: 64,
-    dist: 45
-  });
+  // 2. Run
+  const [run, setRun] = useState({ course: 64, dist: 45 });
 
-  // 3. 正中 (Noon Sight)
+  // 3. Noon Sight
   const [noon, setNoon] = useState({
     hs: { d: 65, m: 8.3 },
-    ie: 1.5,
-    dip: 15,
-    sunCorr: 15.5,
+    totalCorr: 9.8,      // 改正総数 (Corr)
+    totalCorrSign: 1,    // 符号
     dec: { d: 13, m: 0.8, dir: 1 },
-    eqTime: { m: 3, s: 47, sign: -1 } // 均時差 (- means Mean Time < Apparent Time typically in formulas)
+    eqTime: { m: 3, s: 47, sign: -1 } 
   });
 
   const [result, setResult] = useState<any>(null);
 
   // --- 計算処理 ---
   const handleCalculate = () => {
-    // 1. Morning Sight Calculation
+    // 1. Morning Sight
     const lat1 = toDecimal(morning.drLat.d, morning.drLat.m) * morning.drLat.dir;
     const lon1 = toDecimal(morning.drLong.d, morning.drLong.m) * morning.drLong.dir;
     
-    // Altitude Correction
-    const dipVal1 = 1.76 * Math.sqrt(morning.dip);
-    const { ho: ho1 } = calculateTrueAltitude(toDecimal(morning.hs.d, morning.hs.m), morning.ie, dipVal1, morning.sunCorr);
+    // 真高度 (Ho) = hs + Corr
+    const { ho: ho1 } = calculateTrueAltitude(
+      toDecimal(morning.hs.d, morning.hs.m), 
+      morning.totalCorr * morning.totalCorrSign
+    );
     
-    // LHA Calculation
+    // LHA
     const gha1 = toDecimal(morning.gha.d, morning.gha.m);
     let lha1 = gha1 + lon1;
-    // Normalize LHA
     while (lha1 >= 360) lha1 -= 360;
     while (lha1 < 0) lha1 += 360;
 
-    // Intercept & Azimuth
+    // Sight Reduction
     const dec1 = toDecimal(morning.dec.d, morning.dec.m) * morning.dec.dir;
     const { hc: hc1, Z: z1 } = calculateSightReduction(lat1, dec1, lha1);
-    const intercept1 = (ho1 - hc1) * 60; // Intercept (miles)
+    const intercept1 = (ho1 - hc1) * 60; 
 
-    // 2. Run to Noon (Middle Latitude)
+    // 2. Run
     const { dLat, dep, dLong, lat2: lat2_DR } = calculateRun(lat1, run.course, run.dist);
     const lon2_DR = lon1 + dLong;
 
-    // 3. Noon Sight Calculation
-    const dipVal2 = 1.76 * Math.sqrt(noon.dip);
-    const { ho: ho2 } = calculateTrueAltitude(toDecimal(noon.hs.d, noon.hs.m), noon.ie, dipVal2, noon.sunCorr);
+    // 3. Noon Sight
+    const { ho: ho2 } = calculateTrueAltitude(
+      toDecimal(noon.hs.d, noon.hs.m), 
+      noon.totalCorr * noon.totalCorrSign
+    );
     const dec2 = toDecimal(noon.dec.d, noon.dec.m) * noon.dec.dir;
     
-    // Latitude by Meridian Altitude (l_obs)
-    // Formula: Lat = Dec + (90 - Ho)  (Assuming Same Name & Lat > Dec for 3N exam context)
-    // 厳密には天頂距離(z)の方向判定が必要ですが、試験問題形式に合わせて簡易化
+    // Meridian Altitude Logic (Same Name assumption for exam)
+    // Lat = Dec + (90 - Ho)
     const zenithDist = 90 - ho2;
     const lat2_Obs = dec2 + zenithDist;
 
-    // 4. Meripass Fix
-    const deltaL_miles = (lat2_Obs - lat2_DR) * 60; // Δl
+    // 4. Fix (Meripass)
+    const deltaL_miles = (lat2_Obs - lat2_DR) * 60;
     const { dLongCorr } = calculateMeripass(intercept1, z1, deltaL_miles, lat2_DR);
     const lon2_Obs = lon2_DR + (dLongCorr / 60);
 
-    // 5. Time of Passage
-    // LMT = 12 - EqT
+    // 5. Time
     const eqtHours = (noon.eqTime.m + noon.eqTime.s/60) / 60 * noon.eqTime.sign;
     const lmtPass = 12 - eqtHours;
-    // GMT = LMT - Long/15
     const gmtPass = lmtPass - (lon2_DR / 15);
-    // ZT = GMT + Zone
-    const ztPass = gmtPass + (meta.zone); 
+    const ztPass = gmtPass + meta.zone;
 
     setResult({
-      // Morning
-      lat1, lon1, gha1, lha1, dec1, ho1, hc1, z1, intercept1, dipVal1,
-      // Run
+      lat1, lon1, gha1, lha1, dec1, ho1, hc1, z1, intercept1,
       dLat, dep, dLong, lat2_DR, lon2_DR,
-      // Noon
-      ho2, dec2, lat2_Obs, dipVal2,
-      // Fix
+      ho2, dec2, lat2_Obs,
       deltaL_miles, dLongCorr, lon2_Obs,
-      // Time
-      lmtPass, gmtPass, ztPass, eqtHours
+      lmtPass, gmtPass, ztPass
     });
 
     if(window.innerWidth < 1024) setIsMenuOpen(false);
+  };
+
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const changeView = (view: any) => {
+    setCurrentView(view);
+    setIsMenuOpen(false);
   };
 
   return (
@@ -162,7 +152,7 @@ const MeripassCalculator = () => {
           <Anchor className="text-blue-700" size={20} />
           メリパス計算 (3N)
         </div>
-        <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 text-slate-600">
+        <button onClick={toggleMenu} className="p-2 text-slate-600">
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
@@ -177,16 +167,16 @@ const MeripassCalculator = () => {
             <Anchor className="text-blue-400" />
             3N 天測計算
           </h1>
-          <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider">Meridian Passage Calc</p>
         </div>
         <nav className="flex-1 p-4 space-y-2">
-          <button onClick={() => { setCurrentView('calculator'); setIsMenuOpen(false); }} 
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${currentView === 'calculator' ? 'bg-blue-700 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
+          <button onClick={() => changeView('calculator')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${currentView === 'calculator' ? 'bg-blue-700 text-white' : 'text-slate-400 hover:bg-slate-800'}`}>
             <Calculator size={18} /> 計算シート
           </button>
-          <button onClick={() => { setCurrentView('guide'); setIsMenuOpen(false); }} 
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${currentView === 'guide' ? 'bg-blue-700 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
+          <button onClick={() => changeView('guide')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${currentView === 'guide' ? 'bg-blue-700 text-white' : 'text-slate-400 hover:bg-slate-800'}`}>
             <HelpCircle size={18} /> 利用ガイド
+          </button>
+          <button onClick={() => changeView('theory')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${currentView === 'theory' ? 'bg-blue-700 text-white' : 'text-slate-400 hover:bg-slate-800'}`}>
+            <BookOpen size={18} /> 理論
           </button>
         </nav>
       </aside>
@@ -196,16 +186,15 @@ const MeripassCalculator = () => {
         
         {/* --- Left Panel: Input Forms --- */}
         <div className="w-full lg:w-5/12 p-4 md:p-6 overflow-y-auto border-r border-slate-200 bg-white h-full scrollbar-thin">
-          {currentView === 'guide' ? (
-             <div className="prose prose-sm text-slate-600">
-               <h3>利用ガイド</h3>
-               <p>このアプリは三級海技士（航海）の天測計算問題（メリパス）の解答作成を支援します。</p>
+          {currentView !== 'calculator' ? (
+             <div className="prose prose-sm text-slate-600 p-4">
+               {currentView === 'guide' ? <p>利用ガイド: 左側のフォームに問題の数値を入力し、「計算実行」を押してください。</p> : <p>理論: メリパス計算の公式 $\Delta L = \dots$</p>}
              </div>
           ) : (
           <div className="space-y-8 pb-20">
             <header>
               <h2 className="text-2xl font-bold text-slate-800 border-l-4 border-blue-600 pl-3">Input Data</h2>
-              <p className="text-xs text-slate-400 mt-1 pl-4">問題文の値を入力してください</p>
+              <p className="text-xs text-slate-400 mt-1 pl-4">海技試験問題の値を入力してください</p>
             </header>
 
             {/* 0. General Info */}
@@ -215,58 +204,56 @@ const MeripassCalculator = () => {
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <span className="text-[10px] text-slate-500 block">月 (Month)</span>
+                  <span className="text-[10px] text-slate-500 block">月</span>
                   <input type="number" className="w-full p-2 border rounded text-center font-bold" value={meta.month} onChange={e => setMeta({...meta, month: +e.target.value})} />
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-500 block">日 (Day)</span>
+                  <span className="text-[10px] text-slate-500 block">日</span>
                   <input type="number" className="w-full p-2 border rounded text-center font-bold" value={meta.day} onChange={e => setMeta({...meta, day: +e.target.value})} />
                 </div>
                 <div>
                   <span className="text-[10px] text-slate-500 block">Timezone</span>
                   <div className="flex items-center">
                      <span className="text-xs mr-1">UT</span>
-                     <input type="number" className="w-full p-2 border rounded text-center font-bold" value={meta.zone} onChange={e => setMeta({...meta, zone: +e.target.value})} placeholder="-9" />
+                     <input type="number" className="w-full p-2 border rounded text-center font-bold" value={meta.zone} onChange={e => setMeta({...meta, zone: +e.target.value})} />
                   </div>
                 </div>
               </div>
             </section>
 
-            {/* 1. Departure / Morning Sight */}
+            {/* 1. Morning Sight */}
             <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
               <div className="bg-blue-50/50 px-4 py-2 border-b border-slate-100 flex justify-between items-center">
                 <div className="flex items-center gap-2 font-bold text-blue-800 text-sm">
-                  <MapPin size={16} /> 1. 出発地点 & 第1観測
+                  <MapPin size={16} /> 1. 第1観測 (Morning)
                 </div>
-                <span className="text-xs font-mono bg-blue-100 text-blue-700 px-2 py-0.5 rounded">Morning</span>
               </div>
               <div className="p-4 space-y-4">
-                {/* DR Position */}
                 <div className="grid grid-cols-2 gap-4">
                    <DMSInput label="推測緯度 (Lat1)" value={morning.drLat} onChange={(v:any) => setMorning({...morning, drLat: v})} showSign={true} signType="NS" />
                    <DMSInput label="推測経度 (Long1)" value={morning.drLong} onChange={(v:any) => setMorning({...morning, drLong: v})} showSign={true} signType="EW" />
                 </div>
-                {/* Observed Altitude */}
-                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-dashed border-slate-200">
-                   <DMSInput label="太陽下辺高度 (hs)" value={morning.hs} onChange={(v:any) => setMorning({...morning, hs: v})} />
-                   <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-[10px] text-slate-500">器差 (IC)</span>
-                        <input type="number" className="w-16 p-1 text-right border rounded text-sm" value={morning.ie} onChange={e => setMorning({...morning, ie: +e.target.value})} />
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-[10px] text-slate-500">眼高 (Dip) m</span>
-                        <input type="number" className="w-16 p-1 text-right border rounded text-sm" value={morning.dip} onChange={e => setMorning({...morning, dip: +e.target.value})} />
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-[10px] text-slate-500">高度改正 (Corr)</span>
-                        <input type="number" className="w-16 p-1 text-right border rounded text-sm" value={morning.sunCorr} onChange={e => setMorning({...morning, sunCorr: +e.target.value})} />
-                      </div>
-                   </div>
+                
+                {/* Altitude & Correction */}
+                <div className="pt-2 border-t border-dashed border-slate-200">
+                    <div className="grid grid-cols-2 gap-4 items-end">
+                       <DMSInput label="器械高度 (hs)" value={morning.hs} onChange={(v:any) => setMorning({...morning, hs: v})} />
+                       <div>
+                          <label className="text-[10px] text-slate-500 font-bold block">改正総数 (Corr)</label>
+                          <div className="flex items-center gap-1 mt-1">
+                            <select className="bg-slate-50 border rounded p-1.5 text-sm font-bold" value={morning.totalCorrSign} onChange={e => setMorning({...morning, totalCorrSign: +e.target.value})}>
+                                <option value={1}>+</option><option value={-1}>-</option>
+                            </select>
+                            <input type="number" className="w-full p-1.5 border rounded text-right text-sm" value={morning.totalCorr} onChange={e => setMorning({...morning, totalCorr: +e.target.value})} placeholder="0.0" />
+                            <span className="text-xs">'</span>
+                          </div>
+                       </div>
+                    </div>
                 </div>
+                
                 {/* Almanac */}
                 <div className="pt-2 border-t border-dashed border-slate-200">
-                    <span className="text-[10px] font-bold text-slate-400 block mb-2">航海暦データ (ALMANAC)</span>
+                    <span className="text-[10px] font-bold text-slate-400 block mb-2">航海暦データ</span>
                     <div className="grid grid-cols-2 gap-4">
                         <DMSInput label="GHA (Sun)" value={morning.gha} onChange={(v:any) => setMorning({...morning, gha: v})} />
                         <DMSInput label="赤緯 (Dec)" value={morning.dec} onChange={(v:any) => setMorning({...morning, dec: v})} showSign={true} signType="NS" />
@@ -278,7 +265,7 @@ const MeripassCalculator = () => {
             {/* 2. Run */}
             <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
               <div className="bg-slate-50 px-4 py-2 border-b border-slate-100 flex items-center gap-2 font-bold text-slate-700 text-sm">
-                <ArrowRight size={16} /> 2. 航走 (Run to Noon)
+                <ArrowRight size={16} /> 2. 航走 (Run)
               </div>
               <div className="p-4 grid grid-cols-2 gap-6">
                 <div>
@@ -302,12 +289,10 @@ const MeripassCalculator = () => {
             <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
               <div className="bg-orange-50/50 px-4 py-2 border-b border-slate-100 flex justify-between items-center">
                 <div className="flex items-center gap-2 font-bold text-orange-800 text-sm">
-                  <Sun size={16} /> 3. 正中観測 (Noon Sight)
+                  <Sun size={16} /> 3. 正中観測 (Noon)
                 </div>
-                <span className="text-xs font-mono bg-orange-100 text-orange-700 px-2 py-0.5 rounded">Meridian</span>
               </div>
               <div className="p-4 space-y-4">
-                 {/* Almanac */}
                  <div className="grid grid-cols-2 gap-4 pb-2 border-b border-dashed border-slate-200">
                     <DMSInput label="赤緯 (Dec)" value={noon.dec} onChange={(v:any) => setNoon({...noon, dec: v})} showSign={true} signType="NS" />
                     <div>
@@ -324,21 +309,16 @@ const MeripassCalculator = () => {
                     </div>
                 </div>
 
-                {/* Altitude */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4 items-end">
                    <DMSInput label="子午線高度 (hs)" value={noon.hs} onChange={(v:any) => setNoon({...noon, hs: v})} />
-                   <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-[10px] text-slate-500">器差 (IC)</span>
-                        <input type="number" className="w-16 p-1 text-right border rounded text-sm" value={noon.ie} onChange={e => setNoon({...noon, ie: +e.target.value})} />
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-[10px] text-slate-500">眼高 (Dip) m</span>
-                        <input type="number" className="w-16 p-1 text-right border rounded text-sm" value={noon.dip} onChange={e => setNoon({...noon, dip: +e.target.value})} />
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-[10px] text-slate-500">高度改正 (Corr)</span>
-                        <input type="number" className="w-16 p-1 text-right border rounded text-sm" value={noon.sunCorr} onChange={e => setNoon({...noon, sunCorr: +e.target.value})} />
+                   <div>
+                      <label className="text-[10px] text-slate-500 font-bold block">改正総数 (Corr)</label>
+                      <div className="flex items-center gap-1 mt-1">
+                        <select className="bg-slate-50 border rounded p-1.5 text-sm font-bold" value={noon.totalCorrSign} onChange={e => setNoon({...noon, totalCorrSign: +e.target.value})}>
+                            <option value={1}>+</option><option value={-1}>-</option>
+                        </select>
+                        <input type="number" className="w-full p-1.5 border rounded text-right text-sm" value={noon.totalCorr} onChange={e => setNoon({...noon, totalCorr: +e.target.value})} placeholder="0.0" />
+                        <span className="text-xs">'</span>
                       </div>
                    </div>
                 </div>
@@ -426,7 +406,7 @@ const MeripassCalculator = () => {
                             <h3 className="text-sm font-bold bg-blue-700 text-white inline-block px-3 py-1 mb-3">3. Morning Sight</h3>
                             <div className="bg-white border border-slate-300 p-4 text-sm space-y-1 shadow-sm">
                                 <div className="flex justify-between"><span>hs</span> <span>{morning.hs.d}-{morning.hs.m}</span></div>
-                                <div className="flex justify-between text-xs text-slate-500"><span>(Total Corr)</span> <span>+{(morning.ie - result.dipVal1 + morning.sunCorr).toFixed(1)}'</span></div>
+                                <div className="flex justify-between text-xs text-slate-500"><span>(Corr)</span> <span>{morning.totalCorrSign>=0?'+':''}{morning.totalCorr}'</span></div>
                                 <div className="flex justify-between font-bold border-b border-slate-300 pb-1 mb-1"><span>Ho</span> <span>{formatDMS(result.ho1, 'angle')}</span></div>
                                 
                                 <div className="flex justify-between"><span>GHA</span> <span>{morning.gha.d}° {morning.gha.m}'</span></div>
@@ -449,7 +429,7 @@ const MeripassCalculator = () => {
                             <h3 className="text-sm font-bold bg-orange-700 text-white inline-block px-3 py-1 mb-3">4. Noon Sight</h3>
                             <div className="bg-white border border-slate-300 p-4 text-sm space-y-1 shadow-sm">
                                 <div className="flex justify-between"><span>hs</span> <span>{noon.hs.d}-{noon.hs.m}</span></div>
-                                <div className="flex justify-between text-xs text-slate-500"><span>(Corr)</span> <span>+{(noon.ie - result.dipVal2 + noon.sunCorr).toFixed(1)}'</span></div>
+                                <div className="flex justify-between text-xs text-slate-500"><span>(Corr)</span> <span>{noon.totalCorrSign>=0?'+':''}{noon.totalCorr}'</span></div>
                                 <div className="flex justify-between font-bold border-b border-slate-300 pb-1 mb-1"><span>Ho</span> <span>{formatDMS(result.ho2, 'angle')}</span></div>
                                 
                                 <div className="flex justify-between"><span>90° - Ho</span> <span>{formatDMS(90 - result.ho2, 'angle')} (z)</span></div>
@@ -458,7 +438,7 @@ const MeripassCalculator = () => {
                                     <span>Obs Lat</span> <span>{formatDMS(result.lat2_Obs, 'lat')}</span>
                                 </div>
                                 <div className="mt-3 p-2 text-center text-xs text-slate-500">
-                                    Formula: Lat = Dec ± z<br/>(Same Name, Lat {'>'} Dec)
+                                    Formula: Lat = Dec ± z<br/>(Same Name assumed)
                                 </div>
                             </div>
                         </div>
