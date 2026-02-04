@@ -167,8 +167,8 @@ const MeripassCalculator = () => {
 
     // 2. Run
     const { dLat, dep, dLong, lat2: lat2_DR } = calculateRun(lat1, run.course, run.dist);
+    // [修正] const から let に変更し、経度の正規化処理を追加
     let lon2_DR = lon1 + dLong;
-    // 180度を超える場合の正規化処理
     while (lon2_DR > 180) lon2_DR -= 360;
     while (lon2_DR <= -180) lon2_DR += 360;
 
@@ -179,15 +179,26 @@ const MeripassCalculator = () => {
     );
     const dec2 = toDecimal(noon.dec.d, noon.dec.m) * noon.dec.dir;
     
-    // Meridian Altitude (Lat = Dec + z, simplified for exam)
-    const zenithDist = 90 - ho2;
-    const lat2_Obs = dec2 + zenithDist;
+    // Meridian Altitude Logic (Corrected)
+    // 推測緯度(Lat2_DR)に近い緯度を採用するロジック
+    // Lat = Dec +/- z (Zenith Distance)
+    const zenithDist = 90 - ho2; // z (always positive distance)
+    
+    const latCandidate1 = dec2 + zenithDist; // Case: Sun is Equator-ward
+    const latCandidate2 = dec2 - zenithDist; // Case: Sun is Pole-ward
+    
+    // DR位置に近い方を採用
+    const diff1 = Math.abs(latCandidate1 - lat2_DR);
+    const diff2 = Math.abs(latCandidate2 - lat2_DR);
+    
+    const lat2_Obs = diff1 < diff2 ? latCandidate1 : latCandidate2;
 
     // 4. Fix
     const deltaL_miles = (lat2_Obs - lat2_DR) * 60;
     const { dLongCorr } = calculateMeripass(intercept1, z1, deltaL_miles, lat2_DR);
+    
+    // [修正] const から let に変更し、経度の正規化処理を追加
     let lon2_Obs = lon2_DR + (dLongCorr / 60);
-// 180度を超える場合の正規化処理
     while (lon2_Obs > 180) lon2_Obs -= 360;
     while (lon2_Obs <= -180) lon2_Obs += 360;
 
