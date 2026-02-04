@@ -229,12 +229,12 @@ const MeripassCalculator = () => {
       <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 text-white transform transition-transform duration-300 lg:relative lg:translate-x-0 flex flex-col shadow-2xl ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-6 border-b border-slate-700 bg-slate-950">
           <h1 className="text-lg font-bold flex items-center gap-2">
-            <Anchor className="text-blue-400" /> 3N 天測計算
+            <Anchor className="text-blue-400" /> 航法計算
           </h1>
         </div>
         <nav className="flex-1 p-4 space-y-2">
           <button onClick={() => changeView('calculator')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${currentView === 'calculator' ? 'bg-blue-700 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
-            <Calculator size={18} /> 計算シート
+            <Calculator size={18} /> メリパス計算(3N海技試験対応版)
           </button>
           <button onClick={() => changeView('guide')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${currentView === 'guide' ? 'bg-blue-700 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
             <HelpCircle size={18} /> 利用ガイド
