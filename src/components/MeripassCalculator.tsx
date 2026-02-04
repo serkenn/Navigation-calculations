@@ -167,7 +167,7 @@ const MeripassCalculator = () => {
 
     // 2. Run
     const { dLat, dep, dLong, lat2: lat2_DR } = calculateRun(lat1, run.course, run.dist);
-    const lon2_DR = lon1 + dLong;
+    let lon2_DR = lon1 + dLong;
     // 180度を超える場合の正規化処理
     while (lon2_DR > 180) lon2_DR -= 360;
     while (lon2_DR <= -180) lon2_DR += 360;
@@ -186,7 +186,7 @@ const MeripassCalculator = () => {
     // 4. Fix
     const deltaL_miles = (lat2_Obs - lat2_DR) * 60;
     const { dLongCorr } = calculateMeripass(intercept1, z1, deltaL_miles, lat2_DR);
-    const lon2_Obs = lon2_DR + (dLongCorr / 60);
+    let lon2_Obs = lon2_DR + (dLongCorr / 60);
 // 180度を超える場合の正規化処理
     while (lon2_Obs > 180) lon2_Obs -= 360;
     while (lon2_Obs <= -180) lon2_Obs += 360;
