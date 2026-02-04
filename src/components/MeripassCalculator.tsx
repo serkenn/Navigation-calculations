@@ -1,396 +1,509 @@
 import React, { useState } from 'react';
 import { 
   Calculator, ArrowRight, Sun, Anchor, FileText, 
-  Menu, X, BookOpen, HelpCircle, Info 
+  Menu, X, BookOpen, HelpCircle, Info, Clock, MapPin
 } from 'lucide-react';
-import { toDecimal, formatDMS, rad, calculateRun, calculateMeripass } from '../utils/navigationMath';
+import { toDecimal, formatDMS, rad, calculateRun, calculateSightReduction, calculateTrueAltitude, calculateMeripass } from '../utils/navigationMath';
 
-// --- サブ画面: 使い方 (Guide) ---
-const GuideView = () => (
-  <div className="p-6 bg-white rounded-xl shadow-sm border border-slate-100 animate-in fade-in duration-500">
-    <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-      <HelpCircle className="text-blue-600" /> 使い方 (User Guide)
-    </h2>
-    <div className="space-y-4 text-slate-600 text-sm leading-relaxed">
-      <p>このアプリは、海技試験の「メリパス計算（Meridian Passage）」および実務での視正午船位決定を支援します。</p>
-      
-      <h3 className="font-bold text-slate-800 border-b pb-1 mt-4">手順</h3>
-      <ol className="list-decimal pl-5 space-y-2">
-        <li>
-          <strong>Morning Sight (AM):</strong> 午前中の太陽観測データを入力します。推測位置(DR)、方位角(Azimuth)、Interceptを入力してください。
-        </li>
-        <li>
-          <strong>Run to Noon:</strong> 午前観測時から正中時までの針路(Course)と航程(Dist)を入力します。これにより正中時の推測位置(l₀, L₀)が計算されます。
-        </li>
-        <li>
-          <strong>Noon Sight:</strong> 正中時の観測高度と赤緯を入力します。これにより正中時の実測緯度(l_obs)が計算されます。
-        </li>
-        <li>
-          <strong>計算実行:</strong> ボタンを押すと、経度改正量(ΔL)が計算され、最終的な視正午船位が表示されます。
-        </li>
-      </ol>
-    </div>
-  </div>
-);
-
-// --- サブ画面: 計算理論 (Theory) ---
-const TheoryView = () => (
-  <div className="p-6 bg-white rounded-xl shadow-sm border border-slate-100 animate-in fade-in duration-500">
-    <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-      <BookOpen className="text-blue-600" /> 計算理論 (Theory)
-    </h2>
-    <div className="space-y-4 text-slate-600 text-sm">
-      <p>メリパス計算は、午前の位置の線と、正中時の緯度位置の線を組み合わせて船位を決定する方法です。</p>
-      
-      <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 my-4 text-xs md:text-sm overflow-x-auto">
-        <p className="font-bold text-slate-800 mb-2">経度改正公式 (ΔL):</p>
-        <div className="p-4 bg-white border rounded text-center font-serif text-lg text-slate-800">
-          ΔL = ( I · csc Z - Δl · cot Z ) sec l₀
-        </div>
-        <p className="mt-3 text-slate-500 text-xs font-mono">
-          プログラム上の計算式:<br/>
-          ( I / sin(Z) - Δl / tan(Z) ) / cos(l0)
-        </p>
-      </div>
-
-      <ul className="list-disc pl-5 space-y-2">
-        <li><strong>I:</strong> Intercept (修正差)</li>
-        <li><strong>Z:</strong> Sun's Azimuth (太陽方位角)</li>
-        <li><strong>Δl:</strong> Diff between Obs Lat & DR Lat (l_obs - l₀)</li>
-        <li><strong>l₀:</strong> DR Latitude at Noon (正中時推測緯度)</li>
-      </ul>
+// --- ヘルパー: 度分秒入力用コンポーネント ---
+const DMSInput = ({ value, onChange, label, showSign = false, signType = 'NS' }: any) => (
+  <div className="flex flex-col">
+    <span className="text-[10px] text-slate-500 font-semibold uppercase">{label}</span>
+    <div className="flex items-center gap-1 bg-white border border-slate-300 rounded p-1 shadow-sm">
+      <input 
+        type="number" 
+        className="w-10 text-right outline-none font-mono text-sm" 
+        value={value.d} 
+        onChange={e => onChange({ ...value, d: +e.target.value })} 
+        placeholder="deg"
+      />
+      <span className="text-slate-400 text-xs">°</span>
+      <input 
+        type="number" 
+        className="w-12 text-right outline-none font-mono text-sm" 
+        value={value.m} 
+        onChange={e => onChange({ ...value, m: +e.target.value })} 
+        placeholder="min"
+      />
+      <span className="text-slate-400 text-xs">'</span>
+      {showSign && (
+        <select 
+          className="text-xs bg-transparent outline-none font-bold text-slate-700"
+          value={value.dir}
+          onChange={e => onChange({ ...value, dir: +e.target.value })}
+        >
+          {signType === 'NS' ? (
+            <><option value={1}>N</option><option value={-1}>S</option></>
+          ) : (
+            <><option value={1}>E</option><option value={-1}>W</option></>
+          )}
+        </select>
+      )}
     </div>
   </div>
 );
 
 // --- メインコンポーネント ---
 const MeripassCalculator = () => {
-  // UI State
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [currentView, setCurrentView] = useState<'calculator' | 'guide' | 'theory'>('calculator');
+  const [currentView, setCurrentView] = useState<'calculator' | 'guide'>('calculator');
 
-  // Calculation State
-  const [morning, setMorning] = useState({
-    time: "09:00",
-    lat: { d: 37, m: 20, s: 0, dir: 1 },
-    lon: { d: 146, m: 15, s: 0, dir: 1 },
-    obsAlt: { d: 48, m: 10.2 },
-    intercept: 3.5,
-    azimuth: 115.4,
+  // --- State: 入力データ ---
+  // 日時・タイムゾーン
+  const [meta, setMeta] = useState({
+    month: 8, day: 19,
+    zone: -9, // JST
+    approxTime: 900 // 09:00
   });
 
+  // 1. 出発地点 (Morning Sight)
+  const [morning, setMorning] = useState({
+    drLat: { d: 37, m: 20, dir: 1 },
+    drLong: { d: 146, m: 15, dir: 1 },
+    hs: { d: 48, m: 10.2 }, // 器械高度
+    ie: 1.5, // 器差 (Index Error)
+    dip: 15, // 眼高 (m)
+    sunCorr: 14.3, // 太陽高度改正総数
+    gha: { d: 315, m: 10.5 }, // GHA
+    dec: { d: 13, m: 2.8, dir: 1 } // 赤緯
+  });
+
+  // 2. 航走 (Run)
   const [run, setRun] = useState({
     course: 64,
-    distance: 45,
+    dist: 45
   });
 
+  // 3. 正中 (Noon Sight)
   const [noon, setNoon] = useState({
-    obsAlt: { d: 65, m: 8.3 },
+    hs: { d: 65, m: 8.3 },
+    ie: 1.5,
+    dip: 15,
+    sunCorr: 15.5,
     dec: { d: 13, m: 0.8, dir: 1 },
+    eqTime: { m: 3, s: 47, sign: -1 } // 均時差 (- means Mean Time < Apparent Time typically in formulas)
   });
 
   const [result, setResult] = useState<any>(null);
 
+  // --- 計算処理 ---
   const handleCalculate = () => {
-    // 1. Data Prep
-    const lat1 = toDecimal(morning.lat.d, morning.lat.m, morning.lat.s) * morning.lat.dir;
-    const lon1 = toDecimal(morning.lon.d, morning.lon.m, morning.lon.s) * morning.lon.dir;
+    // 1. Morning Sight Calculation
+    const lat1 = toDecimal(morning.drLat.d, morning.drLat.m) * morning.drLat.dir;
+    const lon1 = toDecimal(morning.drLong.d, morning.drLong.m) * morning.drLong.dir;
+    
+    // Altitude Correction
+    const dipVal1 = 1.76 * Math.sqrt(morning.dip);
+    const { ho: ho1 } = calculateTrueAltitude(toDecimal(morning.hs.d, morning.hs.m), morning.ie, dipVal1, morning.sunCorr);
+    
+    // LHA Calculation
+    const gha1 = toDecimal(morning.gha.d, morning.gha.m);
+    let lha1 = gha1 + lon1;
+    // Normalize LHA
+    while (lha1 >= 360) lha1 -= 360;
+    while (lha1 < 0) lha1 += 360;
 
-    // 2. Run
-    const { dLat, dep } = calculateRun(run.course, run.distance);
-    const lat2_DR = lat1 + dLat;
-    const mLat = (lat1 + lat2_DR) / 2;
-    const dLong = (dep / Math.cos(rad(mLat))) / 60;
+    // Intercept & Azimuth
+    const dec1 = toDecimal(morning.dec.d, morning.dec.m) * morning.dec.dir;
+    const { hc: hc1, Z: z1 } = calculateSightReduction(lat1, dec1, lha1);
+    const intercept1 = (ho1 - hc1) * 60; // Intercept (miles)
+
+    // 2. Run to Noon (Middle Latitude)
+    const { dLat, dep, dLong, lat2: lat2_DR } = calculateRun(lat1, run.course, run.dist);
     const lon2_DR = lon1 + dLong;
 
-    // 3. Noon Sight
-    const altNoonVal = toDecimal(noon.obsAlt.d, noon.obsAlt.m);
-    const decNoonVal = toDecimal(noon.dec.d, noon.dec.m) * noon.dec.dir;
-    const zDist = 90 - altNoonVal;
-    const lat2_Obs = (lat2_DR >= 0) ? (decNoonVal + zDist) : (decNoonVal - zDist);
+    // 3. Noon Sight Calculation
+    const dipVal2 = 1.76 * Math.sqrt(noon.dip);
+    const { ho: ho2 } = calculateTrueAltitude(toDecimal(noon.hs.d, noon.hs.m), noon.ie, dipVal2, noon.sunCorr);
+    const dec2 = toDecimal(noon.dec.d, noon.dec.m) * noon.dec.dir;
+    
+    // Latitude by Meridian Altitude (l_obs)
+    // Formula: Lat = Dec + (90 - Ho)  (Assuming Same Name & Lat > Dec for 3N exam context)
+    // 厳密には天頂距離(z)の方向判定が必要ですが、試験問題形式に合わせて簡易化
+    const zenithDist = 90 - ho2;
+    const lat2_Obs = dec2 + zenithDist;
 
-    // 4. Meripass Logic
-    const meripassRes = calculateMeripass(
-      lat2_DR, lat2_Obs, morning.intercept, morning.azimuth, lon2_DR
-    );
+    // 4. Meripass Fix
+    const deltaL_miles = (lat2_Obs - lat2_DR) * 60; // Δl
+    const { dLongCorr } = calculateMeripass(intercept1, z1, deltaL_miles, lat2_DR);
+    const lon2_Obs = lon2_DR + (dLongCorr / 60);
+
+    // 5. Time of Passage
+    // LMT = 12 - EqT
+    const eqtHours = (noon.eqTime.m + noon.eqTime.s/60) / 60 * noon.eqTime.sign;
+    const lmtPass = 12 - eqtHours;
+    // GMT = LMT - Long/15
+    const gmtPass = lmtPass - (lon2_DR / 15);
+    // ZT = GMT + Zone
+    const ztPass = gmtPass + (meta.zone); 
 
     setResult({
-      lat1, lon1, dLat, dep, dLong, lat2_DR, lon2_DR, lat2_Obs, ...meripassRes
+      // Morning
+      lat1, lon1, gha1, lha1, dec1, ho1, hc1, z1, intercept1, dipVal1,
+      // Run
+      dLat, dep, dLong, lat2_DR, lon2_DR,
+      // Noon
+      ho2, dec2, lat2_Obs, dipVal2,
+      // Fix
+      deltaL_miles, dLongCorr, lon2_Obs,
+      // Time
+      lmtPass, gmtPass, ztPass, eqtHours
     });
-    
-    // スマホなら計算後にメニューを閉じる
-    if(window.innerWidth < 1024) {
-        setIsMenuOpen(false);
-    }
-  };
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const changeView = (view: 'calculator' | 'guide' | 'theory') => {
-    setCurrentView(view);
-    setIsMenuOpen(false);
+    if(window.innerWidth < 1024) setIsMenuOpen(false);
   };
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen bg-gray-50 text-slate-800 font-sans overflow-hidden">
+    <div className="flex flex-col lg:flex-row h-screen bg-slate-100 text-slate-800 font-sans overflow-hidden">
       
-      {/* モバイル用ヘッダー & メニューボタン */}
-      <div className="lg:hidden bg-white p-4 shadow-sm flex items-center justify-between z-20 relative border-b border-gray-200">
-        <div className="flex items-center gap-2 font-bold text-slate-900">
-            <Anchor className="text-blue-600" size={20} />
-            Meripass Calc
+      {/* Mobile Header */}
+      <div className="lg:hidden bg-white p-4 shadow-sm flex items-center justify-between z-20 border-b border-slate-200">
+        <div className="flex items-center gap-2 font-bold text-slate-800">
+          <Anchor className="text-blue-700" size={20} />
+          メリパス計算 (3N)
         </div>
-        <button onClick={toggleMenu} className="p-2 rounded-md hover:bg-gray-100 text-slate-600">
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 text-slate-600">
+          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
-      {/* サイドメニュー (オーバーレイ背景) */}
-      <div className={`
-        fixed inset-0 z-30 bg-black/50 transition-opacity lg:hidden
-        ${isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
-      `} onClick={() => setIsMenuOpen(false)} />
-
-      {/* サイドメニュー本体 */}
+      {/* Sidebar Menu */}
       <aside className={`
-        fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 text-white transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 flex flex-col shadow-xl
+        fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 text-white transform transition-transform duration-300 lg:relative lg:translate-x-0 flex flex-col shadow-2xl
         ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="p-6 border-b border-slate-700 bg-slate-950">
-            <h1 className="text-xl font-bold flex items-center gap-2">
-                <Anchor className="text-blue-400" />
-                Navigation
-            </h1>
-            <p className="text-xs text-slate-400 mt-1">Meridian Passage Calculation</p>
+          <h1 className="text-lg font-bold flex items-center gap-2">
+            <Anchor className="text-blue-400" />
+            3N 天測計算
+          </h1>
+          <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider">Meridian Passage Calc</p>
         </div>
         <nav className="flex-1 p-4 space-y-2">
-            <button 
-                onClick={() => changeView('calculator')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentView === 'calculator' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}
-            >
-                <Calculator size={18} /> 計算機 (Calculator)
-            </button>
-            <button 
-                onClick={() => changeView('guide')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentView === 'guide' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}
-            >
-                <HelpCircle size={18} /> 使い方 (Guide)
-            </button>
-            <button 
-                onClick={() => changeView('theory')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentView === 'theory' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}
-            >
-                <BookOpen size={18} /> 理論 (Theory)
-            </button>
+          <button onClick={() => { setCurrentView('calculator'); setIsMenuOpen(false); }} 
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${currentView === 'calculator' ? 'bg-blue-700 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
+            <Calculator size={18} /> 計算シート
+          </button>
+          <button onClick={() => { setCurrentView('guide'); setIsMenuOpen(false); }} 
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${currentView === 'guide' ? 'bg-blue-700 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
+            <HelpCircle size={18} /> 利用ガイド
+          </button>
         </nav>
-        <div className="p-4 border-t border-slate-700 text-xs text-slate-500 text-center">
-            Ver 1.0.0
-        </div>
       </aside>
 
-      {/* メインエリア */}
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
         
-        {/* 左パネル: 入力フォーム or 情報ビュー */}
-        <div className="w-full lg:w-1/2 p-6 overflow-y-auto border-r border-gray-200 bg-gray-50 h-full scrollbar-thin">
+        {/* --- Left Panel: Input Forms --- */}
+        <div className="w-full lg:w-5/12 p-4 md:p-6 overflow-y-auto border-r border-slate-200 bg-white h-full scrollbar-thin">
+          {currentView === 'guide' ? (
+             <div className="prose prose-sm text-slate-600">
+               <h3>利用ガイド</h3>
+               <p>このアプリは三級海技士（航海）の天測計算問題（メリパス）の解答作成を支援します。</p>
+             </div>
+          ) : (
+          <div className="space-y-8 pb-20">
+            <header>
+              <h2 className="text-2xl font-bold text-slate-800 border-l-4 border-blue-600 pl-3">Input Data</h2>
+              <p className="text-xs text-slate-400 mt-1 pl-4">問題文の値を入力してください</p>
+            </header>
+
+            {/* 0. General Info */}
+            <section className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <div className="flex items-center gap-2 mb-3 text-slate-700 font-bold text-sm uppercase tracking-wider">
+                <Clock size={16} /> Date & Zone
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <span className="text-[10px] text-slate-500 block">月 (Month)</span>
+                  <input type="number" className="w-full p-2 border rounded text-center font-bold" value={meta.month} onChange={e => setMeta({...meta, month: +e.target.value})} />
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-500 block">日 (Day)</span>
+                  <input type="number" className="w-full p-2 border rounded text-center font-bold" value={meta.day} onChange={e => setMeta({...meta, day: +e.target.value})} />
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-500 block">Timezone</span>
+                  <div className="flex items-center">
+                     <span className="text-xs mr-1">UT</span>
+                     <input type="number" className="w-full p-2 border rounded text-center font-bold" value={meta.zone} onChange={e => setMeta({...meta, zone: +e.target.value})} placeholder="-9" />
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* 1. Departure / Morning Sight */}
+            <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="bg-blue-50/50 px-4 py-2 border-b border-slate-100 flex justify-between items-center">
+                <div className="flex items-center gap-2 font-bold text-blue-800 text-sm">
+                  <MapPin size={16} /> 1. 出発地点 & 第1観測
+                </div>
+                <span className="text-xs font-mono bg-blue-100 text-blue-700 px-2 py-0.5 rounded">Morning</span>
+              </div>
+              <div className="p-4 space-y-4">
+                {/* DR Position */}
+                <div className="grid grid-cols-2 gap-4">
+                   <DMSInput label="推測緯度 (Lat1)" value={morning.drLat} onChange={(v:any) => setMorning({...morning, drLat: v})} showSign={true} signType="NS" />
+                   <DMSInput label="推測経度 (Long1)" value={morning.drLong} onChange={(v:any) => setMorning({...morning, drLong: v})} showSign={true} signType="EW" />
+                </div>
+                {/* Observed Altitude */}
+                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-dashed border-slate-200">
+                   <DMSInput label="太陽下辺高度 (hs)" value={morning.hs} onChange={(v:any) => setMorning({...morning, hs: v})} />
+                   <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] text-slate-500">器差 (IC)</span>
+                        <input type="number" className="w-16 p-1 text-right border rounded text-sm" value={morning.ie} onChange={e => setMorning({...morning, ie: +e.target.value})} />
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] text-slate-500">眼高 (Dip) m</span>
+                        <input type="number" className="w-16 p-1 text-right border rounded text-sm" value={morning.dip} onChange={e => setMorning({...morning, dip: +e.target.value})} />
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] text-slate-500">高度改正 (Corr)</span>
+                        <input type="number" className="w-16 p-1 text-right border rounded text-sm" value={morning.sunCorr} onChange={e => setMorning({...morning, sunCorr: +e.target.value})} />
+                      </div>
+                   </div>
+                </div>
+                {/* Almanac */}
+                <div className="pt-2 border-t border-dashed border-slate-200">
+                    <span className="text-[10px] font-bold text-slate-400 block mb-2">航海暦データ (ALMANAC)</span>
+                    <div className="grid grid-cols-2 gap-4">
+                        <DMSInput label="GHA (Sun)" value={morning.gha} onChange={(v:any) => setMorning({...morning, gha: v})} />
+                        <DMSInput label="赤緯 (Dec)" value={morning.dec} onChange={(v:any) => setMorning({...morning, dec: v})} showSign={true} signType="NS" />
+                    </div>
+                </div>
+              </div>
+            </section>
+
+            {/* 2. Run */}
+            <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="bg-slate-50 px-4 py-2 border-b border-slate-100 flex items-center gap-2 font-bold text-slate-700 text-sm">
+                <ArrowRight size={16} /> 2. 航走 (Run to Noon)
+              </div>
+              <div className="p-4 grid grid-cols-2 gap-6">
+                <div>
+                    <span className="text-[10px] text-slate-500 font-bold">真針路 (Course)</span>
+                    <div className="flex items-center gap-2 mt-1">
+                        <input type="number" className="w-full p-2 border rounded font-mono" value={run.course} onChange={e => setRun({...run, course: +e.target.value})} />
+                        <span className="text-sm">°</span>
+                    </div>
+                </div>
+                <div>
+                    <span className="text-[10px] text-slate-500 font-bold">航程 (Dist)</span>
+                    <div className="flex items-center gap-2 mt-1">
+                        <input type="number" className="w-full p-2 border rounded font-mono" value={run.dist} onChange={e => setRun({...run, dist: +e.target.value})} />
+                        <span className="text-sm">miles</span>
+                    </div>
+                </div>
+              </div>
+            </section>
+
+            {/* 3. Noon Sight */}
+            <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="bg-orange-50/50 px-4 py-2 border-b border-slate-100 flex justify-between items-center">
+                <div className="flex items-center gap-2 font-bold text-orange-800 text-sm">
+                  <Sun size={16} /> 3. 正中観測 (Noon Sight)
+                </div>
+                <span className="text-xs font-mono bg-orange-100 text-orange-700 px-2 py-0.5 rounded">Meridian</span>
+              </div>
+              <div className="p-4 space-y-4">
+                 {/* Almanac */}
+                 <div className="grid grid-cols-2 gap-4 pb-2 border-b border-dashed border-slate-200">
+                    <DMSInput label="赤緯 (Dec)" value={noon.dec} onChange={(v:any) => setNoon({...noon, dec: v})} showSign={true} signType="NS" />
+                    <div>
+                        <span className="text-[10px] text-slate-500 font-bold uppercase">Eq. of Time</span>
+                        <div className="flex items-center gap-1 mt-1">
+                            <select className="bg-white border rounded p-1 text-sm" value={noon.eqTime.sign} onChange={e => setNoon({...noon, eqTime: {...noon.eqTime, sign: +e.target.value}})}>
+                                <option value={1}>+</option><option value={-1}>-</option>
+                            </select>
+                            <input type="number" className="w-12 p-1 border rounded text-right text-sm" value={noon.eqTime.m} onChange={e => setNoon({...noon, eqTime: {...noon.eqTime, m: +e.target.value}})} placeholder="m" />
+                            <span className="text-xs">m</span>
+                            <input type="number" className="w-12 p-1 border rounded text-right text-sm" value={noon.eqTime.s} onChange={e => setNoon({...noon, eqTime: {...noon.eqTime, s: +e.target.value}})} placeholder="s" />
+                            <span className="text-xs">s</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Altitude */}
+                <div className="grid grid-cols-2 gap-4">
+                   <DMSInput label="子午線高度 (hs)" value={noon.hs} onChange={(v:any) => setNoon({...noon, hs: v})} />
+                   <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] text-slate-500">器差 (IC)</span>
+                        <input type="number" className="w-16 p-1 text-right border rounded text-sm" value={noon.ie} onChange={e => setNoon({...noon, ie: +e.target.value})} />
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] text-slate-500">眼高 (Dip) m</span>
+                        <input type="number" className="w-16 p-1 text-right border rounded text-sm" value={noon.dip} onChange={e => setNoon({...noon, dip: +e.target.value})} />
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] text-slate-500">高度改正 (Corr)</span>
+                        <input type="number" className="w-16 p-1 text-right border rounded text-sm" value={noon.sunCorr} onChange={e => setNoon({...noon, sunCorr: +e.target.value})} />
+                      </div>
+                   </div>
+                </div>
+              </div>
+            </section>
+
+            <button 
+              onClick={handleCalculate}
+              className="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-200 flex justify-center items-center gap-2"
+            >
+              <Calculator size={20} /> 計算実行 (RUN)
+            </button>
+          </div>
+          )}
+        </div>
+
+        {/* --- Right Panel: Calculation Sheet --- */}
+        <div className="w-full lg:w-7/12 bg-[#fffdf5] p-8 md:p-10 border-l border-slate-200 overflow-y-auto font-mono text-slate-800 relative shadow-inner min-h-[50vh] lg:h-full">
+            <div className="absolute top-6 right-6 opacity-5 pointer-events-none">
+                <FileText size={200} />
+            </div>
             
-            {/* 画面切り替え */}
-            {currentView === 'guide' && <GuideView />}
-            {currentView === 'theory' && <TheoryView />}
-            
-            {currentView === 'calculator' && (
-                <div className="space-y-6 pb-20 animate-in fade-in duration-300">
-                    <header className="hidden lg:block mb-6">
-                        <h2 className="text-2xl font-bold text-slate-900">Input Data</h2>
-                        <p className="text-sm text-slate-500">観測データと航走データを入力してください</p>
-                    </header>
+            <div className="border-b-2 border-slate-800 pb-4 mb-8 flex justify-between items-end">
+                <h2 className="text-2xl font-bold tracking-tight">Calculation Sheet</h2>
+                <span className="text-xs font-sans text-slate-500">3N Navigation Form</span>
+            </div>
 
-                    {/* 1. 午前観測 */}
-                    <section className="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
-                        <h2 className="text-sm font-bold text-blue-600 uppercase tracking-wide mb-4 flex items-center gap-2">
-                            <Sun size={16} /> 1. Morning Sight (AM)
-                        </h2>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                            <label className="block text-slate-500 mb-1 font-medium">推測緯度 (DR Lat)</label>
-                            <div className="flex gap-2 items-center">
-                                <input type="number" className="w-16 p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none" value={morning.lat.d} onChange={e=>setMorning({...morning, lat:{...morning.lat, d:+e.target.value}})} />
-                                <span className="text-slate-600">°</span>
-                                <input type="number" className="w-16 p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none" value={morning.lat.m} onChange={e=>setMorning({...morning, lat:{...morning.lat, m:+e.target.value}})} />
-                                <span className="text-slate-600">' N</span>
+            {!result ? (
+                <div className="h-64 flex flex-col items-center justify-center text-slate-400">
+                    <p className="mb-2">No Data Calculated</p>
+                    <p className="text-xs">左側のフォームに入力して計算を実行してください</p>
+                </div>
+            ) : (
+                <div className="space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
+                    
+                    {/* 1. Run Calculation */}
+                    <div className="relative">
+                        <h3 className="text-sm font-bold bg-slate-800 text-white inline-block px-3 py-1 mb-3">1. D.R.P at Noon (中分緯度航法)</h3>
+                        <div className="grid grid-cols-2 gap-8 text-sm border-l-2 border-slate-300 pl-4">
+                            <div className="space-y-1">
+                                <div className="flex justify-between"><span>Course</span> <span>{run.course}°</span></div>
+                                <div className="flex justify-between"><span>Dist</span> <span>{run.dist}'</span></div>
+                                <div className="flex justify-between border-t border-slate-300 pt-1 mt-1"><span>Dep</span> <span>{result.dep.toFixed(1)}'</span></div>
+                                <div className="flex justify-between"><span>D.Lat</span> <span>{result.dLat >= 0 ? 'N' : 'S'} {(Math.abs(result.dLat)*60).toFixed(1)}'</span></div>
                             </div>
-                            </div>
-                            <div>
-                            <label className="block text-slate-500 mb-1 font-medium">方位角 (Azimuth)</label>
-                            <div className="flex items-center gap-2">
-                                <input type="number" className="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none" value={morning.azimuth} onChange={e=>setMorning({...morning, azimuth:+e.target.value})} />
-                                <span className="text-slate-600">°</span>
-                            </div>
-                            </div>
-                            <div>
-                            <label className="block text-slate-500 mb-1 font-medium">Intercept (I)</label>
-                            <div className="flex items-center gap-2">
-                                <input type="number" className="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none" value={morning.intercept} onChange={e=>setMorning({...morning, intercept:+e.target.value})} />
-                                <span className="text-slate-600">'</span>
-                            </div>
+                            <div className="space-y-1">
+                                <div className="flex justify-between"><span>Lat1</span> <span>{formatDMS(result.lat1, 'lat')}</span></div>
+                                <div className="flex justify-between"><span>D.Lat</span> <span>{result.dLat>=0?'+':'-'}{(Math.abs(result.dLat)*60).toFixed(1)}'</span></div>
+                                <div className="flex justify-between font-bold border-t border-slate-800 pt-1"><span>Lat2 (DR)</span> <span>{formatDMS(result.lat2_DR, 'lat')}</span></div>
+                                <div className="flex justify-between text-xs text-slate-500 mt-2"><span>(Mean Lat)</span> <span>{formatDMS((result.lat1+result.lat2_DR)/2, 'lat')}</span></div>
                             </div>
                         </div>
-                    </section>
+                        <div className="mt-2 text-right text-sm border-t border-slate-200 pt-2">
+                            <span className="mr-4">Long1: {formatDMS(result.lon1, 'lon')}</span>
+                            <span className="mr-4">D.Long: {result.dLong>=0?'+':'-'}{(Math.abs(result.dLong)*60).toFixed(1)}'</span>
+                            <span className="font-bold">Long2 (DR): {formatDMS(result.lon2_DR, 'lon')}</span>
+                        </div>
+                    </div>
 
-                    {/* 2. 航走 (Run) */}
-                    <section className="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
-                        <h2 className="text-sm font-bold text-blue-600 uppercase tracking-wide mb-4 flex items-center gap-2">
-                            <ArrowRight size={16} /> 2. Run to Noon
-                        </h2>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                            <label className="block text-slate-500 mb-1 font-medium">針路 (Course)</label>
-                            <div className="flex items-center gap-2">
-                                <input type="number" className="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none" value={run.course} onChange={e=>setRun({...run, course:+e.target.value})} />
-                                <span className="text-slate-600">°</span>
+                    {/* 2. Time of Passage */}
+                    <div className="relative">
+                        <h3 className="text-sm font-bold bg-slate-800 text-white inline-block px-3 py-1 mb-3">2. Time of Mer. Pass</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 border-l-2 border-slate-300 pl-4 text-sm">
+                            <div className="space-y-1">
+                                <div className="flex justify-between"><span>L.A.T. Noon</span> <span>12-00-00</span></div>
+                                <div className="flex justify-between"><span>Eq. of T.</span> <span>{noon.eqTime.sign<0?'+':'-'} {String(noon.eqTime.m).padStart(2,'0')}-{String(noon.eqTime.s).padStart(2,'0')}</span></div>
+                                <div className="flex justify-between border-t border-slate-400"><span>L.M.T. Pass</span> <span>{Math.floor(result.lmtPass)}h {Math.floor((result.lmtPass%1)*60)}m</span></div>
+                                <div className="flex justify-between"><span>Long (Time)</span> <span>{result.lon2_DR>=0?'-':'+'} {Math.floor(Math.abs(result.lon2_DR)/15)}h {Math.floor((Math.abs(result.lon2_DR)/15%1)*60)}m</span></div>
+                                <div className="flex justify-between border-t border-slate-400 font-bold"><span>G.M.T.</span> <span>{Math.floor(result.gmtPass)}h {Math.floor((result.gmtPass%1)*60)}m {Math.floor((result.gmtPass*3600)%60)}s</span></div>
                             </div>
-                            </div>
-                            <div>
-                            <label className="block text-slate-500 mb-1 font-medium">航程 (Dist)</label>
-                            <div className="flex items-center gap-2">
-                                <input type="number" className="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none" value={run.distance} onChange={e=>setRun({...run, distance:+e.target.value})} />
-                                <span className="text-slate-600">nm</span>
-                            </div>
+                            <div className="flex items-center justify-center">
+                                <div className="text-center p-4 border-2 border-double border-slate-400">
+                                    <div className="text-xs text-slate-500 mb-1">Standard Time (ZT)</div>
+                                    <div className="text-xl font-bold">{Math.floor(result.ztPass)}h {Math.floor((result.ztPass%1)*60)}m {Math.floor((result.ztPass*3600)%60)}s</div>
+                                    <div className="text-xs text-slate-500 mt-1">Zone: {meta.zone}</div>
+                                </div>
                             </div>
                         </div>
-                    </section>
+                    </div>
 
-                    {/* 3. 正中観測 (Noon) */}
-                    <section className="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
-                        <h2 className="text-sm font-bold text-blue-600 uppercase tracking-wide mb-4 flex items-center gap-2">
-                            <Sun size={16} /> 3. Noon Sight (Mer Alt)
-                        </h2>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                            <label className="block text-slate-500 mb-1 font-medium">正中高度 (Obs Alt)</label>
-                            <div className="flex gap-2 items-center">
-                                <input type="number" className="w-16 p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none" value={noon.obsAlt.d} onChange={e=>setNoon({...noon, obsAlt:{...noon.obsAlt, d:+e.target.value}})} />
-                                <span className="text-slate-600">°</span>
-                                <input type="number" className="w-16 p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none" value={noon.obsAlt.m} onChange={e=>setNoon({...noon, obsAlt:{...noon.obsAlt, m:+e.target.value}})} />
-                                <span className="text-slate-600">'</span>
-                            </div>
-                            </div>
-                            <div>
-                            <label className="block text-slate-500 mb-1 font-medium">赤緯 (Dec)</label>
-                            <div className="flex gap-2 items-center">
-                                <input type="number" className="w-16 p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none" value={noon.dec.d} onChange={e=>setNoon({...noon, dec:{...noon.dec, d:+e.target.value}})} />
-                                <span className="text-slate-600">°</span>
-                                <input type="number" className="w-16 p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none" value={noon.dec.m} onChange={e=>setNoon({...noon, dec:{...noon.dec, m:+e.target.value}})} />
-                                <span className="text-slate-600">' N</span>
-                            </div>
+                    {/* 3. Sights */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* Morning */}
+                        <div>
+                            <h3 className="text-sm font-bold bg-blue-700 text-white inline-block px-3 py-1 mb-3">3. Morning Sight</h3>
+                            <div className="bg-white border border-slate-300 p-4 text-sm space-y-1 shadow-sm">
+                                <div className="flex justify-between"><span>hs</span> <span>{morning.hs.d}-{morning.hs.m}</span></div>
+                                <div className="flex justify-between text-xs text-slate-500"><span>(Total Corr)</span> <span>+{(morning.ie - result.dipVal1 + morning.sunCorr).toFixed(1)}'</span></div>
+                                <div className="flex justify-between font-bold border-b border-slate-300 pb-1 mb-1"><span>Ho</span> <span>{formatDMS(result.ho1, 'angle')}</span></div>
+                                
+                                <div className="flex justify-between"><span>GHA</span> <span>{morning.gha.d}° {morning.gha.m}'</span></div>
+                                <div className="flex justify-between"><span>Long</span> <span>{result.lon1>=0?'+':'-'}{formatDMS(Math.abs(result.lon1), 'angle')}</span></div>
+                                <div className="flex justify-between font-bold"><span>LHA (t)</span> <span>{result.lha1.toFixed(1)}°</span></div>
+                                <div className="mt-2 pt-2 border-t border-slate-200">
+                                    <div className="flex justify-between"><span>Lat</span> <span>{formatDMS(result.lat1, 'lat')}</span></div>
+                                    <div className="flex justify-between"><span>Dec</span> <span>{formatDMS(result.dec1, 'lat')}</span></div>
+                                    <div className="flex justify-between mt-1 font-bold"><span>Hc</span> <span>{formatDMS(result.hc1, 'angle')}</span></div>
+                                    <div className="flex justify-between font-bold"><span>Az (Z)</span> <span>{result.z1.toFixed(1)}°</span></div>
+                                </div>
+                                <div className="mt-3 bg-blue-50 p-2 text-center border border-blue-200 font-bold text-blue-900">
+                                    Intercept: {result.intercept.toFixed(1)}' {result.intercept>=0?'T':'A'}
+                                </div>
                             </div>
                         </div>
-                    </section>
 
-                    <button 
-                        onClick={handleCalculate}
-                        className="w-full py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition shadow-md hover:shadow-lg active:scale-95 duration-200 cursor-pointer flex justify-center items-center gap-2"
-                    >
-                        <Calculator size={20} /> 計算実行 (Calculate)
-                    </button>
+                        {/* Noon */}
+                        <div>
+                            <h3 className="text-sm font-bold bg-orange-700 text-white inline-block px-3 py-1 mb-3">4. Noon Sight</h3>
+                            <div className="bg-white border border-slate-300 p-4 text-sm space-y-1 shadow-sm">
+                                <div className="flex justify-between"><span>hs</span> <span>{noon.hs.d}-{noon.hs.m}</span></div>
+                                <div className="flex justify-between text-xs text-slate-500"><span>(Corr)</span> <span>+{(noon.ie - result.dipVal2 + noon.sunCorr).toFixed(1)}'</span></div>
+                                <div className="flex justify-between font-bold border-b border-slate-300 pb-1 mb-1"><span>Ho</span> <span>{formatDMS(result.ho2, 'angle')}</span></div>
+                                
+                                <div className="flex justify-between"><span>90° - Ho</span> <span>{formatDMS(90 - result.ho2, 'angle')} (z)</span></div>
+                                <div className="flex justify-between"><span>Dec</span> <span>{formatDMS(result.dec2, 'lat')}</span></div>
+                                <div className="flex justify-between font-bold border-t border-slate-300 pt-1 mt-1">
+                                    <span>Obs Lat</span> <span>{formatDMS(result.lat2_Obs, 'lat')}</span>
+                                </div>
+                                <div className="mt-3 p-2 text-center text-xs text-slate-500">
+                                    Formula: Lat = Dec ± z<br/>(Same Name, Lat {'>'} Dec)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 5. Fix */}
+                    <div className="relative">
+                        <h3 className="text-sm font-bold bg-slate-800 text-white inline-block px-3 py-1 mb-3">5. Fix (Meripass)</h3>
+                        <div className="bg-slate-100 border-2 border-slate-400 p-6">
+                            <div className="flex justify-around items-center mb-4 text-sm">
+                                <div>
+                                    <p className="font-bold">Δl (Lat Diff)</p>
+                                    <p>{(result.lat2_Obs - result.lat2_DR)*60 >= 0 ? '+' : ''}{((result.lat2_Obs - result.lat2_DR)*60).toFixed(1)}'</p>
+                                </div>
+                                <div>
+                                    <p className="font-bold">Intercept (I)</p>
+                                    <p>{result.intercept.toFixed(1)}'</p>
+                                </div>
+                                <div>
+                                    <p className="font-bold">Azimuth (Z)</p>
+                                    <p>{result.z1.toFixed(1)}°</p>
+                                </div>
+                            </div>
+                            
+                            <div className="text-center mb-4">
+                                <p className="text-xs text-slate-500 mb-1">Calculation Formula</p>
+                                <p className="font-serif italic text-lg">ΔL = ( I · csc Z - Δl · cot Z ) sec l₀</p>
+                                <p className="font-bold text-red-600 text-xl mt-2">D.Long Correction: {result.dLongCorr.toFixed(1)}'</p>
+                            </div>
+
+                            <div className="bg-white border-4 border-double border-slate-800 p-4 text-center shadow-lg">
+                                <p className="text-xs text-slate-400 uppercase tracking-widest mb-2">FIX AT NOON</p>
+                                <div className="flex justify-center gap-8 text-2xl font-bold text-slate-900">
+                                    <span>{formatDMS(result.lat2_Obs, 'lat')}</span>
+                                    <span>{formatDMS(result.lon2_Obs, 'lon')}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             )}
         </div>
 
-        {/* 右パネル: 計算結果シート */}
-        {currentView === 'calculator' && (
-            <div className="w-full lg:w-1/2 bg-yellow-50 p-8 border-l border-yellow-200 overflow-y-auto font-mono text-slate-700 relative shadow-inner h-full min-h-[50vh] lg:min-h-auto">
-                <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-                    <FileText size={120} />
-                </div>
-                
-                <h2 className="text-lg font-bold border-b-2 border-slate-800 pb-2 mb-6 flex items-center justify-between">
-                    <span>Calculation Sheet</span>
-                    <span className="text-xs font-normal bg-yellow-200 px-2 py-1 rounded text-yellow-800 font-sans">Exam Mode</span>
-                </h2>
-
-                {!result ? (
-                <div className="flex flex-col items-center justify-center h-64 text-slate-400 text-center">
-                    <Info size={48} className="mb-4 opacity-20" />
-                    <p>左側のフォームに数値を入力し、<br/>「計算実行」を押してください。</p>
-                </div>
-                ) : (
-                <div className="space-y-8 text-sm leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
-                    
-                    {/* 1. Run Calculation */}
-                    <div className="relative">
-                        <div className="absolute -left-6 top-0 text-slate-400 font-sans font-bold opacity-50 select-none">01</div>
-                        <h3 className="font-bold mb-2 text-slate-800 border-b border-slate-300 inline-block pr-4">Run to Noon</h3>
-                        <div className="grid grid-cols-2 gap-x-8 gap-y-1 mt-2">
-                            <div>Course: {run.course}°</div>
-                            <div>Dist: {run.distance} miles</div>
-                            <div className="col-span-2 mt-2 pl-4 border-l-2 border-slate-300 space-y-1">
-                                <p>D.Lat = {run.distance} × cos({run.course}°) = {Math.round(result.dLat * 60 * 10)/10}'</p>
-                                <p>Dep = {run.distance} × sin({run.course}°) = {Math.round(result.dep * 10)/10}'</p>
-                                <p>D.Long = {Math.round(result.dep * 10)/10} / cos({Math.round(result.lat1)}°) = {Math.round(result.dLong * 60 * 10)/10}'</p>
-                            </div>
-                            <div className="col-span-2 mt-3 p-2 bg-yellow-100/50 rounded border border-yellow-200">
-                                <p className="font-bold text-blue-900">Noon DR Lat (l₀) = {formatDMS(result.lat2_DR, 'lat')}</p>
-                                <p className="font-bold text-blue-900">Noon DR Long (L₀) = {formatDMS(result.lon2_DR, 'lon')}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* 2. Noon Sight */}
-                    <div className="relative">
-                        <div className="absolute -left-6 top-0 text-slate-400 font-sans font-bold opacity-50 select-none">02</div>
-                        <h3 className="font-bold mb-2 text-slate-800 border-b border-slate-300 inline-block pr-4">Noon Sight</h3>
-                        <div className="pl-4 border-l-2 border-slate-300 mt-2 space-y-1">
-                            <p>Obs Alt (a) = {noon.obsAlt.d}° {noon.obsAlt.m}'</p>
-                            <p>Zenith Dist (z) = 90° - a = {formatDMS(90 - toDecimal(noon.obsAlt.d, noon.obsAlt.m), 'angle')}</p>
-                            <p>Dec (d) = {noon.dec.d}° {noon.dec.m}' N</p>
-                            <p className="text-xs text-slate-500 mt-1 mb-1">Lat = z + d (Same Name)</p>
-                            <p className="font-bold text-blue-900">Obs Lat (l) = {formatDMS(result.lat2_Obs, 'lat')}</p>
-                        </div>
-                    </div>
-
-                    {/* 3. Meripass Logic */}
-                    <div className="relative">
-                        <div className="absolute -left-6 top-0 text-slate-400 font-sans font-bold opacity-50 select-none">03</div>
-                        <h3 className="font-bold mb-2 text-slate-800 border-b border-slate-300 inline-block pr-4">Longitude Correction</h3>
-                        <div className="pl-4 border-l-2 border-slate-300 mt-2 space-y-1">
-                            <p>Δl (Obs - DR) = {Math.round(result.delta_l * 10)/10}' {result.delta_l >= 0 ? 'N' : 'S'}</p>
-                            <p>Intercept (I) = {morning.intercept}'</p>
-                            <p>Azimuth (Z) = {morning.azimuth}°</p>
-                            
-                            <div className="my-3 p-3 bg-white border border-slate-200 rounded text-xs">
-                                <p className="text-slate-500 mb-1">Formula:</p>
-                                <p className="font-serif italic text-center text-sm text-slate-800">
-                                    ΔL = [ I cosec Z - Δl cot Z ] sec l₀
-                                </p>
-                            </div>
-
-                            <p className="font-bold text-lg text-red-600">ΔL = {Math.round(result.delta_L_minutes * 10)/10}'</p>
-                        </div>
-                    </div>
-
-                    {/* 4. Final Answer */}
-                    <div className="mt-8 p-6 bg-white border-4 border-double border-blue-600 rounded shadow-md relative">
-                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-4 py-1 text-xs font-bold uppercase tracking-widest rounded-full shadow-sm">
-                            Final Fix
-                        </div>
-                        <div className="grid grid-cols-1 gap-4 text-center">
-                            <div>
-                                <div className="text-xs text-slate-500 uppercase tracking-wide">Latitude</div>
-                                <div className="text-2xl font-bold text-slate-900">{formatDMS(result.lat2_Obs, 'lat')}</div>
-                            </div>
-                            <div className="w-full h-px bg-slate-200"></div>
-                            <div>
-                                <div className="text-xs text-slate-500 uppercase tracking-wide">Longitude</div>
-                                <div className="text-2xl font-bold text-slate-900">{formatDMS(result.lonObs, 'lon')}</div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                )}
-            </div>
-        )}
-      </div>
+      </main>
     </div>
   );
 };
