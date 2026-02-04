@@ -9,6 +9,7 @@ export const formatDMS = (val: number, type: 'lat' | 'lon' | 'angle' = 'angle'):
   const absVal = Math.abs(val);
   const d = Math.floor(absVal);
   const m = (absVal - d) * 60;
+  // 少数第1位まで
   const mStr = m.toFixed(1).padStart(4, '0');
   
   let suffix = '';
