@@ -1,9 +1,13 @@
 import { useState } from 'react';
 import { 
   Calculator, ArrowRight, Sun, Anchor, FileText, 
-  Menu, X, BookOpen, HelpCircle, Info, Clock, MapPin
+  Menu, X, BookOpen, HelpCircle, Info, Clock, MapPin, Compass
 } from 'lucide-react';
-import { toDecimal, formatDMS, calculateRun, calculateSightReduction, calculateTrueAltitude, calculateMeripass } from '../utils/navigationMath';
+import { 
+  toDecimal, formatDMS, 
+  calculateRun, calculateSightReduction, calculateTrueAltitude, calculateMeripass, 
+  calculateAmplitude, calculateGyroError 
+} from '../utils/navigationMath';
 
 // --- Types ---
 interface DMSValue {
@@ -30,7 +34,14 @@ interface CalculationResult {
   deltaL_miles: number; dLongCorr: number; lon2_Obs: number;
   lmtPass: number; gmtPass: number; ztPass: number;
   dec1: number; dec2: number;
-  zoneOffset: number; // 計算された時差
+  zoneOffset: number;
+}
+
+interface GyroResult {
+  trueAzimuthBase: number; // 計算されたZ
+  trueAzimuth360: number;  // 360度表記の真方位
+  gyroError: number;       // 誤差
+  direction: 'Rise' | 'Set';
 }
 
 // --- Helper Component ---
@@ -78,35 +89,27 @@ const GuideView = () => (
       <HelpCircle className="text-blue-600" /> 使い方
     </h2>
     <div className="space-y-4 text-slate-600 text-sm leading-relaxed">
-      <p>海技試験の「メリパス計算」および実務での視正午船位決定を支援します。</p>
-      <h3 className="font-bold text-slate-800 border-b pb-1 mt-4">手順</h3>
+      <p>このアプリは2つの計算モードを提供します。</p>
+      
+      <h3 className="font-bold text-slate-800 border-b pb-1 mt-4">1. メリパス計算 (3N)</h3>
       <ol className="list-decimal pl-5 space-y-2">
-        <li><strong>Date & Zone:</strong> 日付と標準子午線の経度（例: 135° E）を入力します。</li>
-        <li><strong>Morning Sight:</strong> 午前観測の推測位置、高度、GHA、赤緯等を入力します。</li>
-        <li><strong>Run to Noon:</strong> 正中時までの針路と航程を入力します。</li>
-        <li><strong>Noon Sight:</strong> 正中時の観測高度、赤緯、均時差を入力します。</li>
-        <li><strong>計算実行:</strong> ボタンを押すと、経度改正量と最終的な船位が表示されます。</li>
+        <li><strong>Date & Zone:</strong> 日付と標準子午線を入力。</li>
+        <li><strong>Morning Sight:</strong> 午前観測の推測位置、高度、GHA、赤緯等を入力。</li>
+        <li><strong>Run to Noon:</strong> 正中時までの針路と航程を入力。</li>
+        <li><strong>Noon Sight:</strong> 正中時の観測高度、赤緯、均時差を入力。</li>
+        <li><strong>計算実行:</strong> ボタンを押すと経度改正量と船位が表示されます。</li>
       </ol>
 
-      {/* --- 追加・修正部分 --- */}
-      <h3 className="font-bold text-slate-800 border-b pb-1 mt-4">開発・フィードバック</h3>
-      <ul className="list-disc pl-5 space-y-2">
-        <li>
-          ソースコードはGitHubで公開されています。<br />
-          <a 
-            href="https://github.com/serkenn/Navigation-calculations" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="text-blue-600 hover:underline break-all"
-          >
-            https://github.com/serkenn/Navigation-calculations
-          </a>
-        </li>
-        <li>不具合や計算ミスなどがあれば、GitHubのIssueにてご報告をお願いします。</li>
-        <li>コードの提案・機能の追加等があれば、プルリクエストをお願いします。</li>
-      </ul>
-      {/* -------------------- */}
+      <h3 className="font-bold text-slate-800 border-b pb-1 mt-4">2. 出没方位角・ジャイロ誤差</h3>
+      <ol className="list-decimal pl-5 space-y-2">
+        <li>推測緯度と太陽の赤緯を入力します。</li>
+        <li>「日出 (Sunrise)」か「日没 (Sunset)」を選択します。</li>
+        <li>ジャイロコンパスの方位を入力します。</li>
+        <li>計算結果に真方位とジャイロ誤差が表示されます。</li>
+      </ol>
       
+      <h3 className="font-bold text-slate-800 border-b pb-1 mt-4">開発・フィードバック</h3>
+      <p>ソースコード: <a href="https://github.com/serkenn/Navigation-calculations" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">GitHub</a></p>
     </div>
   </div>
 );
@@ -116,14 +119,35 @@ const TheoryView = () => (
     <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
       <BookOpen className="text-blue-600" /> 計算理論
     </h2>
-    <div className="space-y-4 text-slate-600 text-sm">
-      <p>メリパス計算は、午前の位置の線と、正中時の緯度位置の線を組み合わせて船位を決定する方法です。</p>
-      <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 my-4 text-xs md:text-sm overflow-x-auto">
-        <p className="font-bold text-slate-800 mb-2">経度改正公式 (ΔL):</p>
-        <div className="p-4 bg-white border rounded text-center font-serif text-lg text-slate-800">
-          ΔL = ( I · csc Z - Δl · cot Z ) sec l₀
+    <div className="space-y-6 text-slate-600 text-sm">
+      
+      <div>
+        <h3 className="font-bold text-slate-800 mb-2">メリパス計算 (経度改正)</h3>
+        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 overflow-x-auto">
+          <p className="font-serif text-lg text-slate-800 text-center">
+            ΔL = ( I · csc Z - Δl · cot Z ) sec l₀
+          </p>
         </div>
       </div>
+
+      <div>
+        <h3 className="font-bold text-slate-800 mb-2">出没方位角 (Amplitude)</h3>
+        <p className="mb-2">太陽の真の出没方位を求めます。</p>
+        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 overflow-x-auto">
+          <p className="font-serif text-lg text-slate-800 text-center">
+            Z = cos⁻¹( sin d / cos l )
+          </p>
+          <p className="text-xs text-center mt-2 text-slate-500">
+            d: 赤緯 (Dec), l: 緯度 (Lat)
+          </p>
+        </div>
+        <ul className="list-disc pl-5 mt-2 space-y-1">
+          <li><strong>日出時:</strong> 計算値 Z をそのまま採用 (N Z E)</li>
+          <li><strong>日没時:</strong> 計算値 Z に W の符号を付す (N Z W)</li>
+          <li><strong>ジャイロ誤差:</strong> 真方位 - ジャイロ方位</li>
+        </ul>
+      </div>
+
     </div>
   </div>
 );
@@ -131,104 +155,77 @@ const TheoryView = () => (
 // --- Main Component ---
 const MeripassCalculator = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [currentView, setCurrentView] = useState<'calculator' | 'guide' | 'theory'>('calculator');
+  const [currentView, setCurrentView] = useState<'calculator' | 'gyro' | 'guide' | 'theory'>('calculator');
 
-  // Input States
+  // --- Meripass States ---
   const [meta, setMeta] = useState({ 
-    month: 8, day: 19, 
-    zoneLong: 135, // 標準子午線の経度
-    zoneDir: 1     // 1=E, -1=W
+    month: 8, day: 19, zoneLong: 135, zoneDir: 1 
   });
-  
   const [morning, setMorning] = useState({
     drLat: { d: 37, m: 20, dir: 1 },
     drLong: { d: 146, m: 15, dir: 1 },
-    hs: { d: 48, m: 10.2, dir: 1 }, // dir is dummy here
-    totalCorr: 9.6,
-    totalCorrSign: 1, // 1 or -1
+    hs: { d: 48, m: 10.2, dir: 1 },
+    totalCorr: 9.6, totalCorrSign: 1,
     gha: { d: 315, m: 10.5, dir: 1 },
     dec: { d: 13, m: 2.8, dir: 1 } 
   });
-
   const [run, setRun] = useState({ course: 64, dist: 45 });
-
   const [noon, setNoon] = useState({
     hs: { d: 65, m: 8.3, dir: 1 },
-    totalCorr: 9.8,
-    totalCorrSign: 1,
+    totalCorr: 9.8, totalCorrSign: 1,
     dec: { d: 13, m: 0.8, dir: 1 },
     eqTime: { m: 3, s: 47, sign: -1 } 
   });
-
   const [result, setResult] = useState<CalculationResult | null>(null);
 
-  // Calculation Logic
-  const handleCalculate = () => {
-    // 1. Morning Sight
+  // --- Gyro States ---
+  const [gyroInput, setGyroInput] = useState({
+    lat: { d: 35, m: 0, dir: 1 },
+    dec: { d: 10, m: 0, dir: 1 },
+    gyroAzimuth: 0,
+    type: 'rise' as 'rise' | 'set'
+  });
+  const [gyroResult, setGyroResult] = useState<GyroResult | null>(null);
+
+  // --- Handlers ---
+  const handleCalculateMeripass = () => {
     const lat1 = toDecimal(morning.drLat.d, morning.drLat.m) * morning.drLat.dir;
     const lon1 = toDecimal(morning.drLong.d, morning.drLong.m) * morning.drLong.dir;
     
-    // Altitude
-    const { ho: ho1 } = calculateTrueAltitude(
-      toDecimal(morning.hs.d, morning.hs.m), 
-      morning.totalCorr * morning.totalCorrSign
-    );
+    const { ho: ho1 } = calculateTrueAltitude(toDecimal(morning.hs.d, morning.hs.m), morning.totalCorr * morning.totalCorrSign);
     
-    // LHA
     const gha1 = toDecimal(morning.gha.d, morning.gha.m);
     let lha1 = gha1 + lon1;
     while (lha1 >= 360) lha1 -= 360;
     while (lha1 < 0) lha1 += 360;
 
-    // Sight Reduction
     const dec1 = toDecimal(morning.dec.d, morning.dec.m) * morning.dec.dir;
     const { hc: hc1, Z: z1 } = calculateSightReduction(lat1, dec1, lha1);
     const intercept1 = (ho1 - hc1) * 60; 
 
-    // 2. Run
     const { dLat, dep, dLong, lat2: lat2_DR } = calculateRun(lat1, run.course, run.dist);
-    // [修正] const から let に変更し、経度の正規化処理を追加
     let lon2_DR = lon1 + dLong;
     while (lon2_DR > 180) lon2_DR -= 360;
     while (lon2_DR <= -180) lon2_DR += 360;
 
-    // 3. Noon Sight
-    const { ho: ho2 } = calculateTrueAltitude(
-      toDecimal(noon.hs.d, noon.hs.m), 
-      noon.totalCorr * noon.totalCorrSign
-    );
+    const { ho: ho2 } = calculateTrueAltitude(toDecimal(noon.hs.d, noon.hs.m), noon.totalCorr * noon.totalCorrSign);
     const dec2 = toDecimal(noon.dec.d, noon.dec.m) * noon.dec.dir;
     
-    // Meridian Altitude Logic (Corrected)
-    // 推測緯度(Lat2_DR)に近い緯度を採用するロジック
-    // Lat = Dec +/- z (Zenith Distance)
-    const zenithDist = 90 - ho2; // z (always positive distance)
-    
-    const latCandidate1 = dec2 + zenithDist; // Case: Sun is Equator-ward
-    const latCandidate2 = dec2 - zenithDist; // Case: Sun is Pole-ward
-    
-    // DR位置に近い方を採用
-    const diff1 = Math.abs(latCandidate1 - lat2_DR);
-    const diff2 = Math.abs(latCandidate2 - lat2_DR);
-    
-    const lat2_Obs = diff1 < diff2 ? latCandidate1 : latCandidate2;
+    const zenithDist = 90 - ho2; 
+    const latCandidate1 = dec2 + zenithDist; 
+    const latCandidate2 = dec2 - zenithDist; 
+    const lat2_Obs = Math.abs(latCandidate1 - lat2_DR) < Math.abs(latCandidate2 - lat2_DR) ? latCandidate1 : latCandidate2;
 
-    // 4. Fix
     const deltaL_miles = (lat2_Obs - lat2_DR) * 60;
     const { dLongCorr } = calculateMeripass(intercept1, z1, deltaL_miles, lat2_DR);
     
-    // [修正] const から let に変更し、経度の正規化処理を追加
     let lon2_Obs = lon2_DR + (dLongCorr / 60);
     while (lon2_Obs > 180) lon2_Obs -= 360;
     while (lon2_Obs <= -180) lon2_Obs += 360;
 
-    // 5. Time
     const eqtHours = (noon.eqTime.m + noon.eqTime.s/60) / 60 * noon.eqTime.sign;
     const lmtPass = 12 - eqtHours;
     const gmtPass = lmtPass - (lon2_DR / 15);
-    
-    // Calculate Zone Offset from Longitude (approx 15 deg per hour)
-    // East is (+), West is (-) for UTC Offset in this context
     const zoneOffset = Math.round(meta.zoneLong / 15) * meta.zoneDir;
     const ztPass = gmtPass + zoneOffset;
 
@@ -243,7 +240,32 @@ const MeripassCalculator = () => {
     if(window.innerWidth < 1024) setIsMenuOpen(false);
   };
 
-  const changeView = (view: 'calculator' | 'guide' | 'theory') => {
+  const handleCalculateGyro = () => {
+    const lat = toDecimal(gyroInput.lat.d, gyroInput.lat.m) * gyroInput.lat.dir;
+    const dec = toDecimal(gyroInput.dec.d, gyroInput.dec.m) * gyroInput.dec.dir;
+    
+    const Z = calculateAmplitude(lat, dec);
+    
+    // 日出(Rise)の場合は Z (0-180)、日没(Set)の場合は 360 - Z 
+    // ※計算されたZは北基準の角度として扱われる（cos Z = sin d / cos l）
+    let trueAzimuth360 = Z;
+    if (gyroInput.type === 'set') {
+      trueAzimuth360 = 360 - Z;
+    }
+
+    const gyroError = calculateGyroError(trueAzimuth360, gyroInput.gyroAzimuth);
+
+    setGyroResult({
+      trueAzimuthBase: Z,
+      trueAzimuth360,
+      gyroError,
+      direction: gyroInput.type === 'rise' ? 'Rise' : 'Set'
+    });
+
+    if(window.innerWidth < 1024) setIsMenuOpen(false);
+  };
+
+  const changeView = (view: typeof currentView) => {
     setCurrentView(view);
     setIsMenuOpen(false);
   };
@@ -255,7 +277,7 @@ const MeripassCalculator = () => {
       <div className="lg:hidden bg-white p-4 shadow-sm flex items-center justify-between z-20 border-b border-slate-200">
         <div className="flex items-center gap-2 font-bold text-slate-800">
           <Anchor className="text-blue-700" size={20} />
-          メリパス計算 (3N)
+          航法計算アプリ
         </div>
         <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 text-slate-600">
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -272,12 +294,15 @@ const MeripassCalculator = () => {
         </div>
         <nav className="flex-1 p-4 space-y-2">
           <button onClick={() => changeView('calculator')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${currentView === 'calculator' ? 'bg-blue-700 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
-            <Calculator size={18} /> メリパス計算(3N海技試験対応版)
+            <Calculator size={18} /> メリパス計算 (3N)
           </button>
-          <button onClick={() => changeView('guide')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${currentView === 'guide' ? 'bg-blue-700 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
+          <button onClick={() => changeView('gyro')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${currentView === 'gyro' ? 'bg-emerald-700 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
+            <Compass size={18} /> 出没方位角・誤差
+          </button>
+          <button onClick={() => changeView('guide')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${currentView === 'guide' ? 'bg-slate-700 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
             <HelpCircle size={18} /> 利用ガイド
           </button>
-          <button onClick={() => changeView('theory')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${currentView === 'theory' ? 'bg-blue-700 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
+          <button onClick={() => changeView('theory')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${currentView === 'theory' ? 'bg-slate-700 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
             <BookOpen size={18} /> 理論
           </button>
         </nav>
@@ -286,14 +311,19 @@ const MeripassCalculator = () => {
       {/* Main Content */}
       <main className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
         <div className="w-full lg:w-5/12 p-4 md:p-6 overflow-y-auto border-r border-slate-200 bg-white h-full scrollbar-thin">
-          {currentView !== 'calculator' ? (
+          
+          {/* View: Guide / Theory */}
+          {(currentView === 'guide' || currentView === 'theory') && (
              <div className="prose prose-sm text-slate-600 p-4">
                {currentView === 'guide' ? <GuideView /> : <TheoryView />}
              </div>
-          ) : (
+          )}
+
+          {/* View: Meripass Calculator */}
+          {currentView === 'calculator' && (
           <div className="space-y-8 pb-20">
             <header>
-              <h2 className="text-2xl font-bold text-slate-800 border-l-4 border-blue-600 pl-3">Input Data</h2>
+              <h2 className="text-2xl font-bold text-slate-800 border-l-4 border-blue-600 pl-3">Meripass Input</h2>
               <p className="text-xs text-slate-400 mt-1 pl-4">海技試験問題の値を入力してください</p>
             </header>
 
@@ -402,30 +432,87 @@ const MeripassCalculator = () => {
               </div>
             </section>
 
-            <button onClick={handleCalculate} className="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex justify-center items-center gap-2">
+            <button onClick={handleCalculateMeripass} className="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex justify-center items-center gap-2">
               <Calculator size={20} /> 計算実行 (RUN)
             </button>
           </div>
           )}
+
+          {/* View: Gyro Calculator */}
+          {currentView === 'gyro' && (
+          <div className="space-y-8 pb-20">
+            <header>
+              <h2 className="text-2xl font-bold text-slate-800 border-l-4 border-emerald-600 pl-3">Gyro & Amplitude</h2>
+              <p className="text-xs text-slate-400 mt-1 pl-4">出没方位角とジャイロ誤差を算出します</p>
+            </header>
+
+            <section className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                 <DMSInput label="推測緯度 (Lat)" value={gyroInput.lat} onChange={(v:any) => setGyroInput({...gyroInput, lat: v})} showSign={true} signType="NS" />
+                 <DMSInput label="赤緯 (Dec)" value={gyroInput.dec} onChange={(v:any) => setGyroInput({...gyroInput, dec: v})} showSign={true} signType="NS" />
+              </div>
+
+              <div>
+                <label className="text-[10px] text-slate-500 font-bold block uppercase mb-1">Calculation Type</label>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => setGyroInput({...gyroInput, type: 'rise'})}
+                    className={`flex-1 py-2 px-4 rounded-lg font-bold border ${gyroInput.type === 'rise' ? 'bg-orange-100 border-orange-400 text-orange-700' : 'bg-slate-50 border-slate-200 text-slate-500'}`}
+                  >
+                    日出 (Sunrise)
+                  </button>
+                  <button 
+                    onClick={() => setGyroInput({...gyroInput, type: 'set'})}
+                    className={`flex-1 py-2 px-4 rounded-lg font-bold border ${gyroInput.type === 'set' ? 'bg-indigo-100 border-indigo-400 text-indigo-700' : 'bg-slate-50 border-slate-200 text-slate-500'}`}
+                  >
+                    日没 (Sunset)
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                 <span className="text-[10px] text-slate-500 font-bold uppercase">Gyro Azimuth</span>
+                 <div className="flex items-center gap-2 mt-1">
+                   <input 
+                    type="number" 
+                    className="flex-1 p-2 border rounded font-mono text-lg font-bold" 
+                    value={gyroInput.gyroAzimuth} 
+                    onChange={e => setGyroInput({...gyroInput, gyroAzimuth: +e.target.value})} 
+                    placeholder="000.0" 
+                  />
+                  <span className="text-sm font-bold">°</span>
+                 </div>
+              </div>
+
+              <button onClick={handleCalculateGyro} className="w-full py-4 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex justify-center items-center gap-2">
+                <Compass size={20} /> 計算実行 (CALC)
+              </button>
+            </section>
+          </div>
+          )}
         </div>
 
-        {/* --- Right Panel --- */}
+        {/* --- Right Panel (Output) --- */}
         <div className="w-full lg:w-7/12 bg-[#fffdf5] p-8 md:p-10 border-l border-slate-200 overflow-y-auto font-mono text-slate-800 relative shadow-inner min-h-[50vh] lg:h-full">
             <div className="absolute top-6 right-6 opacity-5 pointer-events-none"><FileText size={200} /></div>
             <div className="border-b-2 border-slate-800 pb-4 mb-8 flex justify-between items-end">
                 <h2 className="text-2xl font-bold tracking-tight">Calculation Sheet</h2>
-                <span className="text-xs font-sans text-slate-500">3N Navigation Form</span>
+                <span className="text-xs font-sans text-slate-500">
+                  {currentView === 'gyro' ? 'Gyro Error Form' : '3N Navigation Form'}
+                </span>
             </div>
 
-            {!result ? (
+            {/* Meripass Result Display */}
+            {currentView === 'calculator' && (
+              !result ? (
                 <div className="h-64 flex flex-col items-center justify-center text-slate-400">
                     <Info size={48} className="mb-4 opacity-20" />
                     <p>No Data Calculated</p>
                 </div>
-            ) : (
+              ) : (
                 <div className="space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
-                    
-                    {/* 1. Run Calculation */}
+                  {/* ... (既存のMeripass結果表示コードは変更なし) ... */}
+                  {/* 1. Run Calculation */}
                     <div className="relative">
                         <h3 className="text-sm font-bold bg-slate-800 text-white inline-block px-3 py-1 mb-3">1. D.R.P at Noon</h3>
                         <div className="grid grid-cols-2 gap-8 text-sm border-l-2 border-slate-300 pl-4">
@@ -472,14 +559,12 @@ const MeripassCalculator = () => {
 
                     {/* 3. Sights */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {/* Morning */}
                         <div>
                             <h3 className="text-sm font-bold bg-blue-700 text-white inline-block px-3 py-1 mb-3">3. Morning Sight</h3>
                             <div className="bg-white border border-slate-300 p-4 text-sm space-y-1 shadow-sm">
                                 <div className="flex justify-between"><span>hs</span> <span>{morning.hs.d}-{morning.hs.m}</span></div>
                                 <div className="flex justify-between text-xs text-slate-500"><span>(Total Corr)</span> <span>{morning.totalCorrSign>=0?'+':'-'}{morning.totalCorr}'</span></div>
                                 <div className="flex justify-between font-bold border-b border-slate-300 pb-1 mb-1"><span>Ho</span> <span>{formatDMS(result.ho1, 'angle')}</span></div>
-                                
                                 <div className="flex justify-between"><span>GHA</span> <span>{morning.gha.d}° {morning.gha.m}'</span></div>
                                 <div className="flex justify-between"><span>Long</span> <span>{result.lon1>=0?'+':'-'}{formatDMS(Math.abs(result.lon1), 'angle')}</span></div>
                                 <div className="flex justify-between font-bold"><span>LHA (t)</span> <span>{result.lha1.toFixed(1)}°</span></div>
@@ -495,7 +580,6 @@ const MeripassCalculator = () => {
                             </div>
                         </div>
 
-                        {/* Noon */}
                         <div>
                             <h3 className="text-sm font-bold bg-orange-700 text-white inline-block px-3 py-1 mb-3">4. Noon Sight</h3>
                             <div className="bg-white border border-slate-300 p-4 text-sm space-y-1 shadow-sm">
@@ -533,6 +617,57 @@ const MeripassCalculator = () => {
                         </div>
                     </div>
                 </div>
+              )
+            )}
+
+            {/* Gyro Result Display */}
+            {currentView === 'gyro' && (
+              !gyroResult ? (
+                 <div className="h-64 flex flex-col items-center justify-center text-slate-400">
+                    <Compass size={48} className="mb-4 opacity-20" />
+                    <p>Enter data and press CALC</p>
+                </div>
+              ) : (
+                <div className="space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
+                   <div className="relative">
+                      <h3 className="text-sm font-bold bg-emerald-700 text-white inline-block px-3 py-1 mb-3">Amplitude Calculation</h3>
+                      <div className="bg-white border border-slate-300 p-6 text-sm shadow-sm space-y-4">
+                        
+                        <div className="grid grid-cols-2 gap-8 border-b border-slate-200 pb-4">
+                           <div>
+                             <p className="text-slate-500 text-xs uppercase font-bold">Condition</p>
+                             <p className="text-xl font-bold text-slate-800">{gyroResult.direction}</p>
+                           </div>
+                           <div className="text-right">
+                             <p className="text-slate-500 text-xs uppercase font-bold">True Azimuth (Base)</p>
+                             <p className="text-lg font-mono">
+                               N {gyroResult.trueAzimuthBase.toFixed(1)}° {gyroResult.direction === 'Rise' ? 'E' : 'W'}
+                             </p>
+                           </div>
+                        </div>
+
+                        <div>
+                           <div className="flex justify-between items-center mb-2">
+                             <span className="font-bold text-slate-600">True Azimuth (360°)</span>
+                             <span className="font-mono text-xl font-bold">{gyroResult.trueAzimuth360.toFixed(1)}°</span>
+                           </div>
+                           <div className="flex justify-between items-center mb-2">
+                             <span className="font-bold text-slate-600">Gyro Azimuth</span>
+                             <span className="font-mono text-xl">{gyroInput.gyroAzimuth.toFixed(1)}°</span>
+                           </div>
+                           <div className="mt-4 pt-4 border-t-2 border-slate-800 flex justify-between items-center bg-slate-50 p-4">
+                             <span className="font-bold text-emerald-800">Gyro Error</span>
+                             <span className="font-mono text-3xl font-bold text-emerald-700">
+                               {Math.abs(gyroResult.gyroError).toFixed(1)}° {gyroResult.gyroError > 0 ? 'E (Low)' : gyroResult.gyroError < 0 ? 'W (High)' : ''}
+                             </span>
+                           </div>
+                           <p className="text-xs text-right text-slate-400 mt-2">Error = True - Gyro</p>
+                        </div>
+
+                      </div>
+                   </div>
+                </div>
+              )
             )}
         </div>
 

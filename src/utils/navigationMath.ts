@@ -34,7 +34,6 @@ export const toDMS = (degVal: number) => {
 // --- 航海計算ロジック ---
 
 // 1. 真高度の計算 (True Altitude)
-// hs: 器械高度, corr: 改正総数 (符号付き分単位)
 export const calculateTrueAltitude = (hs: number, corr: number) => {
   const ho = hs + (corr / 60);
   return { ho };
@@ -47,14 +46,13 @@ export const calculateRun = (lat1: number, course: number, dist: number) => {
   
   const meanLat = (lat1 + lat2) / 2;
   const dep = dist * Math.sin(rad(course));
-  // cos(MeanLat)が0に近すぎる場合の保護
   const div = Math.cos(rad(meanLat));
   const dLong = Math.abs(div) < 1e-6 ? 0 : (dep / div) / 60;
   
   return { dLat, dep, dLong, lat2, meanLat };
 };
 
-// 3. 計算高度と方位角 (Calculated Altitude & Azimuth)
+// 3. 計算高度と方位角 (Sight Reduction)
 export const calculateSightReduction = (lat: number, dec: number, lha: number) => {
   const latR = rad(lat);
   const decR = rad(dec);
@@ -66,14 +64,10 @@ export const calculateSightReduction = (lat: number, dec: number, lha: number) =
   const hc = deg(hcR);
 
   // Azimuth (Z)
-  // cos Z = (sin d - sin L sin h) / (cos L cos h)
   const cosZ = (Math.sin(decR) - Math.sin(latR) * sinHc) / (Math.cos(latR) * Math.cos(hcR));
-  
-  // acosの範囲外エラー防止
   const cosZClamped = Math.max(-1, Math.min(1, cosZ));
   let Z = deg(Math.acos(cosZClamped));
   
-  // 方位角の符号処理 (LHAが0-180ならWest, 180-360ならEast)
   if (Math.sin(lhaR) > 0) {
     Z = 360 - Z; 
   }
@@ -83,14 +77,12 @@ export const calculateSightReduction = (lat: number, dec: number, lha: number) =
 
 // 4. メリパス経度改正 (Meripass Logic)
 export const calculateMeripass = (
-  intercept: number, // I
-  azimuth: number,   // Z
-  deltaL_miles: number, // Δl (miles)
-  lat0: number       // Noon DR Lat
+  intercept: number, 
+  azimuth: number, 
+  deltaL_miles: number, 
+  lat0: number
 ) => {
   const Zr = rad(azimuth);
-  // ΔL = [ I / sin Z - Δl / tan Z ] / cos l0
-  // tan Zが0に近い場合の保護
   const tanZ = Math.tan(Zr);
   const sinZ = Math.sin(Zr);
   
@@ -101,11 +93,32 @@ export const calculateMeripass = (
   const term1 = intercept / sinZ;
   const term2 = deltaL_miles / tanZ;
   const depCorr = term1 - term2; 
-  
   const dLongCorr = depCorr / Math.cos(rad(lat0)); 
   
-  return {
-    depCorr,
-    dLongCorr
-  };
+  return { depCorr, dLongCorr };
+};
+
+// 5. 出没方位角計算 (Amplitude Calculation)
+export const calculateAmplitude = (lat: number, dec: number) => {
+  const latR = rad(lat);
+  const decR = rad(dec);
+
+  // 公式: cos Z = sin d / cos l
+  // ここでの Z は北(または南)からの角度だが、数式上は北基準(0-180)で算出される値
+  const cosZ = Math.sin(decR) / Math.cos(latR);
+  
+  // 安全のための範囲制限
+  const cosZClamped = Math.max(-1, Math.min(1, cosZ));
+  const Z = deg(Math.acos(cosZClamped));
+  
+  return Z; // 0° 〜 180°
+};
+
+// 6. ジャイロ誤差計算
+export const calculateGyroError = (trueAzimuth: number, gyroAzimuth: number) => {
+  let diff = trueAzimuth - gyroAzimuth;
+  // -180 〜 180 に正規化
+  while (diff > 180) diff -= 360;
+  while (diff < -180) diff += 360;
+  return diff;
 };
