@@ -1,73 +1,49 @@
-# React + TypeScript + Vite
+# Meripass Calculator (メリパス計算アプリ)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+海技試験（三級海技士など）の航法計算、および実務での「視正午船位決定（メリパス計算）」を支援するWebアプリケーションです。
 
-Currently, two official plugins are available:
+**公開サイト:** [http://navcalc.serken.tech/](http://navcalc.serken.tech/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 概要
 
-## React Compiler
+このアプリは、午前の天体観測（第1観測）による位置の線と、太陽が正中した際の観測（正中観測）による緯度位置の線を組み合わせ、計算によって正確な正中時の船位（Fix）を算出します。
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+海技試験の計算プロセスをデジタル化し、各ステップの計算詳細（推定位置、高度改正、経度改正量など）をシミュレーションすることが可能です。
 
-## Expanding the ESLint configuration
+## 主な機能
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **第1観測（午前観測）計算**: 器械高度(hs)から真高度(Ho)の算出、および計算高度(Hc)・方位角(Z)の計算。
+- **航走（Run）計算**: 中分緯度航法に基づいた、正中時までの推定位置（DR位置）の算出。
+- **正中観測計算**: 正中高度からの観測緯度の決定、および均時差を考慮した正中時刻の算出。
+- **経度改正（メリパス）**: 公式 `ΔL = (I · csc Z - Δl · cot Z) sec l₀` に基づく経度改正量の算出。
+- **レスポンシブデザイン**: PCだけでなく、スマートフォンやタブレットからも操作可能なUI。
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 使用技術
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- **Frontend**: React 19, TypeScript, Vite
+- **Styling**: Tailwind CSS 4.0
+- **Icons**: Lucide React
+- **Math Logic**: カスタムの航法計算ユーティリティ (`src/utils/navigationMath.ts`)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 使い方
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+1. **Date & Zone**: 日付と標準子午線の経度を入力します。
+2. **Morning Sight**: 午前観測時の推測位置、器械高度、GHA、赤緯等を入力します。
+3. **Run to Noon**: 正中時までの針路と航程を入力します。
+4. **Noon Sight**: 正中時の観測高度、赤緯、均時差を入力します。
+5. **計算実行**: 「計算実行」ボタンを押すと、右側のCalculation Sheetに詳細な計算結果が表示されます。
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 開発環境のセットアップ
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+```bash
+# リポジトリのクローン
+git clone <repository-url>
+
+# 依存関係のインストール
+npm install
+
+# 開発サーバーの起動
+npm run dev
+
+# ビルド
+npm run build
