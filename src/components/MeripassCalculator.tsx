@@ -87,6 +87,26 @@ const GuideView = () => (
         <li><strong>Noon Sight:</strong> 正中時の観測高度、赤緯、均時差を入力します。</li>
         <li><strong>計算実行:</strong> ボタンを押すと、経度改正量と最終的な船位が表示されます。</li>
       </ol>
+
+      {/* --- 追加・修正部分 --- */}
+      <h3 className="font-bold text-slate-800 border-b pb-1 mt-4">開発・フィードバック</h3>
+      <ul className="list-disc pl-5 space-y-2">
+        <li>
+          ソースコードはGitHubで公開されています。<br />
+          <a 
+            href="https://github.com/serkenn/Navigation-calculations" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:underline break-all"
+          >
+            https://github.com/serkenn/Navigation-calculations
+          </a>
+        </li>
+        <li>不具合や計算ミスなどがあれば、GitHubのIssueにてご報告をお願いします。</li>
+        <li>コードの提案・機能の追加等があれば、プルリクエストをお願いします。</li>
+      </ul>
+      {/* -------------------- */}
+      
     </div>
   </div>
 );
