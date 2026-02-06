@@ -5,9 +5,8 @@ import Sitemap from 'vite-plugin-sitemap'
 export default defineConfig({
   plugins: [
     react(),
-    // サイトマップ生成の設定を追加
     Sitemap({
-      hostname: 'https://navcalc.serken.tech/', // 公開URLを指定
+      hostname: 'https://navcalc.serken.tech/',
       dynamicRoutes: [
         '/',
         '/gyro',

@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
+
 Sitemap: https://navcalc.serken.tech/sitemap.xml
