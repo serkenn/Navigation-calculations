@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async';
 import { useState } from 'react';
 import { 
   Calculator, ArrowRight, Sun, Anchor, FileText, 
@@ -8,6 +9,34 @@ import {
   calculateRun, calculateSightReduction, calculateTrueAltitude, calculateMeripass, 
   calculateAmplitude, calculateGyroError 
 } from '../utils/navigationMath';
+
+const MeripassCalculator = () => {
+  const [currentView, setCurrentView] = useState<'calculator' | 'gyro' | 'guide' | 'theory'>('calculator');
+
+  // ビューに応じたメタ情報の定義
+  const seoContent = {
+    calculator: { title: "メリパス計算 (3N) | 航法計算アプリ", desc: "午前観測と正中観測から船位を決定するメリパス計算支援ツールです。" },
+    gyro: { title: "出没方位角・ジャイロ誤差計算 | 航法計算アプリ", desc: "太陽の出没方位角(Amplitude)からジャイロコンパスの誤差を算出します。" },
+    guide: { title: "利用ガイド | 航法計算アプリ", desc: "航法計算アプリの使い方と操作手順について解説します。" },
+    theory: { title: "計算理論・公式 | 航法計算アプリ", desc: "メリパス計算や出没方位角計算に使用している数理モデルと公式の紹介です。" },
+  };
+
+  return (
+    <>
+      <Helmet>
+        <title>{seoContent[currentView].title}</title>
+        <meta name="description" content={seoContent[currentView].desc} />
+        {/* SNSシェア用の設定 (OGP) も追加するとより効果的です */}
+        <meta property="og:title" content={seoContent[currentView].title} />
+        <meta property="og:description" content={seoContent[currentView].desc} />
+      </Helmet>
+
+      <div className="flex flex-col lg:flex-row h-screen ...">
+        {/* 既存のレイアウトコード */}
+      </div>
+    </>
+  );
+};
 
 // --- Types ---
 interface DMSValue {

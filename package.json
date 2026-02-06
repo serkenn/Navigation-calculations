@@ -13,7 +13,9 @@
     "@tailwindcss/postcss": "^4.1.18",
     "lucide-react": "^0.563.0",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "react-helmet-async": "^2.0.5",
+    "vite-plugin-sitemap": "^0.8.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

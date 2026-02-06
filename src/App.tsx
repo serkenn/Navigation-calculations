@@ -1,11 +1,13 @@
-// src/App.tsx
+import { HelmetProvider } from 'react-helmet-async';
 import MeripassCalculator from './components/MeripassCalculator';
 
 function App() {
   return (
-    <div className="App">
-      <MeripassCalculator />
-    </div>
+    <HelmetProvider>
+      <div className="App">
+        <MeripassCalculator />
+      </div>
+    </HelmetProvider>
   );
 }
 
