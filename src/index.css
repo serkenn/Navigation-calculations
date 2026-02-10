@@ -1,8 +1,19 @@
 @import "tailwindcss";
 
-/* 以下は維持 */
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, sans-serif;
-  background-color: #f8fafc;
+@layer base {
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, sans-serif;
+    /* デフォルト（ライトモード）の色 */
+    background-color: #f8fafc; 
+    color: #1e293b;
+    transition-property: background-color, color;
+    transition-duration: 300ms;
+  }
+
+  /* ダークモード時のみ適用 */
+  :root.dark body {
+    background-color: #020617;
+    color: #f1f5f9;
+  }
 }
