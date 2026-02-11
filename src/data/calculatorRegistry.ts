@@ -46,8 +46,8 @@ import { LOPCalc } from '../components/calculators/astro/LOPCalc';
 import { LOPResultView } from '../components/calculators/astro/LOPResult';
 import { PositionFixCalc } from '../components/calculators/astro/PositionFixCalc';
 import { PositionFixResultView } from '../components/calculators/astro/PositionFixResult';
-import { MeripassCalc } from '../components/calculators/astro/MeripassCalc';
-import { MeripassResultView } from '../components/calculators/astro/MeripassResult';
+import { MeripassCalc } from '../components/calculators/exam/MeripassCalc';
+import { MeripassResultView } from '../components/calculators/exam/MeripassResult';
 import { GyroAmplitudeCalc } from '../components/calculators/astro/GyroAmplitudeCalc';
 import { GyroAmplitudeResultView } from '../components/calculators/astro/GyroAmplitudeResult';
 
