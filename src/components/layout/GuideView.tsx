@@ -27,6 +27,7 @@ export const GuideView = () => (
 
       <h3 className="font-bold text-slate-800 dark:text-slate-200 border-b dark:border-slate-700 pb-1 mt-4">開発・フィードバック</h3>
       <p>ソースコード: <a href="https://github.com/serkenn/Navigation-calculations" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">GitHub</a></p>
+      <p>作者: <a href="https://serken.tech" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">serken.tech</a></p>
     </div>
   </div>
 );
