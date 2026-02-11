@@ -341,20 +341,19 @@ const MeripassCalculator = () => {
 
             <nav className="flex-1 p-4 space-y-2">
               {[
-                { id: 'calculator', icon: Calculator, label: 'メリパス計算 (3N)', color: 'blue' },
-                { id: 'gyro', icon: Compass, label: '出没方位角・誤差', color: 'emerald' },
-                { id: 'guide', icon: HelpCircle, label: '利用ガイド', color: 'slate' },
-                { id: 'theory', icon: BookOpen, label: '理論', color: 'slate' }
+                { id: 'calculator', icon: Calculator, label: 'メリパス計算 (3N)', activeClass: 'bg-blue-600 dark:bg-blue-700 text-white shadow-md' },
+                { id: 'gyro', icon: Compass, label: '出没方位角・誤差', activeClass: 'bg-emerald-600 dark:bg-emerald-700 text-white shadow-md' },
+                { id: 'guide', icon: HelpCircle, label: '利用ガイド', activeClass: 'bg-slate-600 dark:bg-slate-700 text-white shadow-md' },
+                { id: 'theory', icon: BookOpen, label: '理論', activeClass: 'bg-slate-600 dark:bg-slate-700 text-white shadow-md' }
               ].map((item) => {
                 const isActive = currentView === item.id;
-                const activeClass = `bg-${item.color}-600 dark:bg-${item.color}-700 text-white shadow-md`;
                 const inactiveClass = "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white";
 
                 return (
-                  <button 
+                  <button
                     key={item.id}
-                    onClick={() => changeView(item.id as any)} 
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${isActive ? activeClass : inactiveClass}`}
+                    onClick={() => changeView(item.id as any)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${isActive ? item.activeClass : inactiveClass}`}
                   >
                     <item.icon size={18} /> {item.label}
                   </button>
