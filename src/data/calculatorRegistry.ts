@@ -1,9 +1,9 @@
 import {
   Navigation, Ship, Globe, Compass, Star, Telescope,
   Clock, Calculator, ArrowRightLeft, Timer,
-  MapPin, Anchor as AnchorIcon, Wind, Waves, Gauge,
+  MapPin, Anchor as AnchorIcon, Wind, Waves,
   Crosshair, Eye, Sunset, MoveRight, Route,
-  ArrowUpDown, RotateCcw
+  ArrowUpDown, RotateCcw, GraduationCap
 } from 'lucide-react';
 import type { CategoryDefinition, CalculatorDefinition } from '../types/calculator';
 
@@ -78,6 +78,7 @@ export const categories: CategoryDefinition[] = [
   { id: 'sextant', nameJa: '六分儀 SEXTANT', nameEn: 'Sextant', icon: Telescope, accentColor: 'text-purple-600 dark:text-purple-400' },
   { id: 'timeArc', nameJa: '時間と弧度 TIME & ARC', nameEn: 'Time & Arc', icon: Clock, accentColor: 'text-green-600 dark:text-green-400' },
   { id: 'timeCalc', nameJa: '四則計算 TIME Calc', nameEn: 'Time Calculations', icon: Calculator, accentColor: 'text-rose-600 dark:text-rose-400' },
+  { id: 'exam', nameJa: '海技試験 EXAM', nameEn: 'Maritime Exam', icon: GraduationCap, accentColor: 'text-indigo-600 dark:text-indigo-400' },
 ];
 
 export const calculators: CalculatorDefinition[] = [
@@ -222,14 +223,7 @@ export const calculators: CalculatorDefinition[] = [
     seoDescription: '複数のLOPから船位を決定します。',
     Component: PositionFixCalc, ResultComponent: PositionFixResultView,
   },
-  {
-    id: 'meripass', category: 'astro',
-    nameJa: '正中時', nameEn: 'Meridian Passage',
-    icon: Gauge, accentColor: 'text-amber-600 dark:text-amber-400',
-    seoTitle: 'メリパス計算 (3N) | 航法計算アプリ',
-    seoDescription: '午前観測と正中観測から船位を決定するメリパス計算支援ツールです。',
-    Component: MeripassCalc, ResultComponent: MeripassResultView,
-  },
+  // (meripass moved to exam category below)
   {
     id: 'gyro-amplitude', category: 'astro',
     nameJa: '出没方位角', nameEn: 'Gyro & Amplitude',
@@ -299,6 +293,16 @@ export const calculators: CalculatorDefinition[] = [
     seoTitle: '時間の四則計算 | 航法計算アプリ',
     seoDescription: '時分秒形式での加減乗除計算を行います。',
     Component: ArithmeticCalc, ResultComponent: ArithmeticResultView,
+  },
+
+  // --- EXAM (海技試験) ---
+  {
+    id: 'meripass-3n', category: 'exam',
+    nameJa: 'メリパス計算 3N', nameEn: 'Meripass 3N',
+    icon: GraduationCap, accentColor: 'text-indigo-600 dark:text-indigo-400',
+    seoTitle: 'メリパス計算 (3N) | 航法計算アプリ',
+    seoDescription: '午前観測と正中観測から船位を決定するメリパス計算支援ツールです。三級海技士(航海)試験対応。',
+    Component: MeripassCalc, ResultComponent: MeripassResultView,
   },
 ];
 

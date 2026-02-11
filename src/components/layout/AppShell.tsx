@@ -8,7 +8,7 @@ import { GuideView } from './GuideView';
 import { TheoryView } from './TheoryView';
 import { getCalculator, calculators } from '../../data/calculatorRegistry';
 
-const defaultCalcId = 'meripass';
+const defaultCalcId = 'meripass-3n';
 
 const seoFallback: Record<string, { title: string; desc: string }> = {
   guide: { title: '利用ガイド | 航法計算アプリ', desc: '航法計算アプリの使い方と操作手順について解説します。' },

@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import type { ComponentType } from 'react';
 
-export type CategoryId = 'pilot1' | 'pilot2' | 'astro' | 'sextant' | 'timeArc' | 'timeCalc';
+export type CategoryId = 'pilot1' | 'pilot2' | 'astro' | 'sextant' | 'timeArc' | 'timeCalc' | 'exam';
 
 export interface CategoryDefinition {
   id: CategoryId;
