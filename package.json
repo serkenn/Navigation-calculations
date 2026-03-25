@@ -1,42 +1,28 @@
 {
-  "name": "meripass-app",
+  "name": "navcalc-app",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "node server.js"
   },
   "dependencies": {
-    "@tailwindcss/postcss": "^4.1.18",
-    "lucide-react": "^0.563.0",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "react-helmet-async": "^2.0.5",
-    "vite-plugin-sitemap": "^0.8.2"
+    "hono": "^4.7.0",
+    "@hono/node-server": "^1.14.0",
+    "lucide-svelte": "^0.469.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.1",
-    "@types/node": "^24.10.1",
-    "@types/react": "^19.2.5",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.1",
-    "autoprefixer": "^10.4.24",
-    "eslint": "^9.39.1",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.4.24",
-    "globals": "^16.5.0",
-    "postcss": "^8.5.6",
+    "@sveltejs/adapter-static": "^3.0.8",
+    "@sveltejs/kit": "^2.16.0",
+    "@sveltejs/vite-plugin-svelte": "^5.0.0",
+    "svelte": "^5.20.0",
+    "svelte-check": "^4.1.0",
     "tailwindcss": "^4.1.18",
-    "typescript": "~5.9.3",
-    "typescript-eslint": "^8.46.4",
-    "vite": "^7.2.4"
-  },
-  "overrides": {
-    "react-helmet-async": {
-      "react": "$react"
-    }
+    "@tailwindcss/vite": "^4.1.18",
+    "typescript": "~5.7.0",
+    "vite": "^6.3.0"
   }
 }
