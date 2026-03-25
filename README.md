@@ -1,9 +1,11 @@
 # NavCalc — 航法計算アプリ
 
 [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](https://unlicense.org/)
-[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![SvelteKit](https://img.shields.io/badge/SvelteKit-2-FF3E00?logo=svelte&logoColor=white)](https://kit.svelte.dev/)
+[![Svelte](https://img.shields.io/badge/Svelte-5-FF3E00?logo=svelte&logoColor=white)](https://svelte.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Cloudflare Pages](https://img.shields.io/badge/Cloudflare_Pages-F38020?logo=cloudflarepages&logoColor=white)](https://pages.cloudflare.com/)
 
 船舶の航法計算をブラウザ上で行える Web アプリケーションです。海技試験（三級海技士など）の学習支援から、実務での天文航法・航海計画まで幅広く対応します。
 
@@ -62,12 +64,25 @@
 
 ## 技術スタック
 
-- **フレームワーク:** React 19 + TypeScript
-- **ビルドツール:** Vite
+- **フレームワーク:** SvelteKit 2 + Svelte 5 + TypeScript
+- **ビルドツール:** Vite 6
 - **スタイリング:** Tailwind CSS v4（ダークモード対応）
-- **アイコン:** Lucide React
-- **SEO:** react-helmet-async
+- **アイコン:** Lucide Svelte
+- **ホスティング:** Cloudflare Pages（adapter-static）
 - **CI/CD:** GitHub Actions（`v*` タグで自動リリース）
+
+## ドキュメント
+
+各計算機能の詳細な解説は [`docs/`](docs/) ディレクトリにあります。
+
+| ドキュメント | 内容 |
+|---|---|
+| [航海計画 (Pilot 1)](docs/pilot1.md) | メルカトル航法・大圏航法・推測航法 |
+| [その他の航法 (Pilot 2)](docs/pilot2.md) | 潮流・風向・潮汐計算 |
+| [天文航法 (Celestial)](docs/celestial.md) | 薄明時・位置の線・船位決定 |
+| [六分儀 (Sextant)](docs/sextant.md) | 測高度改正・物標距離 |
+| [時間・弧度変換](docs/time-arc.md) | 時間⇔弧度変換・四則計算 |
+| [海技試験 (Exam)](docs/exam.md) | メリパス計算 3N |
 
 ## 開発
 
@@ -82,11 +97,8 @@ npm install
 # 開発サーバーの起動
 npm run dev
 
-# 型チェック + ビルド
+# ビルド
 npm run build
-
-# リント
-npm run lint
 
 # プロダクションビルドのプレビュー
 npm run preview
@@ -96,36 +108,44 @@ npm run preview
 
 ```
 src/
-├── components/
-│   ├── calculators/       # 各計算機能のコンポーネント
-│   │   ├── pilot1/        #   航海計画系
-│   │   ├── pilot2/        #   潮流・風向など
-│   │   ├── astro/         #   天文航法系
-│   │   ├── sextant/       #   六分儀系
-│   │   ├── timeArc/       #   時間⇔弧度変換
-│   │   ├── timeCalc/      #   四則計算
-│   │   └── exam/          #   海技試験
-│   ├── layout/            # AppShell, Sidebar, Header
-│   └── shared/            # 共通UI部品 (DMSInput, SectionCard, etc.)
-├── data/
-│   ├── calculatorRegistry.ts   # 全計算機能の定義・ルーティング
-│   └── stars.ts                # 恒星データ
-├── hooks/
-│   └── useTheme.ts        # ダークモード制御
-├── types/                 # TypeScript 型定義
-├── utils/                 # 航法計算ロジック
-│   ├── navigationMath.ts  #   メリパス・高度改正・Sight Reduction
-│   ├── mercatorSailing.ts #   メルカトル航法
-│   ├── greatCircle.ts     #   大圏航法
-│   ├── astronomy.ts       #   天文計算
-│   ├── ephemeris.ts       #   天体暦
-│   ├── sextant.ts         #   六分儀計算
-│   ├── currentVector.ts   #   潮流ベクトル
-│   ├── wind.ts            #   風向計算
-│   ├── tide.ts            #   潮汐計算
-│   └── timeConversion.ts  #   時間変換
-├── App.tsx
-└── main.tsx
+├── routes/
+│   ├── +layout.svelte         # アプリ全体のレイアウト
+│   ├── +page.ts               # トップページ
+│   ├── calc/[id]/             # 各計算ページ（動的ルート）
+│   ├── guide/                 # 使い方ガイド
+│   └── theory/                # 理論解説
+├── lib/
+│   ├── components/
+│   │   ├── calculators/       # 各計算機能のコンポーネント
+│   │   │   ├── pilot1/        #   航海計画系
+│   │   │   ├── pilot2/        #   潮流・風向など
+│   │   │   ├── astro/         #   天文航法系
+│   │   │   ├── sextant/       #   六分儀系
+│   │   │   ├── timeArc/       #   時間⇔弧度変換
+│   │   │   ├── timeCalc/      #   四則計算
+│   │   │   └── exam/          #   海技試験
+│   │   ├── layout/            # Sidebar, MobileHeader
+│   │   └── shared/            # 共通UI部品 (DMSInput, SectionCard, etc.)
+│   ├── data/
+│   │   ├── calculatorRegistry.ts   # 全計算機能の定義・ルーティング
+│   │   └── stars.ts                # 恒星データ
+│   ├── stores/
+│   │   └── theme.svelte.ts    # ダークモード制御（Svelte 5 runes）
+│   ├── types/                 # TypeScript 型定義
+│   └── utils/                 # 航法計算ロジック
+│       ├── navigationMath.ts  #   メリパス・高度改正・Sight Reduction
+│       ├── mercatorSailing.ts #   メルカトル航法
+│       ├── greatCircle.ts     #   大圏航法
+│       ├── astronomy.ts       #   天文計算
+│       ├── ephemeris.ts       #   天体暦
+│       ├── sextant.ts         #   六分儀計算
+│       ├── currentVector.ts   #   潮流ベクトル
+│       ├── wind.ts            #   風向計算
+│       ├── tide.ts            #   潮汐計算
+│       └── timeConversion.ts  #   時間変換
+├── app.css                    # Tailwind CSS エントリーポイント
+└── app.html                   # HTML テンプレート
+docs/                          # 各計算機能の詳細ドキュメント
 ```
 
 ## ライセンス
