@@ -11,6 +11,9 @@ const config = {
 			fallback: 'index.html',
 			precompress: false
 		}),
+		paths: {
+			relative: true
+		},
 		prerender: {
 			entries: ['*']
 		}
