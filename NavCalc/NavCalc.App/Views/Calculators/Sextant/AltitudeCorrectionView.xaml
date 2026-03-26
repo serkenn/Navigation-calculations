@@ -1,0 +1,77 @@
+<UserControl x:Class="NavCalc.App.Views.Calculators.Sextant.AltitudeCorrectionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:NavCalc.App.Controls">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0" Margin="0,0,10,0">
+            <TextBlock Text="測高度改正" Style="{StaticResource HeaderText}" Margin="0,0,0,4"/>
+            <TextBlock Text="Altitude Correction" Style="{StaticResource SubHeaderText}" Margin="0,0,0,16"/>
+
+            <Border Style="{StaticResource CardPanel}">
+                <StackPanel>
+                    <controls:NumberInputControl Label="六分儀高度 hs" Value="{Binding Hs}" Unit="°" InputWidth="80"/>
+                    <controls:NumberInputControl Label="眼高" Value="{Binding HeightOfEye}" Unit="m" InputWidth="80"/>
+
+                    <TextBlock Text="天体" Style="{StaticResource LabelText}" Margin="0,8,0,4"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <RadioButton Content="太陽下辺" IsChecked="True" GroupName="Body" Checked="Body0" Margin="0,0,8,0"/>
+                        <RadioButton Content="太陽上辺" GroupName="Body" Checked="Body1" Margin="0,0,8,0"/>
+                        <RadioButton Content="恒星" GroupName="Body" Checked="Body2" Margin="0,0,8,0"/>
+                        <RadioButton Content="月" GroupName="Body" Checked="Body3" Margin="0,0,8,0"/>
+                        <RadioButton Content="惑星" GroupName="Body" Checked="Body4"/>
+                    </StackPanel>
+
+                    <controls:NumberInputControl Label="気温" Value="{Binding Temp}" Unit="℃" InputWidth="60"/>
+                    <controls:NumberInputControl Label="気圧" Value="{Binding Pressure}" Unit="hPa" InputWidth="80"/>
+                    <controls:NumberInputControl Label="SD (半径)" Value="{Binding SD}" Unit="'" InputWidth="60"/>
+                    <controls:NumberInputControl Label="HP (水平視差)" Value="{Binding HP}" Unit="'" InputWidth="60"/>
+                </StackPanel>
+            </Border>
+
+            <Button Content="計算" Style="{StaticResource CalculateButton}"
+                    Background="{DynamicResource SextantAccent}" Command="{Binding CalculateCommand}"/>
+            <Button Content="クリア" Style="{StaticResource SecondaryButton}"
+                    Command="{Binding ClearCommand}" Margin="0,8,0,0"/>
+        </StackPanel>
+
+        <StackPanel Grid.Column="1" Margin="10,0,0,0"
+                    Visibility="{Binding HasResult, Converter={StaticResource BoolToVisibility}}">
+            <TextBlock Text="計算結果" Style="{StaticResource HeaderText}" Margin="0,0,0,16"/>
+            <Border Style="{StaticResource CardPanel}">
+                <StackPanel>
+                    <Grid Margin="0,4"><Grid.ColumnDefinitions><ColumnDefinition Width="100"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <TextBlock Text="Dip" Style="{StaticResource ResultLabel}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Dip, StringFormat=-{0:F1}'}" Style="{StaticResource ResultValue}" Foreground="{DynamicResource ResultNegative}"/>
+                    </Grid>
+                    <Grid Margin="0,4"><Grid.ColumnDefinitions><ColumnDefinition Width="100"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <TextBlock Text="大気差" Style="{StaticResource ResultLabel}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Refraction, StringFormat=-{0:F1}'}" Style="{StaticResource ResultValue}" Foreground="{DynamicResource ResultNegative}"/>
+                    </Grid>
+                    <Grid Margin="0,4"><Grid.ColumnDefinitions><ColumnDefinition Width="100"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <TextBlock Text="視差" Style="{StaticResource ResultLabel}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Parallax, StringFormat=+{0:F1}'}" Style="{StaticResource ResultValue}" Foreground="{DynamicResource ResultPositive}"/>
+                    </Grid>
+                    <Grid Margin="0,4"><Grid.ColumnDefinitions><ColumnDefinition Width="100"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <TextBlock Text="半径" Style="{StaticResource ResultLabel}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding SdCorr, StringFormat={}{0:F1}'}" Style="{StaticResource ResultValue}"/>
+                    </Grid>
+                    <Border Height="1" Background="{DynamicResource Separator}" Margin="0,8"/>
+                    <Grid Margin="0,4"><Grid.ColumnDefinitions><ColumnDefinition Width="100"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <TextBlock Text="全補正" Style="{StaticResource ResultLabel}" FontWeight="Bold"/>
+                        <TextBlock Grid.Column="1" Text="{Binding TotalCorr, StringFormat={}{0:F1}'}" Style="{StaticResource ResultValue}" FontWeight="Bold"/>
+                    </Grid>
+                    <Border Height="2" Background="{DynamicResource SextantAccent}" Margin="0,8"/>
+                    <TextBlock Text="Ho (真高度)" Style="{StaticResource ResultLabel}" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding Ho, StringFormat={}{0:F4}°}"
+                               Style="{StaticResource ResultHighlight}" Foreground="{DynamicResource SextantAccent}"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -1,0 +1,48 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Background -->
+    <SolidColorBrush x:Key="WindowBackground" Color="#0F172A"/>
+    <SolidColorBrush x:Key="SidebarBackground" Color="#020617"/>
+    <SolidColorBrush x:Key="SidebarText" Color="#E2E8F0"/>
+    <SolidColorBrush x:Key="SidebarHover" Color="#1E293B"/>
+    <SolidColorBrush x:Key="SidebarActive" Color="#1E293B"/>
+    <SolidColorBrush x:Key="PanelBackground" Color="#1E293B"/>
+    <SolidColorBrush x:Key="CardBackground" Color="#1E293B"/>
+    <SolidColorBrush x:Key="CardBorder" Color="#334155"/>
+    <SolidColorBrush x:Key="SheetBackground" Color="#0F172A"/>
+
+    <!-- Text -->
+    <SolidColorBrush x:Key="TextPrimary" Color="#F1F5F9"/>
+    <SolidColorBrush x:Key="TextSecondary" Color="#94A3B8"/>
+    <SolidColorBrush x:Key="TextMuted" Color="#64748B"/>
+
+    <!-- Input -->
+    <SolidColorBrush x:Key="InputBackground" Color="#0F172A"/>
+    <SolidColorBrush x:Key="InputBorder" Color="#475569"/>
+    <SolidColorBrush x:Key="InputFocusBorder" Color="#60A5FA"/>
+
+    <!-- Category Accent Colors -->
+    <SolidColorBrush x:Key="Pilot1Accent" Color="#60A5FA"/>
+    <SolidColorBrush x:Key="Pilot1Light" Color="#1E3A5F"/>
+    <SolidColorBrush x:Key="Pilot2Accent" Color="#22D3EE"/>
+    <SolidColorBrush x:Key="Pilot2Light" Color="#164E63"/>
+    <SolidColorBrush x:Key="AstroAccent" Color="#FBBF24"/>
+    <SolidColorBrush x:Key="AstroLight" Color="#451A03"/>
+    <SolidColorBrush x:Key="SextantAccent" Color="#A855F7"/>
+    <SolidColorBrush x:Key="SextantLight" Color="#3B0764"/>
+    <SolidColorBrush x:Key="TimeArcAccent" Color="#4ADE80"/>
+    <SolidColorBrush x:Key="TimeArcLight" Color="#14532D"/>
+    <SolidColorBrush x:Key="TimeCalcAccent" Color="#FB7185"/>
+    <SolidColorBrush x:Key="TimeCalcLight" Color="#4C0519"/>
+    <SolidColorBrush x:Key="ExamAccent" Color="#818CF8"/>
+    <SolidColorBrush x:Key="ExamLight" Color="#312E81"/>
+
+    <!-- Result -->
+    <SolidColorBrush x:Key="ResultPositive" Color="#4ADE80"/>
+    <SolidColorBrush x:Key="ResultNegative" Color="#F87171"/>
+
+    <!-- Separator -->
+    <SolidColorBrush x:Key="Separator" Color="#334155"/>
+
+</ResourceDictionary>

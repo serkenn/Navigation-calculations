@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <RootNamespace>NavCalc.Core</RootNamespace>
+    <AssemblyName>NavCalc.Core</AssemblyName>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+</Project>
