@@ -3,6 +3,7 @@
   import { themeStore } from '$lib/stores/theme.svelte';
   import Sidebar from '$lib/components/layout/Sidebar.svelte';
   import MobileHeader from '$lib/components/layout/MobileHeader.svelte';
+  import UpdateBanner from '$lib/components/layout/UpdateBanner.svelte';
   import { getCalculator } from '$lib/data/calculatorRegistry';
   import '../app.css';
 
@@ -47,5 +48,7 @@
     <main class="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
       {@render children()}
     </main>
+
+    <UpdateBanner />
   </div>
 </div>
