@@ -48,6 +48,12 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
+      - name: Sync version from tag
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          npm version "$VERSION" --no-git-tag-version
+
       - name: Install dependencies
         run: npm ci
 
@@ -71,6 +77,11 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
+
+      - name: Sync version from tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          npm version "$VERSION" --no-git-tag-version
 
       - name: Install dependencies
         run: npm ci
@@ -107,6 +118,13 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Sync version from tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          npm version "$VERSION" --no-git-tag-version
+          # Update Android versionName
+          sed -i "s/versionName \"1.0\"/versionName \"$VERSION\"/" android/app/build.gradle
 
       - name: Generate signing keystore
         working-directory: android/app
