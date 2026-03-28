@@ -4,7 +4,7 @@ const http = require('http');
 const fs = require('fs');
 
 const DIST_DIR = path.join(__dirname, '..', 'dist');
-const PORT = 19847;
+const PORT = 0; // OS assigns a free port automatically
 
 const MIME_TYPES = {
   '.html': 'text/html',
@@ -15,34 +15,53 @@ const MIME_TYPES = {
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon',
   '.woff': 'font/woff',
-  '.woff2': 'font/woff2'
+  '.woff2': 'font/woff2',
+  '.webp': 'image/webp',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg'
 };
 
 function startServer() {
   const server = http.createServer((req, res) => {
-    let filePath = path.join(DIST_DIR, req.url === '/' ? 'index.html' : req.url);
+    const url = req.url.split('?')[0];
+    const ext = path.extname(url);
 
-    // SPA fallback: if file doesn't exist, serve index.html
-    if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
-      filePath = path.join(DIST_DIR, 'index.html');
-    }
-
-    const ext = path.extname(filePath);
-    const contentType = MIME_TYPES[ext] || 'application/octet-stream';
-
-    fs.readFile(filePath, (err, data) => {
-      if (err) {
-        res.writeHead(404);
-        res.end('Not Found');
+    // Static assets: serve the file directly
+    if (ext && ext !== '.html') {
+      const filePath = path.join(DIST_DIR, url);
+      if (fs.existsSync(filePath)) {
+        const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+        fs.readFile(filePath, (err, data) => {
+          if (err) {
+            res.writeHead(404);
+            res.end('Not Found');
+            return;
+          }
+          res.writeHead(200, { 'Content-Type': contentType });
+          res.end(data);
+        });
         return;
       }
-      res.writeHead(200, { 'Content-Type': contentType });
+    }
+
+    // All routes: serve root index.html (SPA fallback)
+    const indexPath = path.join(DIST_DIR, 'index.html');
+    fs.readFile(indexPath, (err, data) => {
+      if (err) {
+        res.writeHead(500);
+        res.end('Internal Server Error');
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': 'text/html' });
       res.end(data);
     });
   });
 
-  server.listen(PORT, '127.0.0.1');
-  return server;
+  return new Promise((resolve) => {
+    server.listen(0, '127.0.0.1', () => {
+      resolve(server);
+    });
+  });
 }
 
 function createWindow() {
@@ -59,13 +78,19 @@ function createWindow() {
     title: 'NavCalc'
   });
 
-  win.loadURL(`http://127.0.0.1:${PORT}`);
+  const port = server.address().port;
+  win.loadURL(`http://127.0.0.1:${port}`);
+}
+
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  app.quit();
 }
 
 let server;
 
-app.whenReady().then(() => {
-  server = startServer();
+app.whenReady().then(async () => {
+  server = await startServer();
   createWindow();
 });
 
