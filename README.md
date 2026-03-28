@@ -62,6 +62,99 @@
 |------|------|
 | メリパス計算 3N | 午前観測と正中観測から正中時の船位を決定（三級海技士対応） |
 
+## 導入方法
+
+### Web（ブラウザ）
+
+インストール不要。以下のURLにアクセスするだけで利用できます。
+
+**https://navcalc.serken.tech/**
+
+PWA対応ブラウザではホーム画面に追加してオフラインでも利用可能です。
+
+---
+
+### Windows（デスクトップアプリ）
+
+[Releases](https://github.com/serkenn/Navigation-calculations/releases) ページから最新の `.exe` インストーラーをダウンロードして実行してください。
+
+#### ソースからビルドする場合
+
+```bash
+git clone https://github.com/serkenn/Navigation-calculations.git
+cd Navigation-calculations
+npm install
+npm run electron:build        # release/ にインストーラーが生成されます
+```
+
+> **注意:** 初回起動時に Windows Defender SmartScreen の警告が表示される場合があります。「詳細情報」→「実行」で起動できます。
+
+---
+
+### macOS（デスクトップアプリ）
+
+[Releases](https://github.com/serkenn/Navigation-calculations/releases) ページから `.dmg` をダウンロードし、`NavCalc.app` を Applications フォルダにドラッグしてください。
+
+#### ソースからビルドする場合
+
+```bash
+git clone https://github.com/serkenn/Navigation-calculations.git
+cd Navigation-calculations
+npm install
+npm run electron:build:mac    # release/ に .dmg が生成されます
+```
+
+> **注意:** 署名なしの場合、初回起動時に「開発元が未確認」と表示されます。**システム設定 → プライバシーとセキュリティ** から「このまま開く」を選択してください。
+
+---
+
+### iOS / iPadOS
+
+App Store では未公開のため、Xcode 経由でインストールします。
+
+#### 前提条件
+- macOS + Xcode（最新版推奨）
+- Apple ID（無料の開発者アカウントで可）
+
+#### 手順
+
+```bash
+git clone https://github.com/serkenn/Navigation-calculations.git
+cd Navigation-calculations
+npm install
+npm run build
+npx cap sync ios
+```
+
+1. `ios/App/App.xcodeproj` を Xcode で開く
+2. Signing & Capabilities で自分の Apple ID を Team に設定
+3. iPhone / iPad を接続してビルド・実行（`Cmd + R`）
+
+> **注意:** 初回起動時に「信頼されていないデベロッパ」と表示されます。端末の **設定 → 一般 → VPN とデバイス管理** から該当の開発者証明書を信頼してください。
+
+---
+
+### Android
+
+#### APK から直接インストール
+
+[Releases](https://github.com/serkenn/Navigation-calculations/releases) ページから `.apk` をダウンロードし、端末にインストールしてください。
+
+> **注意:** 「提供元不明のアプリ」のインストールを許可する必要があります。
+
+#### ソースからビルドする場合
+
+```bash
+git clone https://github.com/serkenn/Navigation-calculations.git
+cd Navigation-calculations
+npm install
+npm run cap:build    # android/app/build/outputs/apk/release/ に APK が生成されます
+```
+
+Android Studio で `android/` フォルダを開いてビルド・実行することも可能です。
+
+---
+
 ## 技術スタック
 
 - **フレームワーク:** SvelteKit 2 + Svelte 5 + TypeScript
