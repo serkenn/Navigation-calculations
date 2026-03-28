@@ -29,7 +29,7 @@
     <h2 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4">カテゴリ</h2>
 
     <div class="space-y-2">
-      <a href="./calc/course-distance/" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
+      <a href="/calc/course-distance/" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
         <Navigation size={18} class="text-blue-500" />
         <div class="flex-1">
           <div class="text-sm font-bold text-slate-700 dark:text-slate-200">航海計画 PILOT 1</div>
@@ -38,7 +38,7 @@
         <ArrowRight size={14} class="text-slate-300 dark:text-slate-600 group-hover:text-slate-500 transition-colors" />
       </a>
 
-      <a href="./calc/cmg-smg/" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
+      <a href="/calc/cmg-smg/" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
         <Ship size={18} class="text-cyan-500" />
         <div class="flex-1">
           <div class="text-sm font-bold text-slate-700 dark:text-slate-200">その他の航法 PILOT 2</div>
@@ -47,7 +47,7 @@
         <ArrowRight size={14} class="text-slate-300 dark:text-slate-600 group-hover:text-slate-500 transition-colors" />
       </a>
 
-      <a href="./calc/twilight/" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
+      <a href="/calc/twilight/" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
         <Star size={18} class="text-amber-500" />
         <div class="flex-1">
           <div class="text-sm font-bold text-slate-700 dark:text-slate-200">天文航法 ASTRO. NAV</div>
@@ -56,7 +56,7 @@
         <ArrowRight size={14} class="text-slate-300 dark:text-slate-600 group-hover:text-slate-500 transition-colors" />
       </a>
 
-      <a href="./calc/altitude-correction/" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
+      <a href="/calc/altitude-correction/" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
         <Telescope size={18} class="text-purple-500" />
         <div class="flex-1">
           <div class="text-sm font-bold text-slate-700 dark:text-slate-200">六分儀 SEXTANT</div>
@@ -65,7 +65,7 @@
         <ArrowRight size={14} class="text-slate-300 dark:text-slate-600 group-hover:text-slate-500 transition-colors" />
       </a>
 
-      <a href="./calc/time-to-arc/" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
+      <a href="/calc/time-to-arc/" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
         <Clock size={18} class="text-green-500" />
         <div class="flex-1">
           <div class="text-sm font-bold text-slate-700 dark:text-slate-200">時間と弧度 TIME & ARC</div>
@@ -74,7 +74,7 @@
         <ArrowRight size={14} class="text-slate-300 dark:text-slate-600 group-hover:text-slate-500 transition-colors" />
       </a>
 
-      <a href="./calc/to-hms/" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
+      <a href="/calc/to-hms/" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
         <Calculator size={18} class="text-rose-500" />
         <div class="flex-1">
           <div class="text-sm font-bold text-slate-700 dark:text-slate-200">四則計算 TIME Calc</div>
@@ -83,7 +83,7 @@
         <ArrowRight size={14} class="text-slate-300 dark:text-slate-600 group-hover:text-slate-500 transition-colors" />
       </a>
 
-      <a href="./calc/meripass-3n/" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
+      <a href="/calc/meripass-3n/" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
         <GraduationCap size={18} class="text-indigo-500" />
         <div class="flex-1">
           <div class="text-sm font-bold text-slate-700 dark:text-slate-200">海技試験 EXAM</div>

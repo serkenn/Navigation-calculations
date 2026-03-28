@@ -12,7 +12,7 @@ const config = {
 			precompress: false
 		}),
 		paths: {
-			relative: true
+			relative: false
 		},
 		prerender: {
 			entries: ['*']
