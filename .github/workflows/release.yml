@@ -108,6 +108,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Generate signing keystore
+        working-directory: android/app
+        run: keytool -genkeypair -v -keystore release.keystore -alias navcalc -keyalg RSA -keysize 2048 -validity 10000 -storepass navcalc -keypass navcalc -dname "CN=NavCalc, O=NavCalc, C=JP"
+
       - name: Build and sync
         run: npm run build && npx cap sync android
 
