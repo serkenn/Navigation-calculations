@@ -67,10 +67,20 @@
       </ol>
     </section>
 
-    <section>
+    <section class="mb-8">
       <h2 class="text-lg font-bold">角度の入力</h2>
       <p>
         緯度・経度は「度 分」形式で入力し、方向（N/S/E/W）をプルダウンで選択してください。
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-bold">開発・フィードバック</h2>
+      <p>
+        ソースコード: <a href="https://github.com/serkenn/Navigation-calculations" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">GitHub</a>
+      </p>
+      <p>
+        作者: <a href="https://serken.tech" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">serken.tech</a>
       </p>
     </section>
   </div>
