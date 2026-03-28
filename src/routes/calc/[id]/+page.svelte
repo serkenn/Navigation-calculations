@@ -62,8 +62,9 @@
   const calc = $derived(getCalculator(data.id));
   const sheetSubtitle = $derived(calc ? calc.nameEn : 'Navigation Form');
 
-  // Reset result when calculator changes
-  $effect(() => {
+  // Reset result when calculator changes (must run BEFORE render to prevent
+  // the new result component from receiving stale data of a different type)
+  $effect.pre(() => {
     data.id;
     result = null;
     showMobileResult = false;
