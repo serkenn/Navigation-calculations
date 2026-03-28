@@ -100,7 +100,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
@@ -142,7 +142,7 @@ jobs:
       - name: Build unsigned IPA
         working-directory: ios/App
         run: |
-          xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -sdk iphoneos -archivePath build/NavCalc.xcarchive archive CODE_SIGNING_ALLOWED=NO
+          xcodebuild -project App.xcodeproj -scheme App -configuration Release -sdk iphoneos -archivePath build/NavCalc.xcarchive archive CODE_SIGNING_ALLOWED=NO
           mkdir -p build/Payload
           cp -r build/NavCalc.xcarchive/Products/Applications/App.app build/Payload/
           cd build && zip -r NavCalc.ipa Payload
