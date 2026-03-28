@@ -112,6 +112,7 @@
   const components = $derived(componentMap[data.id]);
 </script>
 
+{#key data.id}
 <!-- Left Panel (Input) -->
 <div
   class="w-full lg:w-5/12 p-4 md:p-6 overflow-y-auto border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 h-full transition-colors {showMobileResult
@@ -126,7 +127,7 @@
 <!-- Right Panel (Output / Calculation Sheet) -->
 <div
   class="w-full lg:w-7/12 p-8 md:p-10 border-l border-slate-200 dark:border-slate-800 overflow-y-auto font-mono relative shadow-inner min-h-[50vh] lg:h-full transition-colors bg-[#fffdf5] dark:bg-[#1a1c23] text-slate-800 dark:text-slate-200 {showMobileResult
-    ? 'block h-full fixed inset-0 z-50 overflow-auto pt-safe-top'
+    ? 'block h-full overflow-auto'
     : 'hidden lg:block'}"
 >
   {#if showMobileResult}
@@ -159,3 +160,4 @@
     <svelte:component this={components.result} {result} />
   {/if}
 </div>
+{/key}
