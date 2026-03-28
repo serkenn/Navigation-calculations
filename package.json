@@ -35,7 +35,7 @@
     ],
     "win": {
       "target": "nsis",
-      "icon": "static/favicon.png"
+      "icon": "build/icons/icon.ico"
     },
     "nsis": {
       "oneClick": false,
@@ -47,7 +47,7 @@
     },
     "mac": {
       "target": "dmg",
-      "icon": "static/favicon.png"
+      "icon": "build/icons/icon.icns"
     }
   },
   "devDependencies": {
