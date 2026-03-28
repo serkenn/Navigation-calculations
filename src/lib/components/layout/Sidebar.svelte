@@ -47,12 +47,12 @@
 
 <!-- Mobile overlay -->
 <div
-  class="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm transition-opacity lg:hidden {isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}"
+  class="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm transition-opacity lg:hidden {isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}"
   onclick={onClose}
   role="presentation"
 ></div>
 
-<aside class="fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white transform transition-transform duration-300 lg:relative lg:translate-x-0 flex flex-col shadow-2xl lg:shadow-none {isOpen ? 'translate-x-0' : '-translate-x-full'}">
+<aside class="fixed inset-y-0 left-0 z-[70] w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white transform transition-transform duration-300 lg:relative lg:translate-x-0 flex flex-col shadow-2xl lg:shadow-none {isOpen ? 'translate-x-0' : '-translate-x-full'}">
   <!-- Header -->
   <div class="p-6 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 transition-colors">
     <h1 class="text-lg font-bold flex items-center gap-2">
