@@ -9,7 +9,7 @@
   } = $props();
 </script>
 
-<header class="lg:hidden flex items-center justify-between p-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm z-50 transition-colors">
+<header class="lg:hidden flex items-center justify-between p-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm z-50 transition-colors" style="padding-top: max(1rem, var(--sat));">
   <button onclick={onToggleMenu} class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
     {#if isMenuOpen}
       <X size={24} class="text-slate-700 dark:text-slate-300" />
