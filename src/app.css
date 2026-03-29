@@ -22,12 +22,12 @@
   main > div:last-child {
     display: block !important;
     width: 100vw !important;
-    padding: 0.5in !important;
+    padding: 0.75in !important;
     border: none !important;
     background: white !important;
     color: #1f2937 !important;
     font-size: 11pt;
-    line-height: 1.4;
+    line-height: 1.5;
     margin: 0 !important;
   }
 
@@ -47,6 +47,107 @@
     padding: 0;
   }
 
+  /* Print-specific header styling */
+  main > div:last-child > div:first-child {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-end !important;
+    border-bottom: 3px solid #1f2937 !important;
+    padding-bottom: 0.3in !important;
+    margin-bottom: 0.4in !important;
+  }
+
+  main > div:last-child h2 {
+    font-size: 20pt !important;
+    font-weight: bold !important;
+    letter-spacing: 0.1em !important;
+  }
+
+  /* Hide the watermark and back button */
+  main > div:last-child > div.absolute,
+  main > div:last-child button {
+    display: none !important;
+  }
+
+  /* Section styling for calculation process and final answers */
+  .print-section {
+    margin-bottom: 0.3in !important;
+    page-break-inside: avoid !important;
+  }
+
+  .print-section-title {
+    font-size: 12pt !important;
+    font-weight: bold !important;
+    background-color: #f0f0f0 !important;
+    padding: 0.15in !important;
+    margin-bottom: 0.15in !important;
+    border-left: 4px solid #1f2937 !important;
+  }
+
+  .print-section-content {
+    margin-left: 0.2in !important;
+  }
+
+  .print-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    padding: 0.1in 0 !important;
+    border-bottom: 1px dotted #d1d5db !important;
+  }
+
+  .print-row-label {
+    flex: 1 !important;
+  }
+
+  .print-row-value {
+    font-weight: bold !important;
+    font-family: "Courier New", monospace !important;
+    text-align: right !important;
+    min-width: 2in !important;
+  }
+
+  /* Final answer box - exam style */
+  .print-final-answer {
+    background-color: #f9f9f9 !important;
+    border: 2px solid #1f2937 !important;
+    padding: 0.25in !important;
+    margin-top: 0.4in !important;
+    page-break-inside: avoid !important;
+  }
+
+  .print-final-answer-title {
+    font-size: 11pt !important;
+    font-weight: bold !important;
+    margin-bottom: 0.15in !important;
+    positioning: relative !important;
+  }
+
+  .print-final-answer-box {
+    display: flex !important;
+    justify-content: space-between !important;
+    padding: 0.15in !important;
+    border: 1px solid #d1d5db !important;
+    background: white !important;
+    margin-bottom: 0.1in !important;
+  }
+
+  .print-final-answer-box:last-child {
+    margin-bottom: 0 !important;
+  }
+
+  .print-answer-label {
+    font-weight: normal !important;
+    flex: 1 !important;
+  }
+
+  .print-answer-value {
+    font-weight: bold !important;
+    font-size: 12pt !important;
+    font-family: "Courier New", monospace !important;
+    text-align: right !important;
+    min-width: 1.5in !important;
+  }
+
   h1,
   h2,
   h3,
@@ -54,19 +155,20 @@
   h5,
   h6 {
     margin-top: 0 !important;
-    margin-bottom: 0.5rem !important;
+    margin-bottom: 0.2rem !important;
     page-break-after: avoid !important;
   }
 
   table {
     border-collapse: collapse !important;
     width: 100% !important;
+    margin: 0.15in 0 !important;
   }
 
   td,
   th {
     border: 1px solid #cbd5e1 !important;
-    padding: 8px !important;
+    padding: 6px !important;
   }
 
   /* Remove dark mode colors and ensure white background */
@@ -83,5 +185,25 @@
   [class*="dark:"] {
     background: white !important;
     color: #1f2937 !important;
+  }
+
+  /* Adjust animation for print */
+  .animate-in {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  /* Space management for print */
+  .space-y-8 {
+    margin: 0 !important;
+  }
+
+  .space-y-8 > * {
+    margin: 0 !important;
+    margin-bottom: 0.25in !important;
+  }
+
+  .space-y-8 > *:last-child {
+    margin-bottom: 0 !important;
   }
 }
