@@ -70,6 +70,16 @@
   import OperationCargoByDraftResult from '$lib/components/calculators/exam/OperationCargoByDraftResult.svelte';
   import OperationDensityMeanCalc from '$lib/components/calculators/exam/OperationDensityMeanCalc.svelte';
   import OperationDensityMeanResult from '$lib/components/calculators/exam/OperationDensityMeanResult.svelte';
+   import ParallelMeridionalCalc from '$lib/components/calculators/exam/nav/ParallelMeridionalCalc.svelte';
+   import ParallelMeridionalResult from '$lib/components/calculators/exam/nav/ParallelMeridionalResult.svelte';
+   import NavGreatCircleCalc from '$lib/components/calculators/exam/nav/GreatCircleCalc.svelte';
+   import NavGreatCircleResult from '$lib/components/calculators/exam/nav/GreatCircleResult.svelte';
+   import NavTrueWindCalc from '$lib/components/calculators/exam/nav/TrueWindCalc.svelte';
+   import NavTrueWindResult from '$lib/components/calculators/exam/nav/TrueWindResult.svelte';
+   import NavCourseToSteerCalc from '$lib/components/calculators/exam/nav/CourseToSteerCalc.svelte';
+   import NavCourseToSteerResult from '$lib/components/calculators/exam/nav/CourseToSteerResult.svelte';
+   import NavDeadReckoningCalc from '$lib/components/calculators/exam/nav/DeadReckoningCalc.svelte';
+   import NavDeadReckoningResult from '$lib/components/calculators/exam/nav/DeadReckoningResult.svelte';
 
   let { data } = $props();
   let result: any = $state(null);
@@ -138,6 +148,11 @@
     'op-ballast-transfer': { calc: OperationBallastTransferCalc, result: OperationBallastTransferResult },
     'op-cargo-by-draft': { calc: OperationCargoByDraftCalc, result: OperationCargoByDraftResult },
     'op-density-mean': { calc: OperationDensityMeanCalc, result: OperationDensityMeanResult },
+     'nav-parallel-meridional': { calc: ParallelMeridionalCalc, result: ParallelMeridionalResult },
+     'nav-great-circle': { calc: NavGreatCircleCalc, result: NavGreatCircleResult },
+     'nav-true-wind': { calc: NavTrueWindCalc, result: NavTrueWindResult },
+     'nav-course-to-steer': { calc: NavCourseToSteerCalc, result: NavCourseToSteerResult },
+     'nav-dead-reckoning': { calc: NavDeadReckoningCalc, result: NavDeadReckoningResult },
   };
 
   const components = $derived(componentMap[data.id]);
