@@ -14,17 +14,48 @@
     onToggleTheme: () => void;
   } = $props();
 
+  const categoryById = $derived(new Map(categories.map((cat) => [cat.id, cat])));
+
+  function getAncestorCategoryIds(categoryId: CategoryId): CategoryId[] {
+    const ancestors: CategoryId[] = [];
+    let current = categoryById.get(categoryId);
+
+    while (current?.parentId) {
+      ancestors.push(current.parentId);
+      current = categoryById.get(current.parentId);
+    }
+
+    return ancestors;
+  }
+
+  function getChildCategories(parentId?: CategoryId) {
+    return categories.filter((cat) => cat.parentId === parentId);
+  }
+
   function getActiveCategoryId(): CategoryId | null {
     const calc = calculators.find(c => c.id === activeId);
     return calc ? calc.category : null;
   }
 
-  let openCategories = $state<Set<CategoryId>>(new Set(getActiveCategoryId() ? [getActiveCategoryId()!] : []));
+  let openCategories = $state<Set<CategoryId>>(
+    new Set(
+      getActiveCategoryId()
+        ? [
+            getActiveCategoryId()!,
+            ...getAncestorCategoryIds(getActiveCategoryId()!),
+          ]
+        : [],
+    ),
+  );
 
   function handleSelect(id: string) {
     const calc = calculators.find(c => c.id === id);
     if (calc) {
-      openCategories = new Set([...openCategories, calc.category]);
+      openCategories = new Set([
+        ...openCategories,
+        calc.category,
+        ...getAncestorCategoryIds(calc.category),
+      ]);
     }
     goto(`/calc/${id}/`);
     onSelect();
@@ -62,7 +93,7 @@
 
   <!-- Categories -->
   <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
-    {#each categories as cat}
+    {#each getChildCategories(undefined) as cat}
       <SidebarCategory
         category={cat}
         calculators={calculators.filter(c => c.category === cat.id)}
@@ -71,6 +102,36 @@
         isOpen={openCategories.has(cat.id)}
         onToggle={() => toggleCategory(cat.id)}
       />
+
+      {#if openCategories.has(cat.id)}
+        <div class="ml-3 space-y-1">
+          {#each getChildCategories(cat.id) as child}
+            <SidebarCategory
+              category={child}
+              calculators={calculators.filter(c => c.category === child.id)}
+              {activeId}
+              onSelect={handleSelect}
+              isOpen={openCategories.has(child.id)}
+              onToggle={() => toggleCategory(child.id)}
+            />
+
+            {#if openCategories.has(child.id)}
+              <div class="ml-3 space-y-1">
+                {#each getChildCategories(child.id) as grandchild}
+                  <SidebarCategory
+                    category={grandchild}
+                    calculators={calculators.filter(c => c.category === grandchild.id)}
+                    {activeId}
+                    onSelect={handleSelect}
+                    isOpen={openCategories.has(grandchild.id)}
+                    onToggle={() => toggleCategory(grandchild.id)}
+                  />
+                {/each}
+              </div>
+            {/if}
+          {/each}
+        </div>
+      {/if}
     {/each}
 
     <div class="border-t border-slate-200 dark:border-slate-700 my-2"></div>
@@ -80,11 +141,12 @@
       { path: '/theory/', icon: BookOpen, label: '理論', id: 'theory' },
     ] as item}
       {@const isActive = false}
+      {@const ItemIcon = item.icon}
       <button
         onclick={() => handleNavSelect(item.path)}
         class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
       >
-        <svelte:component this={item.icon} size={16} /> {item.label}
+        <ItemIcon size={16} /> {item.label}
       </button>
     {/each}
   </nav>

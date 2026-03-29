@@ -54,6 +54,22 @@
   import ArithmeticResult from '$lib/components/calculators/timeCalc/ArithmeticResult.svelte';
   import MeripassCalc from '$lib/components/calculators/exam/MeripassCalc.svelte';
   import MeripassResult from '$lib/components/calculators/exam/MeripassResult.svelte';
+  import OperationTPCDraftCalc from '$lib/components/calculators/exam/OperationTPCDraftCalc.svelte';
+  import OperationTPCDraftResult from '$lib/components/calculators/exam/OperationTPCDraftResult.svelte';
+  import OperationTrimLoadCalc from '$lib/components/calculators/exam/OperationTrimLoadCalc.svelte';
+  import OperationTrimLoadResult from '$lib/components/calculators/exam/OperationTrimLoadResult.svelte';
+  import OperationGMPeriodCalc from '$lib/components/calculators/exam/OperationGMPeriodCalc.svelte';
+  import OperationGMPeriodResult from '$lib/components/calculators/exam/OperationGMPeriodResult.svelte';
+  import OperationDensityDraftCalc from '$lib/components/calculators/exam/OperationDensityDraftCalc.svelte';
+  import OperationDensityDraftResult from '$lib/components/calculators/exam/OperationDensityDraftResult.svelte';
+  import OperationBlindZoneCalc from '$lib/components/calculators/exam/OperationBlindZoneCalc.svelte';
+  import OperationBlindZoneResult from '$lib/components/calculators/exam/OperationBlindZoneResult.svelte';
+  import OperationBallastTransferCalc from '$lib/components/calculators/exam/OperationBallastTransferCalc.svelte';
+  import OperationBallastTransferResult from '$lib/components/calculators/exam/OperationBallastTransferResult.svelte';
+  import OperationCargoByDraftCalc from '$lib/components/calculators/exam/OperationCargoByDraftCalc.svelte';
+  import OperationCargoByDraftResult from '$lib/components/calculators/exam/OperationCargoByDraftResult.svelte';
+  import OperationDensityMeanCalc from '$lib/components/calculators/exam/OperationDensityMeanCalc.svelte';
+  import OperationDensityMeanResult from '$lib/components/calculators/exam/OperationDensityMeanResult.svelte';
 
   let { data } = $props();
   let result: any = $state(null);
@@ -108,6 +124,14 @@
     'to-decimal': { calc: ToDecimalCalc, result: ToDecimalResult },
     'arithmetic': { calc: ArithmeticCalc, result: ArithmeticResult },
     'meripass-3n': { calc: MeripassCalc, result: MeripassResult },
+    'op-tpc-draft': { calc: OperationTPCDraftCalc, result: OperationTPCDraftResult },
+    'op-trim-load': { calc: OperationTrimLoadCalc, result: OperationTrimLoadResult },
+    'op-gm-period': { calc: OperationGMPeriodCalc, result: OperationGMPeriodResult },
+    'op-density-draft': { calc: OperationDensityDraftCalc, result: OperationDensityDraftResult },
+    'op-blind-zone': { calc: OperationBlindZoneCalc, result: OperationBlindZoneResult },
+    'op-ballast-transfer': { calc: OperationBallastTransferCalc, result: OperationBallastTransferResult },
+    'op-cargo-by-draft': { calc: OperationCargoByDraftCalc, result: OperationCargoByDraftResult },
+    'op-density-mean': { calc: OperationDensityMeanCalc, result: OperationDensityMeanResult },
   };
 
   const components = $derived(componentMap[data.id]);
@@ -121,7 +145,8 @@
     : 'block'}"
 >
   {#if components}
-    <svelte:component this={components.calc} onResult={handleResult} />
+    {@const CalcComponent = components.calc}
+    <CalcComponent onResult={handleResult} />
   {/if}
 </div>
 
@@ -158,7 +183,8 @@
       <p>No Data Calculated</p>
     </div>
   {:else if components}
-    <svelte:component this={components.result} {result} />
+    {@const ResultComponent = components.result}
+    <ResultComponent {result} />
   {/if}
 </div>
 {/key}
