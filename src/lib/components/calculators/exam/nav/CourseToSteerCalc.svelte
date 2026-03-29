@@ -1,6 +1,8 @@
 <script lang="ts">
   import { calculateCourseToSteer } from '$lib/utils/examNavigation';
 
+  let { onResult }: { onResult: (r: any) => void } = $props();
+
   let desiredTrack = $state(180);
   let shipSpeed = $state(15);
   let currentSet = $state(270);
@@ -10,14 +12,17 @@
 
   function handleCalculate() {
     const courseResult = calculateCourseToSteer(desiredTrack, shipSpeed, currentSet, currentDrift);
-    
-    result = {
+
+    const calcResult = {
       ...courseResult,
       desiredTrack,
       shipSpeed,
       currentSet,
       currentDrift
     };
+
+    result = calcResult;
+    onResult(calcResult);
   }
 </script>
 

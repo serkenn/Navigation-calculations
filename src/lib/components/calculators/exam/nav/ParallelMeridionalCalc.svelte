@@ -1,6 +1,8 @@
 <script lang="ts">
   import { calculateParallelSailing, calculateMeridionalSailing } from '$lib/utils/examNavigation';
 
+  let { onResult }: { onResult: (r: any) => void } = $props();
+
   let latitude = $state(35.0);
   let longitudeDelta = $state(120.0);
   let latitudeStart = $state(35.0);
@@ -11,12 +13,15 @@
   function handleCalculate() {
     const parallel = calculateParallelSailing(latitude, longitudeDelta);
     const meridional = calculateMeridionalSailing(latitudeStart, latitudeEnd);
-    
-    result = {
+
+    const calcResult = {
       parallel,
       meridional,
       timestamp: new Date().toLocaleTimeString()
     };
+
+    result = calcResult;
+    onResult(calcResult);
   }
 </script>
 

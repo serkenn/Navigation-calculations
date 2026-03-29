@@ -1,6 +1,8 @@
 <script lang="ts">
   import { calculateDeadReckoning } from '$lib/utils/examNavigation';
 
+  let { onResult }: { onResult: (r: any) => void } = $props();
+
   let latitude0 = $state(35);
   let longitude0 = $state(139);
   let course = $state(90);
@@ -11,8 +13,8 @@
 
   function handleCalculate() {
     const drResult = calculateDeadReckoning(latitude0, longitude0, course, speed, time);
-    
-    result = {
+
+    const calcResult = {
       ...drResult,
       latitude0,
       longitude0,
@@ -20,6 +22,9 @@
       speed,
       time
     };
+
+    result = calcResult;
+    onResult(calcResult);
   }
 </script>
 

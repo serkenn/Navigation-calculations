@@ -1,6 +1,8 @@
 <script lang="ts">
   import { calculateTrueWind, calculateApparentWind } from '$lib/utils/examNavigation';
 
+  let { onResult }: { onResult: (r: any) => void } = $props();
+
   let shipHeading = $state(180);
   let shipSpeed = $state(15);
   let apparentWindDir = $state(45);
@@ -10,14 +12,17 @@
 
   function handleCalculate() {
     const trueWind = calculateTrueWind(shipHeading, shipSpeed, apparentWindDir, apparentWindSpeed);
-    
-    result = {
+
+    const calcResult = {
       ...trueWind,
       shipHeading,
       shipSpeed,
       apparentWindDir,
       apparentWindSpeed
     };
+
+    result = calcResult;
+    onResult(calcResult);
   }
 </script>
 

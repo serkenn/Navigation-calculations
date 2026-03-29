@@ -1,6 +1,8 @@
 <script lang="ts">
   import { calculateGreatCircle } from '$lib/utils/examNavigation';
 
+  let { onResult }: { onResult: (r: any) => void } = $props();
+
   let lat1 = $state(35.0);
   let lon1 = $state(139.0);
   let lat2 = $state(51.0);
@@ -10,14 +12,17 @@
 
   function handleCalculate() {
     const gcResult = calculateGreatCircle(lat1, lon1, lat2, lon2);
-    
-    result = {
+
+    const calcResult = {
       ...gcResult,
       startLat: lat1,
       startLon: lon1,
       endLat: lat2,
       endLon: lon2
     };
+
+    result = calcResult;
+    onResult(calcResult);
   }
 </script>
 
