@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { FileText, Info, ArrowLeft } from 'lucide-svelte';
+  import { FileText, Info, ArrowLeft, Printer } from 'lucide-svelte';
   import { getCalculator } from '$lib/data/calculatorRegistry';
   // Import all calculator components
   import CourseDistanceCalc from '$lib/components/calculators/pilot1/CourseDistanceCalc.svelte';
@@ -97,6 +97,12 @@
     }
   }
 
+  function handlePrint() {
+    if (typeof window !== 'undefined') {
+      window.print();
+    }
+  }
+
   const componentMap: Record<string, { calc: any; result: any }> = {
     'course-distance': { calc: CourseDistanceCalc, result: CourseDistanceResult },
     'dead-reckoning': { calc: DeadReckoningCalc, result: DeadReckoningResult },
@@ -174,7 +180,16 @@
     <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
       Calculation Sheet
     </h2>
-    <span class="text-xs font-sans text-slate-500 dark:text-slate-400">{sheetSubtitle}</span>
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-sans text-slate-500 dark:text-slate-400">{sheetSubtitle}</span>
+      <button
+        onclick={handlePrint}
+        class="print:hidden ml-4 p-2 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+        title="Print Calculation Sheet"
+      >
+        <Printer size={18} />
+      </button>
+    </div>
   </div>
 
   {#if !result}
