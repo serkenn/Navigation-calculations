@@ -12,123 +12,170 @@
 
 /* Print Styles */
 @media print {
-  /* Hide all non-essential elements */
+  @page {
+    size: A4;
+    margin: 15mm 12mm;
+  }
+
+  /* ── Reset everything to white ── */
+  *,
+  *::before,
+  *::after {
+    background: white !important;
+    color: #1e293b !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  body, html {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 10pt;
+    line-height: 1.6;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ── Hide non-print elements ── */
+  header,
+  aside,
+  nav,
+  .print\\:hidden,
+  [class*="UpdateBanner"] {
+    display: none !important;
+  }
+
+  /* Hide left panel (input form) */
   main > div:first-child {
     display: none !important;
-    width: 0 !important;
   }
 
-  /* Show only the calculation sheet */
-  main > div:last-child {
-    display: block !important;
-    width: 100vw !important;
-    padding: 0.75in !important;
-    border: none !important;
-    background: white !important;
-    color: #1f2937 !important;
-    font-size: 11pt;
-    line-height: 1.5;
-    margin: 0 !important;
-  }
-
-  body,
-  html {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    background: white;
-  }
-
-  main {
-    display: flex;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-  }
-
-  /* Print-specific header styling */
-  main > div:last-child > div:first-child {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: flex-end !important;
-    border-bottom: 3px solid #1f2937 !important;
-    padding-bottom: 0.3in !important;
-    margin-bottom: 0.4in !important;
-  }
-
-  main > div:last-child h2 {
-    font-size: 20pt !important;
-    font-weight: bold !important;
-    letter-spacing: 0.1em !important;
-  }
-
-  /* Hide the watermark and back button */
+  /* Hide watermark icon, back button, print button */
   main > div:last-child > div.absolute,
+  main > div:last-child > button,
   main > div:last-child button {
     display: none !important;
   }
 
-  /* Section styling for calculation process and final answers */
+  /* ── Layout: full-width sheet ── */
+  main {
+    display: block !important;
+    width: 100% !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  main > div:last-child {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    overflow: visible !important;
+    height: auto !important;
+    font-family: "Times New Roman", "Hiragino Mincho ProN", "Yu Mincho", serif !important;
+  }
+
+  /* ── Sheet header ── */
+  main > div:last-child > div.border-b-2 {
+    border-bottom: 2pt solid #1e293b !important;
+    padding-bottom: 8pt !important;
+    margin-bottom: 20pt !important;
+    margin-top: 0 !important;
+  }
+
+  main > div:last-child > div.border-b-2 h2 {
+    font-size: 18pt !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.15em !important;
+    font-family: "Courier New", monospace !important;
+  }
+
+  main > div:last-child > div.border-b-2 span {
+    font-size: 9pt !important;
+    font-family: "Courier New", monospace !important;
+  }
+
+  /* ── Section cards ── */
   .print-section {
-    margin-bottom: 0.3in !important;
+    margin-bottom: 14pt !important;
+    padding: 10pt 12pt !important;
+    border: 0.5pt solid #94a3b8 !important;
+    border-radius: 0 !important;
     page-break-inside: avoid !important;
   }
 
   .print-section-title {
-    font-size: 12pt !important;
-    font-weight: bold !important;
-    background-color: #f0f0f0 !important;
-    padding: 0.15in !important;
-    margin-bottom: 0.15in !important;
-    border-left: 4px solid #1f2937 !important;
+    font-size: 10.5pt !important;
+    font-weight: 700 !important;
+    padding: 4pt 8pt !important;
+    margin-bottom: 8pt !important;
+    border-left: 3pt solid #1e293b !important;
+    border-bottom: 0.5pt solid #cbd5e1 !important;
+    background: #f1f5f9 !important;
+    font-family: "Helvetica Neue", "Hiragino Kaku Gothic ProN", sans-serif !important;
   }
 
   .print-section-content {
-    margin-left: 0.2in !important;
+    margin-left: 4pt !important;
   }
 
+  /* ── Data rows ── */
   .print-row {
     display: flex !important;
     justify-content: space-between !important;
-    padding: 0.1in 0 !important;
-    border-bottom: 1px dotted #d1d5db !important;
+    align-items: baseline !important;
+    padding: 3pt 0 !important;
+    border-bottom: 0.5pt dotted #cbd5e1 !important;
+    font-size: 9.5pt !important;
+  }
+
+  .print-row:last-child {
+    border-bottom: none !important;
   }
 
   .print-row-label {
     flex: 1 !important;
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif !important;
   }
 
   .print-row-value {
-    font-weight: bold !important;
+    font-weight: 600 !important;
     font-family: "Courier New", monospace !important;
     text-align: right !important;
-    min-width: 2in !important;
+    min-width: 40% !important;
+    font-size: 9.5pt !important;
   }
 
-  /* Final answer box - exam style */
+  /* ── Final answer box ── */
   .print-final-answer {
-    background-color: #f9f9f9 !important;
-    border: 2px solid #1f2937 !important;
-    padding: 0.25in !important;
-    margin-top: 0.4in !important;
+    border: 1.5pt solid #1e293b !important;
+    padding: 12pt 14pt !important;
+    margin-top: 16pt !important;
     page-break-inside: avoid !important;
+    background: white !important;
   }
 
   .print-final-answer-title {
-    font-size: 11pt !important;
-    font-weight: bold !important;
-    margin-bottom: 0.15in !important;
-    positioning: relative !important;
+    font-size: 10pt !important;
+    font-weight: 700 !important;
+    margin-bottom: 8pt !important;
+    padding-bottom: 4pt !important;
+    border-bottom: 1pt solid #1e293b !important;
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif !important;
+    letter-spacing: 0.1em !important;
   }
 
   .print-final-answer-box {
     display: flex !important;
     justify-content: space-between !important;
-    padding: 0.15in !important;
-    border: 1px solid #d1d5db !important;
-    background: white !important;
-    margin-bottom: 0.1in !important;
+    align-items: center !important;
+    padding: 6pt 10pt !important;
+    margin-bottom: 4pt !important;
+    border: 0.5pt solid #e2e8f0 !important;
+    background: #f8fafc !important;
   }
 
   .print-final-answer-box:last-child {
@@ -136,73 +183,62 @@
   }
 
   .print-answer-label {
-    font-weight: normal !important;
+    font-weight: 400 !important;
     flex: 1 !important;
+    font-size: 9.5pt !important;
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif !important;
   }
 
   .print-answer-value {
-    font-weight: bold !important;
+    font-weight: 700 !important;
     font-size: 12pt !important;
     font-family: "Courier New", monospace !important;
     text-align: right !important;
-    min-width: 1.5in !important;
+    min-width: 35% !important;
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  /* ── Typography ── */
+  h1, h2, h3, h4, h5, h6 {
     margin-top: 0 !important;
-    margin-bottom: 0.2rem !important;
+    margin-bottom: 4pt !important;
     page-break-after: avoid !important;
   }
 
+  /* ── Tables ── */
   table {
     border-collapse: collapse !important;
     width: 100% !important;
-    margin: 0.15in 0 !important;
+    margin: 8pt 0 !important;
+    font-size: 9pt !important;
   }
 
-  td,
+  td, th {
+    border: 0.5pt solid #94a3b8 !important;
+    padding: 4pt 6pt !important;
+  }
+
   th {
-    border: 1px solid #cbd5e1 !important;
-    padding: 6px !important;
+    font-weight: 700 !important;
+    background: #f1f5f9 !important;
   }
 
-  /* Remove dark mode colors and ensure white background */
-  * {
-    background: white !important;
-    color: #1f2937 !important;
-  }
-
-  a {
-    text-decoration: underline !important;
-  }
-
-  /* Hide dark mode classes */
-  [class*="dark:"] {
-    background: white !important;
-    color: #1f2937 !important;
-  }
-
-  /* Adjust animation for print */
+  /* ── Utilities ── */
   .animate-in {
     animation: none !important;
     opacity: 1 !important;
   }
 
-  /* Space management for print */
-  .space-y-8 {
-    margin: 0 !important;
+  a {
+    text-decoration: none !important;
   }
 
+  .space-y-6 > *,
   .space-y-8 > * {
-    margin: 0 !important;
-    margin-bottom: 0.25in !important;
+    margin-top: 0 !important;
+    margin-bottom: 10pt !important;
   }
 
+  .space-y-6 > *:last-child,
   .space-y-8 > *:last-child {
     margin-bottom: 0 !important;
   }
