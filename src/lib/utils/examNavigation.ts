@@ -326,6 +326,346 @@ export function calculateDeadReckoning(
 }
 
 /**
+ * Light Range (Geographic Visibility Distance)
+ * D = 2.083 × (√H + √h)
+ * H: light height [m], h: eye height [m]
+ */
+export function calculateLightRange(
+  lightHeightM: number,
+  eyeHeightM: number,
+): {
+  lightGeoRange: number;
+  eyeGeoRange: number;
+  totalRange: number;
+} {
+  const lightGeoRange = 2.083 * Math.sqrt(lightHeightM);
+  const eyeGeoRange = 2.083 * Math.sqrt(eyeHeightM);
+  const totalRange = lightGeoRange + eyeGeoRange;
+  return { lightGeoRange, eyeGeoRange, totalRange };
+}
+
+/**
+ * Tidal Current from Tidal Stream Table
+ * Interpolates current speed and finds slack/max times
+ */
+export function calculateTidalCurrent(
+  highTideTimeH: number,
+  highTideTimeM: number,
+  targetTimeH: number,
+  targetTimeM: number,
+  springRate: number,
+  neapRate: number,
+  springNeapFactor: number,
+): {
+  hoursFromHighTide: number;
+  interpolatedRate: number;
+  currentSpeed: number;
+} {
+  const highTideMin = highTideTimeH * 60 + highTideTimeM;
+  const targetMin = targetTimeH * 60 + targetTimeM;
+  let diffMin = targetMin - highTideMin;
+  if (diffMin < -360) diffMin += 720;
+  if (diffMin > 360) diffMin -= 720;
+  const hoursFromHighTide = diffMin / 60;
+
+  const interpolatedRate =
+    neapRate + (springRate - neapRate) * springNeapFactor;
+  const currentSpeed = interpolatedRate;
+
+  return { hoursFromHighTide, interpolatedRate, currentSpeed };
+}
+
+/**
+ * Cross Bearing Position Fix
+ * Two bearings from known positions to determine ship position
+ */
+export function calculateCrossBearing(
+  obj1Lat: number,
+  obj1Lon: number,
+  bearing1: number,
+  obj2Lat: number,
+  obj2Lon: number,
+  bearing2: number,
+): {
+  shipLat: number;
+  shipLon: number;
+} {
+  const lat1 = RAD(obj1Lat);
+  const lon1 = RAD(obj1Lon);
+  const lat2 = RAD(obj2Lat);
+  const lon2 = RAD(obj2Lon);
+  const b1 = RAD(bearing1);
+  const b2 = RAD(bearing2);
+
+  const dLat = lat2 - lat1;
+  const dLon = lon2 - lon1;
+
+  const dist12 = 2 * Math.asin(Math.sqrt(
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2
+  ));
+
+  if (Math.abs(dist12) < 1e-10) {
+    return { shipLat: obj1Lat, shipLon: obj1Lon };
+  }
+
+  const bearingA = Math.acos(
+    (Math.sin(lat2) - Math.sin(lat1) * Math.cos(dist12)) /
+    (Math.sin(dist12) * Math.cos(lat1))
+  );
+  const bearingB = Math.acos(
+    (Math.sin(lat1) - Math.sin(lat2) * Math.cos(dist12)) /
+    (Math.sin(dist12) * Math.cos(lat2))
+  );
+
+  let bearing12: number;
+  let bearing21: number;
+  if (Math.sin(lon2 - lon1) > 0) {
+    bearing12 = bearingA;
+    bearing21 = 2 * PI - bearingB;
+  } else {
+    bearing12 = 2 * PI - bearingA;
+    bearing21 = bearingB;
+  }
+
+  const alpha1 = ((b1 - bearing12 + PI) % (2 * PI)) - PI;
+  const alpha2 = ((bearing21 - b2 + PI) % (2 * PI)) - PI;
+
+  if (Math.abs(Math.sin(alpha1)) < 1e-10 && Math.abs(Math.sin(alpha2)) < 1e-10) {
+    return { shipLat: obj1Lat, shipLon: obj1Lon };
+  }
+
+  const alpha3 = Math.acos(
+    -Math.cos(alpha1) * Math.cos(alpha2) +
+    Math.sin(alpha1) * Math.sin(alpha2) * Math.cos(dist12)
+  );
+
+  const dist13 = Math.atan2(
+    Math.sin(dist12) * Math.sin(alpha1) * Math.sin(alpha2),
+    Math.cos(alpha2) + Math.cos(alpha1) * Math.cos(alpha3)
+  );
+
+  const shipLat = Math.asin(
+    Math.sin(lat1) * Math.cos(dist13) +
+    Math.cos(lat1) * Math.sin(dist13) * Math.cos(b1)
+  );
+
+  const shipLon = lon1 + Math.atan2(
+    Math.sin(b1) * Math.sin(dist13) * Math.cos(lat1),
+    Math.cos(dist13) - Math.sin(lat1) * Math.sin(shipLat)
+  );
+
+  return { shipLat: DEG(shipLat), shipLon: DEG(shipLon) };
+}
+
+/**
+ * Running Fix
+ * Transfer position line to determine fix
+ */
+export function calculateRunningFix(
+  bearing1: number,
+  bearing2: number,
+  courseTrue: number,
+  speedKts: number,
+  timeBetweenMin: number,
+  objectLat: number,
+  objectLon: number,
+): {
+  distanceRun: number;
+  fixLat: number;
+  fixLon: number;
+  distanceFromObject: number;
+} {
+  const distanceRun = speedKts * (timeBetweenMin / 60);
+
+  const b1Rad = RAD(bearing1);
+  const b2Rad = RAD(bearing2);
+  const angleAtObject = Math.abs(bearing2 - bearing1);
+  const angleAtObjectRad = RAD(angleAtObject);
+
+  const courseRad = RAD(courseTrue);
+  const angleAtFix = Math.abs(bearing2 - courseTrue);
+  const angleAtFixRad = RAD(angleAtFix > 180 ? 360 - angleAtFix : angleAtFix);
+
+  const sinAngleObj = Math.sin(angleAtObjectRad);
+  const distanceFromObject = sinAngleObj === 0 ? 0 :
+    distanceRun * Math.sin(RAD(Math.abs(bearing1 - courseTrue) > 180 ? 360 - Math.abs(bearing1 - courseTrue) : Math.abs(bearing1 - courseTrue))) / sinAngleObj;
+
+  const fixLat = objectLat + (distanceFromObject / 60) * Math.cos(b2Rad);
+  const meanLat = (objectLat + fixLat) / 2;
+  const cosLat = Math.cos(RAD(meanLat));
+  const fixLon = cosLat === 0 ? objectLon :
+    objectLon + (distanceFromObject / 60) * Math.sin(b2Rad) / cosLat;
+
+  return { distanceRun, fixLat, fixLon, distanceFromObject };
+}
+
+/**
+ * Ship Clock Correction
+ * Time zone and clock adjustment based on longitude
+ */
+export function calculateClockCorrection(
+  departureLonDeg: number,
+  departureLonMin: number,
+  departureLonEW: 'E' | 'W',
+  arrivalLonDeg: number,
+  arrivalLonMin: number,
+  arrivalLonEW: 'E' | 'W',
+  standardMeridian: number,
+): {
+  departureLon: number;
+  arrivalLon: number;
+  longitudeDiff: number;
+  timeDiffMinutes: number;
+  timeDiffHours: number;
+  timeDiffRemainMin: number;
+  direction: string;
+  departureZone: number;
+  arrivalZone: number;
+  zoneDiff: number;
+} {
+  const depLon = (departureLonDeg + departureLonMin / 60) * (departureLonEW === 'W' ? -1 : 1);
+  const arrLon = (arrivalLonDeg + arrivalLonMin / 60) * (arrivalLonEW === 'W' ? -1 : 1);
+
+  const longitudeDiff = arrLon - depLon;
+  const timeDiffMinutes = (longitudeDiff / 360) * 24 * 60;
+  const timeDiffHours = Math.floor(Math.abs(timeDiffMinutes) / 60);
+  const timeDiffRemainMin = Math.abs(timeDiffMinutes) % 60;
+
+  const direction = longitudeDiff > 0 ? '進める' : '遅らせる';
+
+  const departureZone = Math.round(depLon / 15);
+  const arrivalZone = Math.round(arrLon / 15);
+  const zoneDiff = arrivalZone - departureZone;
+
+  return {
+    departureLon: depLon,
+    arrivalLon: arrLon,
+    longitudeDiff,
+    timeDiffMinutes,
+    timeDiffHours,
+    timeDiffRemainMin: Math.round(timeDiffRemainMin * 100) / 100,
+    direction,
+    departureZone,
+    arrivalZone,
+    zoneDiff,
+  };
+}
+
+/**
+ * Sunrise / Sunset time calculation (simplified)
+ * Using approximate formula for civil sunrise/sunset
+ */
+export function calculateSunriseSunset(
+  latitudeDeg: number,
+  longitudeDeg: number,
+  dayOfYear: number,
+  standardMeridian: number,
+): {
+  sunriseLocal: string;
+  sunsetLocal: string;
+  daylightHours: number;
+  solarNoonLocal: string;
+  declination: number;
+  equationOfTime: number;
+} {
+  const B = (360 / 365) * (dayOfYear - 81);
+  const Brad = RAD(B);
+
+  const declination = 23.45 * Math.sin(Brad);
+  const decRad = RAD(declination);
+  const latRad = RAD(latitudeDeg);
+
+  const cosHA = -Math.tan(latRad) * Math.tan(decRad);
+  const clampedCosHA = Math.max(-1, Math.min(1, cosHA));
+  const HA = DEG(Math.acos(clampedCosHA));
+
+  const equationOfTime = 9.87 * Math.sin(2 * Brad) - 7.53 * Math.cos(Brad) - 1.5 * Math.sin(Brad);
+
+  const solarNoonMin = 720 - 4 * (longitudeDeg - standardMeridian) - equationOfTime;
+  const sunriseMin = solarNoonMin - HA * 4;
+  const sunsetMin = solarNoonMin + HA * 4;
+
+  const daylightHours = (HA * 2) / 15;
+
+  const formatTime = (min: number) => {
+    let m = ((min % 1440) + 1440) % 1440;
+    const h = Math.floor(m / 60);
+    const mm = Math.round(m % 60);
+    return `${h.toString().padStart(2, '0')}:${mm.toString().padStart(2, '0')}`;
+  };
+
+  return {
+    sunriseLocal: formatTime(sunriseMin),
+    sunsetLocal: formatTime(sunsetMin),
+    daylightHours: Math.round(daylightHours * 100) / 100,
+    solarNoonLocal: formatTime(solarNoonMin),
+    declination: Math.round(declination * 100) / 100,
+    equationOfTime: Math.round(equationOfTime * 100) / 100,
+  };
+}
+
+/**
+ * Amplitude and Gyro Error
+ * Calculate true bearing of celestial body at rising/setting
+ * Z = cos⁻¹(sin d / cos φ) — amplitude formula
+ */
+export function calculateAmplitudeGyroError(
+  latitudeDeg: number,
+  declinationDeg: number,
+  compassBearing: number,
+  isRising: boolean,
+): {
+  amplitude: number;
+  trueBearing: number;
+  gyroError: number;
+  gyroErrorLabel: string;
+  amplitudeLabel: string;
+} {
+  const latRad = RAD(latitudeDeg);
+  const decRad = RAD(declinationDeg);
+
+  const cosLat = Math.cos(latRad);
+  if (Math.abs(cosLat) < 1e-10) {
+    return { amplitude: 0, trueBearing: 0, gyroError: 0, gyroErrorLabel: '', amplitudeLabel: '' };
+  }
+
+  const sinAmp = Math.sin(decRad) / cosLat;
+  const clampedSinAmp = Math.max(-1, Math.min(1, sinAmp));
+  const amplitude = DEG(Math.acos(Math.abs(clampedSinAmp)));
+  const amplitudeFromEquator = DEG(Math.asin(Math.abs(clampedSinAmp)));
+
+  let trueBearing: number;
+  const ns = declinationDeg >= 0 ? 'N' : 'S';
+
+  if (isRising) {
+    trueBearing = declinationDeg >= 0 ? 90 - amplitudeFromEquator : 90 + amplitudeFromEquator;
+    if (latitudeDeg < 0) {
+      trueBearing = declinationDeg >= 0 ? 90 - amplitudeFromEquator : 90 + amplitudeFromEquator;
+    }
+  } else {
+    trueBearing = declinationDeg >= 0 ? 270 + amplitudeFromEquator : 270 - amplitudeFromEquator;
+    if (latitudeDeg < 0) {
+      trueBearing = declinationDeg >= 0 ? 270 + amplitudeFromEquator : 270 - amplitudeFromEquator;
+    }
+  }
+
+  trueBearing = (trueBearing + 360) % 360;
+
+  let gyroError = trueBearing - compassBearing;
+  if (gyroError > 180) gyroError -= 360;
+  if (gyroError < -180) gyroError += 360;
+
+  const ew = isRising ? 'E' : 'W';
+  const amplitudeLabel = `${ew} ${amplitudeFromEquator.toFixed(1)}° ${ns}`;
+  const gyroErrorLabel = gyroError >= 0
+    ? `${Math.abs(gyroError).toFixed(1)}° E(ly)`
+    : `${Math.abs(gyroError).toFixed(1)}° W(ly)`;
+
+  return { amplitude: amplitudeFromEquator, trueBearing, gyroError, gyroErrorLabel, amplitudeLabel };
+}
+
+/**
  * Helper: Format degrees to DMS
  */
 export function formatDMS(value: number, type: "lat" | "lon" = "lat"): string {

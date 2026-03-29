@@ -80,6 +80,20 @@
    import NavCourseToSteerResult from '$lib/components/calculators/exam/nav/CourseToSteerResult.svelte';
    import NavDeadReckoningCalc from '$lib/components/calculators/exam/nav/DeadReckoningCalc.svelte';
    import NavDeadReckoningResult from '$lib/components/calculators/exam/nav/DeadReckoningResult.svelte';
+   import LightRangeCalc from '$lib/components/calculators/exam/nav/LightRangeCalc.svelte';
+   import LightRangeResult from '$lib/components/calculators/exam/nav/LightRangeResult.svelte';
+   import TidalCurrentCalc from '$lib/components/calculators/exam/nav/TidalCurrentCalc.svelte';
+   import TidalCurrentResult from '$lib/components/calculators/exam/nav/TidalCurrentResult.svelte';
+   import CrossBearingCalc from '$lib/components/calculators/exam/nav/CrossBearingCalc.svelte';
+   import CrossBearingResult from '$lib/components/calculators/exam/nav/CrossBearingResult.svelte';
+   import RunningFixCalc from '$lib/components/calculators/exam/nav/RunningFixCalc.svelte';
+   import RunningFixResult from '$lib/components/calculators/exam/nav/RunningFixResult.svelte';
+   import ClockCorrectionCalc from '$lib/components/calculators/exam/nav/ClockCorrectionCalc.svelte';
+   import ClockCorrectionResult from '$lib/components/calculators/exam/nav/ClockCorrectionResult.svelte';
+   import SunriseSunsetCalc from '$lib/components/calculators/exam/nav/SunriseSunsetCalc.svelte';
+   import SunriseSunsetResult from '$lib/components/calculators/exam/nav/SunriseSunsetResult.svelte';
+   import AmplitudeGyroCalc from '$lib/components/calculators/exam/nav/AmplitudeGyroCalc.svelte';
+   import AmplitudeGyroResult from '$lib/components/calculators/exam/nav/AmplitudeGyroResult.svelte';
 
   let { data } = $props();
   let result: any = $state(null);
@@ -153,6 +167,13 @@
      'nav-true-wind': { calc: NavTrueWindCalc, result: NavTrueWindResult },
      'nav-course-to-steer': { calc: NavCourseToSteerCalc, result: NavCourseToSteerResult },
      'nav-dead-reckoning': { calc: NavDeadReckoningCalc, result: NavDeadReckoningResult },
+     'nav-light-range': { calc: LightRangeCalc, result: LightRangeResult },
+     'nav-tidal-current': { calc: TidalCurrentCalc, result: TidalCurrentResult },
+     'nav-cross-bearing': { calc: CrossBearingCalc, result: CrossBearingResult },
+     'nav-running-fix': { calc: RunningFixCalc, result: RunningFixResult },
+     'nav-clock-correction': { calc: ClockCorrectionCalc, result: ClockCorrectionResult },
+     'nav-sunrise-sunset': { calc: SunriseSunsetCalc, result: SunriseSunsetResult },
+     'nav-amplitude-gyro': { calc: AmplitudeGyroCalc, result: AmplitudeGyroResult },
   };
 
   const components = $derived(componentMap[data.id]);
