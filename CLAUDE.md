@@ -2,84 +2,101 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Commands
+## コマンド
 
 ```bash
-npm run dev          # Start dev server (SvelteKit, http://localhost:5173)
-npm run build        # Build for production → dist/
-npm run preview      # Preview production build
+npm run dev          # 開発サーバー起動 (SvelteKit, http://localhost:5173)
+npm run build        # 本番ビルド → dist/
+npm run preview      # 本番ビルドのプレビュー
 
-npm run electron:dev        # Build + run as Electron desktop app
-npm run electron:build      # Build Windows NSIS installer
-npm run cap:sync            # Build + sync to Android (Capacitor)
+npm run electron:dev        # ビルド + Electron デスクトップアプリとして起動
+npm run electron:build      # Windows NSIS インストーラーのビルド
+npm run cap:sync            # ビルド + Android へ同期 (Capacitor)
 ```
 
-Type checking (no test suite exists):
+型チェック（テストスイートは存在しない）:
 ```bash
-npx svelte-check         # Type-check all Svelte/TS files
+npx svelte-check         # 全 Svelte/TS ファイルの型チェック
 ```
 
-Releases are triggered by pushing a `v*` tag — CI builds web zip + Windows installer + creates GitHub Release automatically.
+## コード完成後の作業
 
-## Architecture
+コードを書き終えたら、必ず以下の順番で実行する:
 
-**NavCalc** is a maritime navigation calculator app. It ships as a static SvelteKit web app, an Electron desktop app (Windows/Mac), and an Android app (Capacitor). All three targets share the same `src/` codebase and build from `npm run build` → `dist/`.
+1. **コミット & プッシュ**
+   ```bash
+   git add <変更ファイル>
+   git commit -m "コミットメッセージ"
+   git push origin main
+   ```
 
-### Stack
-- **SvelteKit 2 + Svelte 5** with `adapter-static` (fully pre-rendered SPA, `index.html` fallback)
-- **Tailwind CSS v4** (Vite plugin, imported via `src/app.css`)
+2. **タグを切る**（最新タグを確認してインクリメント）
+   ```bash
+   git tag --sort=-version:refname | head -5   # 現在のタグ確認
+   git tag vX.Y.Z
+   git push origin vX.Y.Z
+   ```
+   タグを push すると CI が自動起動し、web zip + Windows インストーラー + GitHub Release が作成される。
+
+## アーキテクチャ
+
+**NavCalc** は船舶の航法計算 Web アプリ。静的 SvelteKit Web アプリ・Electron デスクトップアプリ（Windows/Mac）・Android アプリ（Capacitor）の3ターゲットが `src/` を共有し、`npm run build` → `dist/` で全ターゲット向けにビルドされる。
+
+### スタック
+- **SvelteKit 2 + Svelte 5** — `adapter-static`（完全プリレンダリング SPA、`index.html` フォールバック）
+- **Tailwind CSS v4** — Vite プラグイン経由、`src/app.css` でインポート
 - **TypeScript 5.7**
-- Dark mode via `.dark` class on `<html>` (custom Tailwind variant `dark`), stored in `localStorage`
+- ダークモード: `<html>` に `.dark` クラスを付与（カスタム Tailwind variant `dark`）、`localStorage` に保存
 
-### Route structure
+### ルート構成
 
 ```
 src/routes/
-  +layout.svelte          # App shell: sidebar + mobile header + <main> wrapper
-  +page.svelte            # Landing page (category list, no calculator loaded)
-  calc/[id]/+page.svelte  # All calculators — one route, switches component by id
-  guide/+page.svelte      # Usage guide
-  theory/+page.svelte     # Calculation theory docs
+  +layout.svelte          # アプリシェル: サイドバー + モバイルヘッダー + <main>
+  +page.svelte            # トップページ（カテゴリ一覧、計算機未選択状態）
+  calc/[id]/+page.svelte  # 全計算機共通ルート。id で表示コンポーネントを切り替え
+  guide/+page.svelte      # 利用ガイド
+  theory/+page.svelte     # 計算理論・公式
 ```
 
-The `calc/[id]/+page.svelte` is the core page. It holds a `componentMap` keyed by calculator id that maps each id to its `{ calc, result }` Svelte component pair. Adding a new calculator requires: (1) adding to `componentMap` in this file, (2) registering in `calculatorRegistry.ts`, (3) creating `*Calc.svelte` + `*Result.svelte` under the appropriate category folder.
+`calc/[id]/+page.svelte` がコア。`componentMap`（id → `{ calc, result }` のペア）で計算機コンポーネントを管理している。**新しい計算機を追加する手順**: ① このファイルの `componentMap` に追加 → ② `calculatorRegistry.ts` に登録 → ③ 該当カテゴリフォルダに `*Calc.svelte` + `*Result.svelte` を作成。
 
-### Calculator pattern
+### 計算機コンポーネントの規約
 
-Every calculator follows the same two-component pattern:
+全計算機は同じ2コンポーネント構成:
 
-- **`*Calc.svelte`** — left panel, input form. Receives `onResult` callback prop, calls it with the result object on submit.
-- **`*Result.svelte`** — right panel ("Calculation Sheet", paper-like `bg-[#fffdf5]`). Receives `result` prop and renders the formatted output.
+- **`*Calc.svelte`** — 左パネル（入力フォーム）。`onResult` コールバック prop を受け取り、計算実行時に結果オブジェクトを渡す。
+- **`*Result.svelte`** — 右パネル（"Calculation Sheet"、紙風の `bg-[#fffdf5]`）。`result` prop を受け取り整形して表示。
 
-Shared input components (`src/lib/components/shared/`): `DMSInput`, `PositionInput`, `NumberInput`, `TimeInput`, `SectionCard`, `ResultBox`, `ResultRow`, `ResultSection`, `CalculateButton`, `EmptyResult`.
+共通入力コンポーネント（`src/lib/components/shared/`）: `DMSInput`, `PositionInput`, `NumberInput`, `TimeInput`, `SectionCard`, `ResultBox`, `ResultRow`, `ResultSection`, `CalculateButton`, `EmptyResult`。
 
-### Calculation logic
+### 計算ロジック
 
-All math is in `src/lib/utils/` — pure TypeScript functions, no side effects:
+`src/lib/utils/` に純粋関数として実装（副作用なし）:
 
-| File | Purpose |
-|------|---------|
-| `navigationMath.ts` | Core helpers: `rad/deg`, `formatDMS`, `toDecimal`, `toDMS` |
-| `mercatorSailing.ts` | Course/distance, dead reckoning (WGS84 meridional parts) |
-| `greatCircle.ts` | Great circle and composite sailing |
-| `astronomy.ts` | Twilight, amplitude, star finder |
-| `ephemeris.ts` | Sun GHA/declination approximation |
-| `tide.ts` | Tide height (cosine interpolation) |
-| `wind.ts` | True wind vector |
-| `currentVector.ts` | CMG/SMG, set/drift |
-| `sextant.ts` | Altitude corrections, distance to object |
-| `timeConversion.ts` | Arc↔time, HMS arithmetic |
-| `examNavigation.ts` | Exam problem calculations (3N navigation category) |
-| `examOperation.ts` | Exam problem calculations (3N operation category) |
+| ファイル | 内容 |
+|----------|------|
+| `navigationMath.ts` | 基本ヘルパー: `rad/deg`, `formatDMS`, `toDecimal`, `toDMS` |
+| `mercatorSailing.ts` | 針路・航程、推測航法（WGS84 子午線弧長） |
+| `greatCircle.ts` | 大圏航法・集成大圏航法 |
+| `astronomy.ts` | 薄明時刻、出没方位角、索星 |
+| `ephemeris.ts` | 太陽 GHA・赤緯の簡易計算 |
+| `tide.ts` | 潮高計算（cos 補間法） |
+| `wind.ts` | 真風向・風速ベクトル |
+| `currentVector.ts` | CMG/SMG、流向・流速 |
+| `sextant.ts` | 測高度改正、物標距離 |
+| `timeConversion.ts` | 弧度⇔時間変換、時分秒四則演算 |
+| `examNavigation.ts` | 海技試験 3N 航海カテゴリの計算 |
+| `examOperation.ts` | 海技試験 3N 運用カテゴリの計算 |
 
-### Calculator registry
+### 計算機レジストリ
 
-`src/lib/data/calculatorRegistry.ts` is the single source of truth for all calculator metadata (id, category, Japanese/English names, SEO title/description, accent colors). `CategoryId` union type is defined in `src/lib/types/calculator.ts`.
+`src/lib/data/calculatorRegistry.ts` が全計算機のメタデータ（id・カテゴリ・日英名・SEO タイトル/説明・アクセントカラー）の唯一の正。`CategoryId` 型は `src/lib/types/calculator.ts` で定義。
 
-### Print styles
+### 印刷スタイル
 
-`src/app.css` contains all `@media print` rules. The print layout hides the left panel and sidebar, expands the right panel to full A4 width, and compresses all spacing/font sizes to fit on one page. When modifying result component layout, check that the print CSS selectors (`main > div:last-child`, `div.border-b-2`, etc.) still match.
+`src/app.css` に `@media print` ルールを一括管理。印刷時は左パネルとサイドバーを非表示にし、右パネルを A4 全幅で展開、全スペーシング・フォントサイズを圧縮して1ページに収める。Result コンポーネントのレイアウトを変更する際は、印刷 CSS のセレクター（`main > div:last-child`、`div.border-b-2` 等）との整合性を確認すること。
 
-### App version
+### アプリバージョン
 
-`__APP_VERSION__` is injected at build time in `vite.config.ts` from the latest git tag (falls back to `package.json` version). Use this constant anywhere version display is needed.
+`__APP_VERSION__` は `vite.config.ts` でビルド時に最新 git タグから注入される（タグがなければ `package.json` の version にフォールバック）。バージョン表示が必要な箇所はこの定数を使う。
