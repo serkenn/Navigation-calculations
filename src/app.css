@@ -2,6 +2,22 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@layer base {
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, sans-serif;
+    background-color: #f8fafc;
+    color: #1e293b;
+    transition-property: background-color, color;
+    transition-duration: 300ms;
+  }
+
+  :root.dark body {
+    background-color: #020617;
+    color: #f1f5f9;
+  }
+}
+
 /* Safe area support for notched devices (iPhone X+) */
 :root {
   --sal: env(safe-area-inset-left, 0px);
@@ -41,7 +57,7 @@
   header,
   aside,
   nav,
-  .print\\:hidden,
+  .print\:hidden,
   [class*="UpdateBanner"] {
     display: none !important;
   }
