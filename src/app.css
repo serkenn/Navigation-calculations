@@ -245,6 +245,25 @@
     font-size: 8.5pt !important;
   }
 
+  /* ── DRP 計算: D.Lat / 中分緯度+Dep / D.Long を3列横並び ── */
+  .drp-calc-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 0 6pt !important;
+    margin-left: 0 !important;
+  }
+
+  .drp-calc-grid > * {
+    margin-top: 0 !important;
+    border-left: 0.5pt solid #cbd5e1;
+    padding-left: 4pt !important;
+  }
+
+  .drp-calc-grid > *:first-child {
+    border-left: none;
+    padding-left: 0 !important;
+  }
+
   /* ── Misc ── */
   .rounded-xl,
   .rounded-lg,

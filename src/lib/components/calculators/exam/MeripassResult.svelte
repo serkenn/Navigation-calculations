@@ -33,61 +33,57 @@
       (解) 1. 推測位置の算出 (D.R.P at Noon)
     </div>
 
-    <div class="ml-4 space-y-3">
+    <!-- 画面: 縦並び / 印刷: 3列横並び -->
+    <div class="drp-calc-grid ml-4 space-y-3">
+
       <!-- D.Lat -->
-      <div>
-        <span class="font-bold">D.Lat</span>
-        <span class="ml-2">= Dist × cos Co = {result.dist}' × cos {result.course}°</span>
-      </div>
-      <div class="ml-8 font-bold">
-        = {fmtMin(dLatMin)}' {latDir(dLatMin)}
-      </div>
-
-      <!-- 到着緯度 -->
-      <div class="mt-2">
-        <div class="flex gap-8">
-          <span>l₁ = {formatDMS(result.lat1, 'lat')}</span>
+      <div class="drp-col-dlat">
+        <div>
+          <span class="font-bold">D.Lat</span>
+          <span class="ml-2">= Dist × cos Co</span>
         </div>
-        <div class="flex gap-8">
-          <span>D.Lat = {signChar(dLatMin)}{fmtMin(dLatMin)}'</span>
-        </div>
-        <div class="flex gap-8 font-bold border-t border-slate-400 dark:border-slate-600 pt-1 mt-1">
-          <span>l₂ = {formatDMS(result.lat2_DR, 'lat')}</span>
+        <div class="ml-4">= {result.dist}' × cos {result.course}°</div>
+        <div class="ml-4 font-bold">= {fmtMin(dLatMin)}' {latDir(dLatMin)}</div>
+        <div class="mt-2 border-t border-slate-300 dark:border-slate-700 pt-1">
+          <div>l₁ = {formatDMS(result.lat1, 'lat')}</div>
+          <div>{signChar(dLatMin)}{fmtMin(dLatMin)}'</div>
+          <div class="font-bold border-t border-slate-400 dark:border-slate-600 pt-1 mt-1">
+            l₂ = {formatDMS(result.lat2_DR, 'lat')}
+          </div>
         </div>
       </div>
 
-      <!-- 中分緯度 -->
-      <div class="mt-2">
-        <span class="font-bold">中分緯度</span>
-        <span class="ml-2">= (l₁ + l₂) / 2 = {formatDMS(meanLat, 'lat')}</span>
-      </div>
-
-      <!-- Dep -->
-      <div class="mt-2">
-        <span class="font-bold">Dep</span>
-        <span class="ml-2">= Dist × sin Co = {result.dist}' × sin {result.course}°</span>
-      </div>
-      <div class="ml-8 font-bold">
-        = {fmtMin(result.dep)}'
+      <!-- 中分緯度 + Dep -->
+      <div class="drp-col-ml mt-2">
+        <div>
+          <span class="font-bold">中分緯度</span>
+        </div>
+        <div class="ml-4">= (l₁ + l₂) / 2</div>
+        <div class="ml-4 font-bold">= {formatDMS(meanLat, 'lat')}</div>
+        <div class="mt-2 border-t border-slate-300 dark:border-slate-700 pt-1">
+          <div><span class="font-bold">Dep</span> = Dist × sin Co</div>
+          <div class="ml-4">= {result.dist}' × sin {result.course}°</div>
+          <div class="ml-4 font-bold">= {fmtMin(result.dep)}'</div>
+        </div>
       </div>
 
       <!-- D.Long -->
-      <div class="mt-2">
-        <span class="font-bold">D.Long</span>
-        <span class="ml-2">= Dep / cos(中分緯度) = {fmtMin(result.dep)}' / cos {fmtDeg(meanLat)}°</span>
-      </div>
-      <div class="ml-8 font-bold">
-        = {fmtMin(dLongMin)}' {lonDir(dLongMin)}
-      </div>
-
-      <!-- 到着経度 -->
-      <div class="mt-2">
-        <div>L₁ = {formatDMS(result.lon1, 'lon')}</div>
-        <div>D.Long = {signChar(dLongMin)}{fmtMin(dLongMin)}'</div>
-        <div class="font-bold border-t border-slate-400 dark:border-slate-600 pt-1 mt-1">
-          L₂ = {formatDMS(result.lon2_DR, 'lon')}
+      <div class="drp-col-dlong mt-2">
+        <div>
+          <span class="font-bold">D.Long</span>
+          <span class="ml-2">= Dep / cos(M.Lat)</span>
+        </div>
+        <div class="ml-4">= {fmtMin(result.dep)}' / cos {fmtDeg(meanLat)}°</div>
+        <div class="ml-4 font-bold">= {fmtMin(dLongMin)}' {lonDir(dLongMin)}</div>
+        <div class="mt-2 border-t border-slate-300 dark:border-slate-700 pt-1">
+          <div>L₁ = {formatDMS(result.lon1, 'lon')}</div>
+          <div>{signChar(dLongMin)}{fmtMin(dLongMin)}'</div>
+          <div class="font-bold border-t border-slate-400 dark:border-slate-600 pt-1 mt-1">
+            L₂ = {formatDMS(result.lon2_DR, 'lon')}
+          </div>
         </div>
       </div>
+
     </div>
 
     <!-- DRP まとめ -->
