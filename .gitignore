@@ -3,5 +3,4 @@ dist/
 .svelte-kit/
 .env
 .env.local
-CLAUDE.md
 .DS_Store
