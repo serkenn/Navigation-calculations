@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  NavCalc Crystal Reports データセットスキーマ
+
+  使用方法 (Crystal Reports Designer での .rpt 作成手順):
+  1. Visual Studio でプロジェクトを右クリック → [追加] → [新しい項目]
+  2. [Crystal Reports] を選択して NavCalcReport.rpt を作成
+  3. [空のレポートを使用] を選択
+  4. フィールドエクスプローラーで [データベースフィールド] を右クリック → [データベースの追加/削除]
+  5. [プロジェクトデータ] → [ADO.NET DataSet] → このXSDを選択
+  6. ReportHeader テーブルと ReportRows テーブルを追加
+  7. レポートセクションにフィールドを配置:
+     - ページヘッダー: CalculatorName, Category, DateTime
+     - 詳細セクション: SectionName, Label, Value (IsHighlighted でハイライト条件)
+  8. ビルドして NavCalcReport.rpt を Reports フォルダーにコピー
+-->
+<xs:schema id="CalculationReport"
+           xmlns=""
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xs:element name="CalculationReport" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="ReportHeader">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="CalculatorName" type="xs:string" minOccurs="0"/>
+              <xs:element name="Category" type="xs:string" minOccurs="0"/>
+              <xs:element name="DateTime" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ReportRows">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="SectionName" type="xs:string" minOccurs="0"/>
+              <xs:element name="Label" type="xs:string" minOccurs="0"/>
+              <xs:element name="Value" type="xs:string" minOccurs="0"/>
+              <xs:element name="IsHighlighted" type="xs:boolean" minOccurs="0"/>
+              <xs:element name="SortOrder" type="xs:int" minOccurs="0"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
