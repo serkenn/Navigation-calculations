@@ -30,7 +30,7 @@
 @media print {
   @page {
     size: A4;
-    margin: 15mm 12mm;
+    margin: 8mm 10mm;
   }
 
   /* ── Reset everything to white ── */
@@ -41,14 +41,16 @@
     color: #1e293b !important;
     box-shadow: none !important;
     text-shadow: none !important;
+    animation: none !important;
+    transition: none !important;
   }
 
   body, html {
     width: 100%;
     margin: 0;
     padding: 0;
-    font-size: 10pt;
-    line-height: 1.6;
+    font-size: 7.5pt;
+    line-height: 1.35;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
@@ -91,132 +93,103 @@
     border: none !important;
     overflow: visible !important;
     height: auto !important;
-    font-family: "Times New Roman", "Hiragino Mincho ProN", "Yu Mincho", serif !important;
+    font-family: "Courier New", "Hiragino Mincho ProN", "Yu Mincho", monospace !important;
   }
 
-  /* ── Sheet header ── */
+  /* ── Sheet header (compact) ── */
   main > div:last-child > div.border-b-2 {
-    border-bottom: 2pt solid #1e293b !important;
-    padding-bottom: 8pt !important;
-    margin-bottom: 20pt !important;
+    border-bottom: 1.5pt solid #1e293b !important;
+    padding-bottom: 3pt !important;
+    margin-bottom: 6pt !important;
     margin-top: 0 !important;
   }
 
   main > div:last-child > div.border-b-2 h2 {
-    font-size: 18pt !important;
+    font-size: 11pt !important;
     font-weight: 700 !important;
-    letter-spacing: 0.15em !important;
-    font-family: "Courier New", monospace !important;
-  }
-
-  main > div:last-child > div.border-b-2 span {
-    font-size: 9pt !important;
-    font-family: "Courier New", monospace !important;
-  }
-
-  /* ── Section cards ── */
-  .print-section {
-    margin-bottom: 14pt !important;
-    padding: 10pt 12pt !important;
-    border: 0.5pt solid #94a3b8 !important;
-    border-radius: 0 !important;
-    page-break-inside: avoid !important;
-  }
-
-  .print-section-title {
-    font-size: 10.5pt !important;
-    font-weight: 700 !important;
-    padding: 4pt 8pt !important;
-    margin-bottom: 8pt !important;
-    border-left: 3pt solid #1e293b !important;
-    border-bottom: 0.5pt solid #cbd5e1 !important;
-    background: #f1f5f9 !important;
-    font-family: "Helvetica Neue", "Hiragino Kaku Gothic ProN", sans-serif !important;
-  }
-
-  .print-section-content {
-    margin-left: 4pt !important;
-  }
-
-  /* ── Data rows ── */
-  .print-row {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: baseline !important;
-    padding: 3pt 0 !important;
-    border-bottom: 0.5pt dotted #cbd5e1 !important;
-    font-size: 9.5pt !important;
-  }
-
-  .print-row:last-child {
-    border-bottom: none !important;
-  }
-
-  .print-row-label {
-    flex: 1 !important;
-    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif !important;
-  }
-
-  .print-row-value {
-    font-weight: 600 !important;
-    font-family: "Courier New", monospace !important;
-    text-align: right !important;
-    min-width: 40% !important;
-    font-size: 9.5pt !important;
-  }
-
-  /* ── Final answer box ── */
-  .print-final-answer {
-    border: 1.5pt solid #1e293b !important;
-    padding: 12pt 14pt !important;
-    margin-top: 16pt !important;
-    page-break-inside: avoid !important;
-    background: white !important;
-  }
-
-  .print-final-answer-title {
-    font-size: 10pt !important;
-    font-weight: 700 !important;
-    margin-bottom: 8pt !important;
-    padding-bottom: 4pt !important;
-    border-bottom: 1pt solid #1e293b !important;
-    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif !important;
     letter-spacing: 0.1em !important;
   }
 
-  .print-final-answer-box {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    padding: 6pt 10pt !important;
-    margin-bottom: 4pt !important;
-    border: 0.5pt solid #e2e8f0 !important;
-    background: #f8fafc !important;
+  main > div:last-child > div.border-b-2 span {
+    font-size: 7pt !important;
   }
 
-  .print-final-answer-box:last-child {
-    margin-bottom: 0 !important;
+  /* ── Compress all spacing utilities ── */
+  .space-y-1 > * + *  { margin-top: 1pt !important; }
+  .space-y-2 > * + *  { margin-top: 2pt !important; }
+  .space-y-3 > * + *  { margin-top: 2pt !important; }
+  .space-y-4 > * + *  { margin-top: 3pt !important; }
+  .space-y-6 > * + *  { margin-top: 4pt !important; }
+  .space-y-8 > * + *  { margin-top: 5pt !important; }
+  .space-y-10 > * + * { margin-top: 6pt !important; }
+
+  /* ── Compress padding ── */
+  .p-3  { padding: 2pt 3pt !important; }
+  .p-4  { padding: 2pt 4pt !important; }
+  .p-5  { padding: 3pt 5pt !important; }
+  .p-6  { padding: 3pt 5pt !important; }
+  .px-3 { padding-left: 3pt !important; padding-right: 3pt !important; }
+  .py-1 { padding-top: 1pt !important; padding-bottom: 1pt !important; }
+  .ml-4 { margin-left: 6pt !important; }
+  .ml-8 { margin-left: 8pt !important; }
+  .mt-2 { margin-top: 2pt !important; }
+  .mt-3 { margin-top: 2pt !important; }
+  .mt-4 { margin-top: 3pt !important; }
+  .mb-1 { margin-bottom: 1pt !important; }
+  .mb-2 { margin-bottom: 1pt !important; }
+  .mb-4 { margin-bottom: 2pt !important; }
+  .pb-1 { padding-bottom: 1pt !important; }
+  .pb-4 { padding-bottom: 2pt !important; }
+  .pt-1 { padding-top: 1pt !important; }
+  .pt-2 { padding-top: 1pt !important; }
+  .gap-4 { gap: 4pt !important; }
+  .gap-8 { gap: 6pt !important; }
+
+  /* ── Compress text sizes ── */
+  .text-xs   { font-size: 6pt !important; }
+  .text-sm   { font-size: 7pt !important; }
+  .text-base { font-size: 7.5pt !important; }
+  .text-lg   { font-size: 8pt !important; }
+  .text-xl   { font-size: 8.5pt !important; }
+  .text-2xl  { font-size: 9pt !important; }
+  .text-3xl  { font-size: 9.5pt !important; }
+
+  /* ── Section headings (border-b-2 pattern in result components) ── */
+  section > div.border-b-2,
+  div > div.border-b-2 {
+    padding-bottom: 1pt !important;
+    margin-bottom: 3pt !important;
   }
 
-  .print-answer-label {
-    font-weight: 400 !important;
-    flex: 1 !important;
-    font-size: 9.5pt !important;
-    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif !important;
+  /* ── Answer/result boxes ── */
+  div.border-2,
+  div.border-4 {
+    padding: 3pt 5pt !important;
+    margin-top: 3pt !important;
   }
 
-  .print-answer-value {
-    font-weight: 700 !important;
-    font-size: 12pt !important;
-    font-family: "Courier New", monospace !important;
-    text-align: right !important;
-    min-width: 35% !important;
+  /* ── Final answer values: keep readable ── */
+  div.border-4 .font-bold.text-base,
+  div.border-4 .font-bold.text-lg {
+    font-size: 8.5pt !important;
+  }
+
+  /* ── Blue result box (Course/Distance) ── */
+  .text-blue-700,
+  .text-blue-400 {
+    color: #1e3a5f !important;
+  }
+
+  /* ── max-w-sm / max-w-md: remove width cap ── */
+  .max-w-sm,
+  .max-w-md {
+    max-width: 100% !important;
   }
 
   /* ── Typography ── */
   h1, h2, h3, h4, h5, h6 {
     margin-top: 0 !important;
-    margin-bottom: 4pt !important;
+    margin-bottom: 2pt !important;
     page-break-after: avoid !important;
   }
 
@@ -224,13 +197,13 @@
   table {
     border-collapse: collapse !important;
     width: 100% !important;
-    margin: 8pt 0 !important;
-    font-size: 9pt !important;
+    margin: 4pt 0 !important;
+    font-size: 7pt !important;
   }
 
   td, th {
     border: 0.5pt solid #94a3b8 !important;
-    padding: 4pt 6pt !important;
+    padding: 2pt 4pt !important;
   }
 
   th {
@@ -238,24 +211,48 @@
     background: #f1f5f9 !important;
   }
 
-  /* ── Utilities ── */
-  .animate-in {
-    animation: none !important;
-    opacity: 1 !important;
+  /* ── Named print classes (legacy) ── */
+  .print-section {
+    margin-bottom: 5pt !important;
+    padding: 3pt 5pt !important;
+    border: 0.5pt solid #94a3b8 !important;
+    border-radius: 0 !important;
+    page-break-inside: avoid !important;
+  }
+
+  .print-section-title {
+    font-size: 7.5pt !important;
+    font-weight: 700 !important;
+    padding: 1pt 4pt !important;
+    margin-bottom: 3pt !important;
+  }
+
+  .print-row {
+    padding: 1pt 0 !important;
+    font-size: 7pt !important;
+  }
+
+  .print-row-value {
+    font-size: 7pt !important;
+  }
+
+  .print-final-answer {
+    padding: 4pt 6pt !important;
+    margin-top: 5pt !important;
+  }
+
+  .print-answer-value {
+    font-size: 8.5pt !important;
+  }
+
+  /* ── Misc ── */
+  .rounded-xl,
+  .rounded-lg,
+  .rounded {
+    border-radius: 0 !important;
   }
 
   a {
     text-decoration: none !important;
-  }
-
-  .space-y-6 > *,
-  .space-y-8 > * {
-    margin-top: 0 !important;
-    margin-bottom: 10pt !important;
-  }
-
-  .space-y-6 > *:last-child,
-  .space-y-8 > *:last-child {
-    margin-bottom: 0 !important;
   }
 }
