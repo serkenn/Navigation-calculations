@@ -24,8 +24,12 @@ class UpdateChecker {
 
   constructor() {
     if (typeof window !== 'undefined') {
-      this.check();
-      this.timer = setInterval(() => this.check(), CHECK_INTERVAL);
+      // Web GUI (http/https) は push 時に自動デプロイされるため更新チェック不要
+      const isWeb = window.location.protocol === 'http:' || window.location.protocol === 'https:';
+      if (!isWeb) {
+        this.check();
+        this.timer = setInterval(() => this.check(), CHECK_INTERVAL);
+      }
     }
   }
 

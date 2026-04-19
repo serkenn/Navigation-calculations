@@ -79,3 +79,58 @@ export function mercatorDeadReckoning(
 
   return { lat2, lon2, dLat, dLon, dep };
 }
+
+/**
+ * 中分緯度航法: 出発点、針路、航程から到着点を計算
+ */
+export function middleLatDeadReckoning(
+  lat1: number, lon1: number,
+  course: number, distance: number,
+) {
+  const dLatMin = distance * Math.cos(rad(course)); // 分
+  const dLat = dLatMin / 60; // 度
+  const lat2 = lat1 + dLat;
+
+  const midLat = (lat1 + lat2) / 2;
+  const dep = distance * Math.sin(rad(course)); // 分
+  const dLonMin = dep / Math.cos(rad(midLat)); // 分
+  const dLon = dLonMin / 60; // 度
+
+  let lon2 = lon1 + dLon;
+  while (lon2 > 180) lon2 -= 360;
+  while (lon2 <= -180) lon2 += 360;
+
+  return { lat2, lon2, dLat, dLon, dep, midLat, dLatMin, dLonMin };
+}
+
+/**
+ * 中分緯度航法: 2地点間の針路と航程
+ */
+export function middleLatCourseDistance(
+  lat1: number, lon1: number,
+  lat2: number, lon2: number,
+) {
+  const dLatMin = (lat2 - lat1) * 60; // 分
+  let dLonMin = (lon2 - lon1) * 60; // 分
+  // 日付変更線対応
+  while (dLonMin > 180 * 60) dLonMin -= 360 * 60;
+  while (dLonMin < -180 * 60) dLonMin += 360 * 60;
+
+  const midLat = (lat1 + lat2) / 2;
+  const dep = dLonMin * Math.cos(rad(midLat)); // 分
+
+  let course: number;
+  let distance: number;
+
+  if (Math.abs(dLatMin) < 0.001) {
+    // 同緯度 (平行圏航法)
+    course = dep > 0 ? 90 : 270;
+    distance = Math.abs(dep);
+  } else {
+    course = deg(Math.atan2(dep, dLatMin));
+    if (course < 0) course += 360;
+    distance = Math.abs(dLatMin / Math.cos(rad(course)));
+  }
+
+  return { course, distance, dLat: dLatMin, dLon: dLonMin, dep, midLat };
+}
