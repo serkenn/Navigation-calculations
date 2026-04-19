@@ -24,7 +24,13 @@ npx svelte-check         # 全 Svelte/TS ファイルの型チェック
 
 コードを書き終えたら、必ず以下の順番で実行する:
 
-1. **コミット & プッシュ**
+1. **フォーマット**
+
+   ```bash
+   npx prettier --write .
+   ```
+
+2. **コミット & プッシュ**
 
    ```bash
    git add <変更ファイル>
@@ -32,7 +38,7 @@ npx svelte-check         # 全 Svelte/TS ファイルの型チェック
    git push origin main
    ```
 
-2. **タグを切る**（最新タグを確認してインクリメント）
+3. **タグを切る**（最新タグを確認してインクリメント）
    ```bash
    git tag --sort=-version:refname | head -5   # 現在のタグ確認
    git tag vX.Y.Z
