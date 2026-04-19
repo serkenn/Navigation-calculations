@@ -1,8 +1,0 @@
-is_global = true
-build_property.RootNamespace = NavCalc.Tests
-build_property.ProjectDir = C:\Users\Proxmox-Rem-Win10-01\Desktop\navcalc\NavCalc\NavCalc.Tests\
-build_property.EnableComHosting = 
-build_property.EnableGeneratedComInterfaceComImportInterop = 
-build_property.CsWinRTUseWindowsUIXamlProjections = false
-build_property.EffectiveAnalysisLevelStyle = 
-build_property.EnableCodeStyleSeverity = 
