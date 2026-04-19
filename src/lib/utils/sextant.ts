@@ -1,4 +1,4 @@
-import { rad } from './navigationMath';
+import { rad } from "./navigationMath";
 
 /**
  * 測高度改正 (Altitude Correction)
@@ -13,7 +13,12 @@ import { rad } from './navigationMath';
 export function altitudeCorrection(
   hs: number,
   heightOfEye: number,
-  bodyType: 'sun_lower' | 'sun_upper' | 'star' | 'moon' | 'planet' = 'sun_lower',
+  bodyType:
+    | "sun_lower"
+    | "sun_upper"
+    | "star"
+    | "moon"
+    | "planet" = "sun_lower",
   temp: number = 10,
   pressure: number = 1010,
   HP: number = 0,
@@ -37,17 +42,17 @@ export function altitudeCorrection(
 
   // 4. Parallax (視差) in minutes
   let parallax = 0;
-  if (bodyType === 'sun_lower' || bodyType === 'sun_upper') {
+  if (bodyType === "sun_lower" || bodyType === "sun_upper") {
     parallax = 0.15 * Math.cos(haR); // 太陽の視差(約0.15')
-  } else if (bodyType === 'moon') {
+  } else if (bodyType === "moon") {
     parallax = HP * Math.cos(haR);
   }
 
   // 5. Semi-diameter
   let sdCorr = 0;
-  if (bodyType === 'sun_lower' || bodyType === 'moon') {
+  if (bodyType === "sun_lower" || bodyType === "moon") {
     sdCorr = SD; // 下辺: +SD
-  } else if (bodyType === 'sun_upper') {
+  } else if (bodyType === "sun_upper") {
     sdCorr = -SD; // 上辺: -SD
   }
 
@@ -56,8 +61,16 @@ export function altitudeCorrection(
   const ho = hs + totalCorr / 60;
 
   return {
-    hs, ho, dip, refraction, parallax, sdCorr, totalCorr,
-    ha, heightOfEye, bodyType,
+    hs,
+    ho,
+    dip,
+    refraction,
+    parallax,
+    sdCorr,
+    totalCorr,
+    ha,
+    heightOfEye,
+    bodyType,
   };
 }
 

@@ -1,4 +1,4 @@
-import { calculators } from '$lib/data/calculatorRegistry';
+import { calculators } from "$lib/data/calculatorRegistry";
 
 export function entries() {
   return calculators.map((c) => ({ id: c.id }));

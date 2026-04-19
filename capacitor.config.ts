@@ -1,12 +1,12 @@
-import type { CapacitorConfig } from '@capacitor/cli';
+import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: 'com.navcalc.app',
-  appName: 'NavCalc',
-  webDir: 'dist',
+  appId: "com.navcalc.app",
+  appName: "NavCalc",
+  webDir: "dist",
   server: {
-    androidScheme: 'https'
-  }
+    androidScheme: "https",
+  },
 };
 
 export default config;

@@ -52,7 +52,7 @@ export function tideTimeForHeight(
 
   // h = LW + (R/2)(1-cos(π·t/T))
   // cos(π·t/T) = 1 - 2(h-LW)/R
-  const cosVal = 1 - 2 * (targetHeight - lwHeight) / range;
+  const cosVal = 1 - (2 * (targetHeight - lwHeight)) / range;
   const clamped = Math.max(-1, Math.min(1, cosVal));
   const ratio = Math.acos(clamped) / Math.PI;
 
@@ -67,8 +67,10 @@ export function tideTimeForHeight(
  * 2つの潮流データ間の補間
  */
 export function tidalStream(
-  rate1: number, dir1: number,
-  rate2: number, dir2: number,
+  rate1: number,
+  dir1: number,
+  rate2: number,
+  dir2: number,
   fraction: number,
 ) {
   // 線形補間

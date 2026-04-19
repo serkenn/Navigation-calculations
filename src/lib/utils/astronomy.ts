@@ -1,4 +1,4 @@
-import { rad, deg } from './navigationMath';
+import { rad, deg } from "./navigationMath";
 
 /**
  * 薄明時計算 (Twilight)
@@ -15,11 +15,17 @@ import { rad, deg } from './navigationMath';
  *   日出没: -0.833° (大気差補正込み)
  */
 export function twilightTime(
-  lat: number, dec: number, lon: number, eqTime: number,
+  lat: number,
+  dec: number,
+  lon: number,
+  eqTime: number,
   alt: number,
 ) {
-  const latR = rad(lat), decR = rad(dec), altR = rad(alt);
-  const cosH = (Math.sin(altR) - Math.sin(latR) * Math.sin(decR)) /
+  const latR = rad(lat),
+    decR = rad(dec),
+    altR = rad(alt);
+  const cosH =
+    (Math.sin(altR) - Math.sin(latR) * Math.sin(decR)) /
     (Math.cos(latR) * Math.cos(decR));
 
   if (Math.abs(cosH) > 1) {
@@ -42,7 +48,10 @@ export function twilightTime(
  * 全薄明時刻をまとめて計算
  */
 export function allTwilights(
-  lat: number, dec: number, lon: number, eqTime: number,
+  lat: number,
+  dec: number,
+  lon: number,
+  eqTime: number,
 ) {
   const sunrise = twilightTime(lat, dec, lon, eqTime, -0.833);
   const civil = twilightTime(lat, dec, lon, eqTime, -6);
@@ -56,15 +65,19 @@ export function allTwilights(
  * 索星: 恒星の高度と方位を計算
  * Sight Reduction: sin(h) = sin(l)sin(d) + cos(l)cos(d)cos(LHA)
  */
-export function starAltAz(
-  lat: number, dec: number, lha: number,
-) {
-  const latR = rad(lat), decR = rad(dec), lhaR = rad(lha);
+export function starAltAz(lat: number, dec: number, lha: number) {
+  const latR = rad(lat),
+    decR = rad(dec),
+    lhaR = rad(lha);
 
-  const sinH = Math.sin(latR) * Math.sin(decR) + Math.cos(latR) * Math.cos(decR) * Math.cos(lhaR);
+  const sinH =
+    Math.sin(latR) * Math.sin(decR) +
+    Math.cos(latR) * Math.cos(decR) * Math.cos(lhaR);
   const alt = deg(Math.asin(Math.max(-1, Math.min(1, sinH))));
 
-  const cosAz = (Math.sin(decR) - Math.sin(latR) * sinH) / (Math.cos(latR) * Math.cos(Math.asin(sinH)));
+  const cosAz =
+    (Math.sin(decR) - Math.sin(latR) * sinH) /
+    (Math.cos(latR) * Math.cos(Math.asin(sinH)));
   let az = deg(Math.acos(Math.max(-1, Math.min(1, cosAz))));
   if (Math.sin(lhaR) > 0) az = 360 - az;
 

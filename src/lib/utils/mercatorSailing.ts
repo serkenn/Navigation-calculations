@@ -1,4 +1,4 @@
-import { rad, deg } from './navigationMath';
+import { rad, deg } from "./navigationMath";
 
 /**
  * 子午線弧長 (Meridional Parts) - WGS84楕円体近似
@@ -8,7 +8,8 @@ export function meridionalParts(lat: number): number {
   const e = 0.08181919; // WGS84 離心率
   const sinL = Math.sin(latR);
   const eSinL = e * sinL;
-  const mp = 7915.7045 * Math.log10(Math.tan(Math.PI / 4 + latR / 2)) -
+  const mp =
+    7915.7045 * Math.log10(Math.tan(Math.PI / 4 + latR / 2)) -
     3437.7468 * Math.log10((1 + eSinL) / (1 - eSinL));
   return lat >= 0 ? mp : -mp;
 }
@@ -17,8 +18,10 @@ export function meridionalParts(lat: number): number {
  * メルカトル航法: 2地点間の針路と航程
  */
 export function mercatorCourseDistance(
-  lat1: number, lon1: number,
-  lat2: number, lon2: number,
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
 ) {
   const dLat = (lat2 - lat1) * 60; // 分
   let dLon = (lon2 - lon1) * 60; // 分
@@ -53,10 +56,12 @@ export function mercatorCourseDistance(
  * メルカトル航法: 出発点、針路、航程から到着点を計算
  */
 export function mercatorDeadReckoning(
-  lat1: number, lon1: number,
-  course: number, distance: number,
+  lat1: number,
+  lon1: number,
+  course: number,
+  distance: number,
 ) {
-  const dLat = distance * Math.cos(rad(course)) / 60; // 度
+  const dLat = (distance * Math.cos(rad(course))) / 60; // 度
   const lat2 = lat1 + dLat;
 
   const mp1 = meridionalParts(lat1);
@@ -66,9 +71,9 @@ export function mercatorDeadReckoning(
   let dLon: number;
   if (Math.abs(dmp) < 0.001) {
     // 同緯度
-    dLon = distance * Math.sin(rad(course)) / Math.cos(rad(lat1)) / 60;
+    dLon = (distance * Math.sin(rad(course))) / Math.cos(rad(lat1)) / 60;
   } else {
-    dLon = dmp * Math.tan(rad(course)) / 60;
+    dLon = (dmp * Math.tan(rad(course))) / 60;
   }
 
   let lon2 = lon1 + dLon;
@@ -84,8 +89,10 @@ export function mercatorDeadReckoning(
  * 中分緯度航法: 出発点、針路、航程から到着点を計算
  */
 export function middleLatDeadReckoning(
-  lat1: number, lon1: number,
-  course: number, distance: number,
+  lat1: number,
+  lon1: number,
+  course: number,
+  distance: number,
 ) {
   const dLatMin = distance * Math.cos(rad(course)); // 分
   const dLat = dLatMin / 60; // 度
@@ -107,8 +114,10 @@ export function middleLatDeadReckoning(
  * 中分緯度航法: 2地点間の針路と航程
  */
 export function middleLatCourseDistance(
-  lat1: number, lon1: number,
-  lat2: number, lon2: number,
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
 ) {
   const dLatMin = (lat2 - lat1) * 60; // 分
   let dLonMin = (lon2 - lon1) * 60; // 分

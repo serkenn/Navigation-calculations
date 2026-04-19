@@ -1,11 +1,12 @@
 declare const __APP_VERSION__: string;
 
-const GITHUB_API = 'https://api.github.com/repos/serkenn/Navigation-calculations/releases/latest';
+const GITHUB_API =
+  "https://api.github.com/repos/serkenn/Navigation-calculations/releases/latest";
 const CHECK_INTERVAL = 60 * 60 * 1000; // 1 hour
-const DISMISS_KEY = 'navcalc-update-dismissed';
+const DISMISS_KEY = "navcalc-update-dismissed";
 
 function compareVersions(current: string, latest: string): boolean {
-  const parse = (v: string) => v.replace(/^v/, '').split('.').map(Number);
+  const parse = (v: string) => v.replace(/^v/, "").split(".").map(Number);
   const c = parse(current);
   const l = parse(latest);
   for (let i = 0; i < 3; i++) {
@@ -17,15 +18,17 @@ function compareVersions(current: string, latest: string): boolean {
 
 class UpdateChecker {
   hasUpdate = $state(false);
-  latestVersion = $state('');
+  latestVersion = $state("");
   currentVersion = $state(__APP_VERSION__);
-  releaseUrl = $state('');
+  releaseUrl = $state("");
   private timer: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       // Web GUI (http/https) は push 時に自動デプロイされるため更新チェック不要
-      const isWeb = window.location.protocol === 'http:' || window.location.protocol === 'https:';
+      const isWeb =
+        window.location.protocol === "http:" ||
+        window.location.protocol === "https:";
       if (!isWeb) {
         this.check();
         this.timer = setInterval(() => this.check(), CHECK_INTERVAL);
@@ -41,8 +44,8 @@ class UpdateChecker {
 
     try {
       const res = await fetch(GITHUB_API, {
-        headers: { 'Accept': 'application/vnd.github.v3+json' },
-        cache: 'no-cache'
+        headers: { Accept: "application/vnd.github.v3+json" },
+        cache: "no-cache",
       });
       if (!res.ok) return;
 

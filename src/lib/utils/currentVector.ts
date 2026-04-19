@@ -1,14 +1,17 @@
-import { rad, deg } from './navigationMath';
+import { rad, deg } from "./navigationMath";
 
 /**
  * 実航針路・実航速力 (CMG/SMG)
  * 船速+針路 と 潮流方向+速度 からベクトル加算
  */
 export function cmgSmg(
-  shipCourse: number, shipSpeed: number,
-  setDir: number, driftSpeed: number,
+  shipCourse: number,
+  shipSpeed: number,
+  setDir: number,
+  driftSpeed: number,
 ) {
-  const sc = rad(shipCourse), sd = rad(setDir);
+  const sc = rad(shipCourse),
+    sd = rad(setDir);
   const vx = shipSpeed * Math.sin(sc) + driftSpeed * Math.sin(sd);
   const vy = shipSpeed * Math.cos(sc) + driftSpeed * Math.cos(sd);
 
@@ -24,11 +27,14 @@ export function cmgSmg(
  * 目標CMG と 潮流 → 必要な船の針路と速力
  */
 export function courseToSteer(
-  requiredCMG: number, requiredSMG: number,
-  setDir: number, driftSpeed: number,
+  requiredCMG: number,
+  requiredSMG: number,
+  setDir: number,
+  driftSpeed: number,
 ) {
   // 目標 ground vector - current vector = ship vector
-  const cmgR = rad(requiredCMG), sdR = rad(setDir);
+  const cmgR = rad(requiredCMG),
+    sdR = rad(setDir);
   const gx = requiredSMG * Math.sin(cmgR);
   const gy = requiredSMG * Math.cos(cmgR);
   const cx = driftSpeed * Math.sin(sdR);
@@ -49,10 +55,13 @@ export function courseToSteer(
  * 船速固定、目標CMG方向へ進むための視針路とSMG
  */
 export function courseToSteerSMG(
-  requiredCMG: number, shipSpeed: number,
-  setDir: number, driftSpeed: number,
+  requiredCMG: number,
+  shipSpeed: number,
+  setDir: number,
+  driftSpeed: number,
 ) {
-  const cmgR = rad(requiredCMG), sdR = rad(setDir);
+  const cmgR = rad(requiredCMG),
+    sdR = rad(setDir);
   // 潮流方向とCMGの角度差
   const alpha = sdR - cmgR;
   // 正弦定理で船の針路偏角を求める
@@ -67,7 +76,7 @@ export function courseToSteerSMG(
 
   // SMG = 正弦定理から
   const gamma = Math.PI - alpha - beta;
-  const smg = shipSpeed * Math.sin(gamma) / Math.sin(alpha || 1e-10);
+  const smg = (shipSpeed * Math.sin(gamma)) / Math.sin(alpha || 1e-10);
 
   return { shipCourse, smg: Math.abs(smg), possible: true };
 }
@@ -77,10 +86,13 @@ export function courseToSteerSMG(
  * 船の針路・速力 と CMG/SMG → 潮流ベクトル
  */
 export function setAndDrift(
-  shipCourse: number, shipSpeed: number,
-  cmg: number, smg: number,
+  shipCourse: number,
+  shipSpeed: number,
+  cmg: number,
+  smg: number,
 ) {
-  const scR = rad(shipCourse), cmgR = rad(cmg);
+  const scR = rad(shipCourse),
+    cmgR = rad(cmg);
   // current = ground - ship
   const cx = smg * Math.sin(cmgR) - shipSpeed * Math.sin(scR);
   const cy = smg * Math.cos(cmgR) - shipSpeed * Math.cos(scR);

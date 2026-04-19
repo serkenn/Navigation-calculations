@@ -15,6 +15,7 @@ npm run cap:sync            # ビルド + Android へ同期 (Capacitor)
 ```
 
 型チェック（テストスイートは存在しない）:
+
 ```bash
 npx svelte-check         # 全 Svelte/TS ファイルの型チェック
 ```
@@ -24,6 +25,7 @@ npx svelte-check         # 全 Svelte/TS ファイルの型チェック
 コードを書き終えたら、必ず以下の順番で実行する:
 
 1. **コミット & プッシュ**
+
    ```bash
    git add <変更ファイル>
    git commit -m "コミットメッセージ"
@@ -43,6 +45,7 @@ npx svelte-check         # 全 Svelte/TS ファイルの型チェック
 **NavCalc** は船舶の航法計算 Web アプリ。静的 SvelteKit Web アプリ・Electron デスクトップアプリ（Windows/Mac）・Android アプリ（Capacitor）の3ターゲットが `src/` を共有し、`npm run build` → `dist/` で全ターゲット向けにビルドされる。
 
 ### スタック
+
 - **SvelteKit 2 + Svelte 5** — `adapter-static`（完全プリレンダリング SPA、`index.html` フォールバック）
 - **Tailwind CSS v4** — Vite プラグイン経由、`src/app.css` でインポート
 - **TypeScript 5.7**
@@ -74,20 +77,20 @@ src/routes/
 
 `src/lib/utils/` に純粋関数として実装（副作用なし）:
 
-| ファイル | 内容 |
-|----------|------|
-| `navigationMath.ts` | 基本ヘルパー: `rad/deg`, `formatDMS`, `toDecimal`, `toDMS` |
-| `mercatorSailing.ts` | 針路・航程、推測航法（WGS84 子午線弧長） |
-| `greatCircle.ts` | 大圏航法・集成大圏航法 |
-| `astronomy.ts` | 薄明時刻、出没方位角、索星 |
-| `ephemeris.ts` | 太陽 GHA・赤緯の簡易計算 |
-| `tide.ts` | 潮高計算（cos 補間法） |
-| `wind.ts` | 真風向・風速ベクトル |
-| `currentVector.ts` | CMG/SMG、流向・流速 |
-| `sextant.ts` | 測高度改正、物標距離 |
-| `timeConversion.ts` | 弧度⇔時間変換、時分秒四則演算 |
-| `examNavigation.ts` | 海技試験 3N 航海カテゴリの計算 |
-| `examOperation.ts` | 海技試験 3N 運用カテゴリの計算 |
+| ファイル             | 内容                                                       |
+| -------------------- | ---------------------------------------------------------- |
+| `navigationMath.ts`  | 基本ヘルパー: `rad/deg`, `formatDMS`, `toDecimal`, `toDMS` |
+| `mercatorSailing.ts` | 針路・航程、推測航法（WGS84 子午線弧長）                   |
+| `greatCircle.ts`     | 大圏航法・集成大圏航法                                     |
+| `astronomy.ts`       | 薄明時刻、出没方位角、索星                                 |
+| `ephemeris.ts`       | 太陽 GHA・赤緯の簡易計算                                   |
+| `tide.ts`            | 潮高計算（cos 補間法）                                     |
+| `wind.ts`            | 真風向・風速ベクトル                                       |
+| `currentVector.ts`   | CMG/SMG、流向・流速                                        |
+| `sextant.ts`         | 測高度改正、物標距離                                       |
+| `timeConversion.ts`  | 弧度⇔時間変換、時分秒四則演算                              |
+| `examNavigation.ts`  | 海技試験 3N 航海カテゴリの計算                             |
+| `examOperation.ts`   | 海技試験 3N 運用カテゴリの計算                             |
 
 ### 計算機レジストリ
 

@@ -1,4 +1,4 @@
-import { rad, deg } from './navigationMath';
+import { rad, deg } from "./navigationMath";
 
 /**
  * 真風向・風速 (True Wind)

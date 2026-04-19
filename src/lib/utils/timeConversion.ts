@@ -47,20 +47,32 @@ export function hmsToDecimal(h: number, m: number, s: number) {
  * 時分秒形式の四則計算
  */
 export function hmsArithmetic(
-  h1: number, m1: number, s1: number,
-  op: '+' | '-' | '*' | '/',
-  h2: number, m2: number, s2: number,
-  multiplier?: number
+  h1: number,
+  m1: number,
+  s1: number,
+  op: "+" | "-" | "*" | "/",
+  h2: number,
+  m2: number,
+  s2: number,
+  multiplier?: number,
 ) {
   const dec1 = hmsToDecimal(h1, m1, s1);
   const dec2 = hmsToDecimal(h2, m2, s2);
 
   let resultDec: number;
   switch (op) {
-    case '+': resultDec = dec1 + dec2; break;
-    case '-': resultDec = dec1 - dec2; break;
-    case '*': resultDec = dec1 * (multiplier ?? dec2); break;
-    case '/': resultDec = dec2 !== 0 ? dec1 / (multiplier ?? dec2) : 0; break;
+    case "+":
+      resultDec = dec1 + dec2;
+      break;
+    case "-":
+      resultDec = dec1 - dec2;
+      break;
+    case "*":
+      resultDec = dec1 * (multiplier ?? dec2);
+      break;
+    case "/":
+      resultDec = dec2 !== 0 ? dec1 / (multiplier ?? dec2) : 0;
+      break;
   }
 
   return { ...decimalToHMS(resultDec), decimal: resultDec };

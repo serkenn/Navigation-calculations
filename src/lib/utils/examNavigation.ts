@@ -400,10 +400,14 @@ export function calculateCrossBearing(
   const dLat = lat2 - lat1;
   const dLon = lon2 - lon1;
 
-  const dist12 = 2 * Math.asin(Math.sqrt(
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2
-  ));
+  const dist12 =
+    2 *
+    Math.asin(
+      Math.sqrt(
+        Math.sin(dLat / 2) ** 2 +
+          Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2,
+      ),
+    );
 
   if (Math.abs(dist12) < 1e-10) {
     return { shipLat: obj1Lat, shipLon: obj1Lon };
@@ -411,11 +415,11 @@ export function calculateCrossBearing(
 
   const bearingA = Math.acos(
     (Math.sin(lat2) - Math.sin(lat1) * Math.cos(dist12)) /
-    (Math.sin(dist12) * Math.cos(lat1))
+      (Math.sin(dist12) * Math.cos(lat1)),
   );
   const bearingB = Math.acos(
     (Math.sin(lat1) - Math.sin(lat2) * Math.cos(dist12)) /
-    (Math.sin(dist12) * Math.cos(lat2))
+      (Math.sin(dist12) * Math.cos(lat2)),
   );
 
   let bearing12: number;
@@ -431,29 +435,34 @@ export function calculateCrossBearing(
   const alpha1 = ((b1 - bearing12 + PI) % (2 * PI)) - PI;
   const alpha2 = ((bearing21 - b2 + PI) % (2 * PI)) - PI;
 
-  if (Math.abs(Math.sin(alpha1)) < 1e-10 && Math.abs(Math.sin(alpha2)) < 1e-10) {
+  if (
+    Math.abs(Math.sin(alpha1)) < 1e-10 &&
+    Math.abs(Math.sin(alpha2)) < 1e-10
+  ) {
     return { shipLat: obj1Lat, shipLon: obj1Lon };
   }
 
   const alpha3 = Math.acos(
     -Math.cos(alpha1) * Math.cos(alpha2) +
-    Math.sin(alpha1) * Math.sin(alpha2) * Math.cos(dist12)
+      Math.sin(alpha1) * Math.sin(alpha2) * Math.cos(dist12),
   );
 
   const dist13 = Math.atan2(
     Math.sin(dist12) * Math.sin(alpha1) * Math.sin(alpha2),
-    Math.cos(alpha2) + Math.cos(alpha1) * Math.cos(alpha3)
+    Math.cos(alpha2) + Math.cos(alpha1) * Math.cos(alpha3),
   );
 
   const shipLat = Math.asin(
     Math.sin(lat1) * Math.cos(dist13) +
-    Math.cos(lat1) * Math.sin(dist13) * Math.cos(b1)
+      Math.cos(lat1) * Math.sin(dist13) * Math.cos(b1),
   );
 
-  const shipLon = lon1 + Math.atan2(
-    Math.sin(b1) * Math.sin(dist13) * Math.cos(lat1),
-    Math.cos(dist13) - Math.sin(lat1) * Math.sin(shipLat)
-  );
+  const shipLon =
+    lon1 +
+    Math.atan2(
+      Math.sin(b1) * Math.sin(dist13) * Math.cos(lat1),
+      Math.cos(dist13) - Math.sin(lat1) * Math.sin(shipLat),
+    );
 
   return { shipLat: DEG(shipLat), shipLon: DEG(shipLon) };
 }
@@ -488,14 +497,26 @@ export function calculateRunningFix(
   const angleAtFixRad = RAD(angleAtFix > 180 ? 360 - angleAtFix : angleAtFix);
 
   const sinAngleObj = Math.sin(angleAtObjectRad);
-  const distanceFromObject = sinAngleObj === 0 ? 0 :
-    distanceRun * Math.sin(RAD(Math.abs(bearing1 - courseTrue) > 180 ? 360 - Math.abs(bearing1 - courseTrue) : Math.abs(bearing1 - courseTrue))) / sinAngleObj;
+  const distanceFromObject =
+    sinAngleObj === 0
+      ? 0
+      : (distanceRun *
+          Math.sin(
+            RAD(
+              Math.abs(bearing1 - courseTrue) > 180
+                ? 360 - Math.abs(bearing1 - courseTrue)
+                : Math.abs(bearing1 - courseTrue),
+            ),
+          )) /
+        sinAngleObj;
 
   const fixLat = objectLat + (distanceFromObject / 60) * Math.cos(b2Rad);
   const meanLat = (objectLat + fixLat) / 2;
   const cosLat = Math.cos(RAD(meanLat));
-  const fixLon = cosLat === 0 ? objectLon :
-    objectLon + (distanceFromObject / 60) * Math.sin(b2Rad) / cosLat;
+  const fixLon =
+    cosLat === 0
+      ? objectLon
+      : objectLon + ((distanceFromObject / 60) * Math.sin(b2Rad)) / cosLat;
 
   return { distanceRun, fixLat, fixLon, distanceFromObject };
 }
@@ -507,10 +528,10 @@ export function calculateRunningFix(
 export function calculateClockCorrection(
   departureLonDeg: number,
   departureLonMin: number,
-  departureLonEW: 'E' | 'W',
+  departureLonEW: "E" | "W",
   arrivalLonDeg: number,
   arrivalLonMin: number,
-  arrivalLonEW: 'E' | 'W',
+  arrivalLonEW: "E" | "W",
   standardMeridian: number,
 ): {
   departureLon: number;
@@ -524,15 +545,18 @@ export function calculateClockCorrection(
   arrivalZone: number;
   zoneDiff: number;
 } {
-  const depLon = (departureLonDeg + departureLonMin / 60) * (departureLonEW === 'W' ? -1 : 1);
-  const arrLon = (arrivalLonDeg + arrivalLonMin / 60) * (arrivalLonEW === 'W' ? -1 : 1);
+  const depLon =
+    (departureLonDeg + departureLonMin / 60) *
+    (departureLonEW === "W" ? -1 : 1);
+  const arrLon =
+    (arrivalLonDeg + arrivalLonMin / 60) * (arrivalLonEW === "W" ? -1 : 1);
 
   const longitudeDiff = arrLon - depLon;
   const timeDiffMinutes = (longitudeDiff / 360) * 24 * 60;
   const timeDiffHours = Math.floor(Math.abs(timeDiffMinutes) / 60);
   const timeDiffRemainMin = Math.abs(timeDiffMinutes) % 60;
 
-  const direction = longitudeDiff > 0 ? '進める' : '遅らせる';
+  const direction = longitudeDiff > 0 ? "進める" : "遅らせる";
 
   const departureZone = Math.round(depLon / 15);
   const arrivalZone = Math.round(arrLon / 15);
@@ -580,9 +604,11 @@ export function calculateSunriseSunset(
   const clampedCosHA = Math.max(-1, Math.min(1, cosHA));
   const HA = DEG(Math.acos(clampedCosHA));
 
-  const equationOfTime = 9.87 * Math.sin(2 * Brad) - 7.53 * Math.cos(Brad) - 1.5 * Math.sin(Brad);
+  const equationOfTime =
+    9.87 * Math.sin(2 * Brad) - 7.53 * Math.cos(Brad) - 1.5 * Math.sin(Brad);
 
-  const solarNoonMin = 720 - 4 * (longitudeDeg - standardMeridian) - equationOfTime;
+  const solarNoonMin =
+    720 - 4 * (longitudeDeg - standardMeridian) - equationOfTime;
   const sunriseMin = solarNoonMin - HA * 4;
   const sunsetMin = solarNoonMin + HA * 4;
 
@@ -592,7 +618,7 @@ export function calculateSunriseSunset(
     let m = ((min % 1440) + 1440) % 1440;
     const h = Math.floor(m / 60);
     const mm = Math.round(m % 60);
-    return `${h.toString().padStart(2, '0')}:${mm.toString().padStart(2, '0')}`;
+    return `${h.toString().padStart(2, "0")}:${mm.toString().padStart(2, "0")}`;
   };
 
   return {
@@ -627,7 +653,13 @@ export function calculateAmplitudeGyroError(
 
   const cosLat = Math.cos(latRad);
   if (Math.abs(cosLat) < 1e-10) {
-    return { amplitude: 0, trueBearing: 0, gyroError: 0, gyroErrorLabel: '', amplitudeLabel: '' };
+    return {
+      amplitude: 0,
+      trueBearing: 0,
+      gyroError: 0,
+      gyroErrorLabel: "",
+      amplitudeLabel: "",
+    };
   }
 
   const sinAmp = Math.sin(decRad) / cosLat;
@@ -636,17 +668,29 @@ export function calculateAmplitudeGyroError(
   const amplitudeFromEquator = DEG(Math.asin(Math.abs(clampedSinAmp)));
 
   let trueBearing: number;
-  const ns = declinationDeg >= 0 ? 'N' : 'S';
+  const ns = declinationDeg >= 0 ? "N" : "S";
 
   if (isRising) {
-    trueBearing = declinationDeg >= 0 ? 90 - amplitudeFromEquator : 90 + amplitudeFromEquator;
+    trueBearing =
+      declinationDeg >= 0
+        ? 90 - amplitudeFromEquator
+        : 90 + amplitudeFromEquator;
     if (latitudeDeg < 0) {
-      trueBearing = declinationDeg >= 0 ? 90 - amplitudeFromEquator : 90 + amplitudeFromEquator;
+      trueBearing =
+        declinationDeg >= 0
+          ? 90 - amplitudeFromEquator
+          : 90 + amplitudeFromEquator;
     }
   } else {
-    trueBearing = declinationDeg >= 0 ? 270 + amplitudeFromEquator : 270 - amplitudeFromEquator;
+    trueBearing =
+      declinationDeg >= 0
+        ? 270 + amplitudeFromEquator
+        : 270 - amplitudeFromEquator;
     if (latitudeDeg < 0) {
-      trueBearing = declinationDeg >= 0 ? 270 + amplitudeFromEquator : 270 - amplitudeFromEquator;
+      trueBearing =
+        declinationDeg >= 0
+          ? 270 + amplitudeFromEquator
+          : 270 - amplitudeFromEquator;
     }
   }
 
@@ -656,13 +700,20 @@ export function calculateAmplitudeGyroError(
   if (gyroError > 180) gyroError -= 360;
   if (gyroError < -180) gyroError += 360;
 
-  const ew = isRising ? 'E' : 'W';
+  const ew = isRising ? "E" : "W";
   const amplitudeLabel = `${ew} ${amplitudeFromEquator.toFixed(1)}° ${ns}`;
-  const gyroErrorLabel = gyroError >= 0
-    ? `${Math.abs(gyroError).toFixed(1)}° E(ly)`
-    : `${Math.abs(gyroError).toFixed(1)}° W(ly)`;
+  const gyroErrorLabel =
+    gyroError >= 0
+      ? `${Math.abs(gyroError).toFixed(1)}° E(ly)`
+      : `${Math.abs(gyroError).toFixed(1)}° W(ly)`;
 
-  return { amplitude: amplitudeFromEquator, trueBearing, gyroError, gyroErrorLabel, amplitudeLabel };
+  return {
+    amplitude: amplitudeFromEquator,
+    trueBearing,
+    gyroError,
+    gyroErrorLabel,
+    amplitudeLabel,
+  };
 }
 
 /**

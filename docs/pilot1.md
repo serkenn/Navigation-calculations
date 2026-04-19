@@ -18,11 +18,11 @@ flowchart LR
 
 ### 計算式
 
-| 記号 | 意味 |
-|------|------|
+| 記号 | 意味             |
+| ---- | ---------------- |
 | dLat | 緯度差 = φ₂ − φ₁ |
 | dLon | 経度差 = λ₂ − λ₁ |
-| dMP | メルカトル部差 |
+| dMP  | メルカトル部差   |
 
 $$
 \text{Co.} = \arctan\left(\frac{d\text{Lon}}{d\text{MP}}\right)
