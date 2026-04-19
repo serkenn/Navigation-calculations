@@ -89,7 +89,7 @@ export const calculators: CalculatorDefinition[] = [
     nameEn: "Course & Distance",
     iconName: "route",
     seoTitle: "針路・航程計算 | 航法計算アプリ",
-    seoDescription: "メルカトル航法による針路と航程を計算します。",
+    seoDescription: "中分緯度航法・漸長緯度航法による針路と航程を計算します。",
     accentColor: "text-blue-600 dark:text-blue-400",
     borderColor: "border-blue-600",
     buttonColor:
