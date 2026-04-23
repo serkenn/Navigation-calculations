@@ -1,16 +1,18 @@
 import { rad, deg } from "./navigationMath";
 
 /**
- * 子午線弧長 (Meridional Parts) - WGS84楕円体近似
+ * 漸長緯度 (Meridional Parts) - WGS84楕円体
+ * MP(φ) = (a/sin1') × [ ln(tan(π/4 + φ/2)) − (e/2)·ln((1+e·sinφ)/(1−e·sinφ)) ]
  */
 export function meridionalParts(lat: number): number {
   const latR = rad(Math.abs(lat));
-  const e = 0.08181919; // WGS84 離心率
+  const e = 0.0818191908426; // WGS84 離心率
   const sinL = Math.sin(latR);
   const eSinL = e * sinL;
   const mp =
-    7915.7045 * Math.log10(Math.tan(Math.PI / 4 + latR / 2)) -
-    3437.7468 * Math.log10((1 + eSinL) / (1 - eSinL));
+    3437.7467707849396 *
+    (Math.log(Math.tan(Math.PI / 4 + latR / 2)) -
+      (e / 2) * Math.log((1 + eSinL) / (1 - eSinL)));
   return lat >= 0 ? mp : -mp;
 }
 
