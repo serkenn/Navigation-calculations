@@ -137,3 +137,33 @@ export const calculateGyroError = (
   while (diff < -180) diff += 360;
   return diff;
 };
+
+// 7. 360度式を90度式（象限表記）に変換
+export const toQuadrantBearing = (course: number): string => {
+  // 0-360度の範囲に正規化
+  let normalizedCourse = course % 360;
+  if (normalizedCourse < 0) normalizedCourse += 360;
+
+  if (normalizedCourse === 0 || normalizedCourse === 360) {
+    return "N 0° E";
+  } else if (normalizedCourse === 90) {
+    return "N 90° E";
+  } else if (normalizedCourse === 180) {
+    return "S 0° E";
+  } else if (normalizedCourse === 270) {
+    return "N 90° W";
+  } else if (normalizedCourse > 0 && normalizedCourse < 90) {
+    return `N ${normalizedCourse.toFixed(1)}° E`;
+  } else if (normalizedCourse > 90 && normalizedCourse < 180) {
+    const angle = 180 - normalizedCourse;
+    return `S ${angle.toFixed(1)}° E`;
+  } else if (normalizedCourse > 180 && normalizedCourse < 270) {
+    const angle = normalizedCourse - 180;
+    return `S ${angle.toFixed(1)}° W`;
+  } else if (normalizedCourse > 270 && normalizedCourse < 360) {
+    const angle = 360 - normalizedCourse;
+    return `N ${angle.toFixed(1)}° W`;
+  }
+
+  return "N 0° E"; // fallback
+};

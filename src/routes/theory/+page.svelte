@@ -31,6 +31,38 @@
     </section>
 
     <section class="mb-8">
+      <h2 class="text-lg font-bold">計算精度と手計算との差異</h2>
+      <p>本アプリでは高精度なデジタル計算を行っており、従来の手計算との間で以下の差異が生じる場合があります：</p>
+
+      <h3 class="text-base font-semibold mt-4 mb-2">1. 楕円体モデルの違い</h3>
+      <p class="text-sm mb-3">
+        <strong>アプリ：</strong> WGS84楕円体（離心率 e = 0.0818191908426）による精密計算<br>
+        <strong>手計算：</strong> 球体近似または簡略化された楕円体モデル
+      </p>
+
+      <h3 class="text-base font-semibold mt-4 mb-2">2. 三角関数の精度</h3>
+      <p class="text-sm mb-3">
+        <strong>アプリ：</strong> 浮動小数点演算による高精度計算<br>
+        <strong>手計算：</strong> 三角関数表からの読み取り（通常4桁精度）
+      </p>
+
+      <h3 class="text-base font-semibold mt-4 mb-2">3. 中間値の丸め処理</h3>
+      <p class="text-sm mb-3">
+        <strong>アプリ：</strong> 最終段階まで精密計算を継続<br>
+        <strong>手計算：</strong> 計算過程で適宜丸め処理を実行
+      </p>
+
+      <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded border border-blue-200 dark:border-blue-800 mt-4">
+        <p class="text-sm"><strong>実際の差異：</strong></p>
+        <ul class="text-sm list-disc list-inside mt-2 space-y-1">
+          <li>短距離（30海里以下）：±0.1海里程度</li>
+          <li>中距離（100海里程度）：±0.2海里程度</li>
+          <li>長距離（200海里以上）：±0.5海里程度</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="mb-8">
       <h2 class="text-lg font-bold">大圏航法 (Great Circle Sailing)</h2>
       <p>地球上の2点間の最短距離を大円に沿って計算します。</p>
       <div

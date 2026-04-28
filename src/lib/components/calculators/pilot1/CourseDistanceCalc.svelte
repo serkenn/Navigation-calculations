@@ -3,7 +3,7 @@
   import PositionInput from '$lib/components/shared/PositionInput.svelte';
   import type { DMSValue } from '$lib/types/navigation';
   import { toDecimal } from '$lib/utils/navigationMath';
-  import { middleLatCourseDistance, mercatorCourseDistance } from '$lib/utils/mercatorSailing';
+  import { middleLatCourseDistance, mercatorCourseDistance, middleLatCourseDistanceManual } from '$lib/utils/mercatorSailing';
 
   let { onResult }: { onResult: (r: any) => void } = $props();
 
@@ -12,18 +12,22 @@
   let lat2: DMSValue = $state({ d: 33, m: 30, dir: 1 });
   let lon2: DMSValue = $state({ d: 135, m: 45, dir: 1 });
   let method: 'midlat' | 'mercator' = $state('midlat');
+  let precision: 'high' | 'manual' = $state('high');
 
   function handleCalculate() {
     const la1 = toDecimal(lat1.d, lat1.m) * lat1.dir;
     const lo1 = toDecimal(lon1.d, lon1.m) * lon1.dir;
     const la2 = toDecimal(lat2.d, lat2.m) * lat2.dir;
     const lo2 = toDecimal(lon2.d, lon2.m) * lon2.dir;
+
     if (method === 'midlat') {
-      const result = middleLatCourseDistance(la1, lo1, la2, lo2);
-      onResult({ ...result, lat1: la1, lon1: lo1, lat2: la2, lon2: lo2, method });
+      const result = precision === 'manual'
+        ? middleLatCourseDistanceManual(la1, lo1, la2, lo2)
+        : middleLatCourseDistance(la1, lo1, la2, lo2);
+      onResult({ ...result, lat1: la1, lon1: lo1, lat2: la2, lon2: lo2, method, precision });
     } else {
       const result = mercatorCourseDistance(la1, lo1, la2, lo2);
-      onResult({ ...result, lat1: la1, lon1: lo1, lat2: la2, lon2: lo2, method });
+      onResult({ ...result, lat1: la1, lon1: lo1, lat2: la2, lon2: lo2, method, precision });
     }
   }
 </script>
@@ -52,6 +56,29 @@
         </button>
       </div>
     </div>
+
+    {#if method === 'midlat'}
+    <div>
+      <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold block uppercase mb-1">計算精度 (Calculation Precision)</label>
+      <div class="flex gap-2">
+        <button
+          onclick={() => precision = 'high'}
+          class={`flex-1 py-2 px-3 rounded-lg text-sm font-bold border transition-colors ${precision === 'high' ? 'bg-purple-100 dark:bg-purple-900/40 border-purple-400 text-purple-700 dark:text-purple-300' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400'}`}
+        >
+          高精度計算
+        </button>
+        <button
+          onclick={() => precision = 'manual'}
+          class={`flex-1 py-2 px-3 rounded-lg text-sm font-bold border transition-colors ${precision === 'manual' ? 'bg-orange-100 dark:bg-orange-900/40 border-orange-400 text-orange-700 dark:text-orange-300' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400'}`}
+        >
+          手計算相当
+        </button>
+      </div>
+      <p class="text-[10px] text-slate-400 mt-1">
+        {precision === 'high' ? 'WGS84楕円体による高精度計算' : '三角関数表を使った手計算に近い精度'}
+      </p>
+    </div>
+    {/if}
   </section>
 
   <section class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4 transition-colors">

@@ -145,3 +145,61 @@ export function middleLatCourseDistance(
 
   return { course, distance, dLat: dLatMin, dLon: dLonMin, dep, midLat };
 }
+
+/**
+ * 中分緯度航法: 2地点間の針路と航程（手計算モード）
+ * 関数電卓を使った手計算相当の精度で計算（各段階で小数第一位に丸め）
+ */
+export function middleLatCourseDistanceManual(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+) {
+  // 各段階で小数第一位に丸める（関数電卓での手計算相当）
+  const dLatMin = Math.round((lat2 - lat1) * 60 * 10) / 10; // 分
+  let dLonMin = Math.round((lon2 - lon1) * 60 * 10) / 10; // 分
+
+  // 日付変更線対応
+  while (dLonMin > 180 * 60) dLonMin -= 360 * 60;
+  while (dLonMin < -180 * 60) dLonMin += 360 * 60;
+  dLonMin = Math.round(dLonMin * 10) / 10; // 再度丸め
+
+  const midLat = Math.round(((lat1 + lat2) / 2) * 10) / 10; // 中分緯度を小数第一位に丸め
+
+  // 関数電卓でcos値を高精度計算（丸めずにそのまま使用）
+  const cosValue = Math.cos(rad(midLat));
+
+  const dep = Math.round(dLonMin * cosValue * 10) / 10; // departure を小数第一位に丸め
+
+  let course: number;
+  let distance: number;
+
+  if (Math.abs(dLatMin) < 0.1) {
+    // 同緯度 (平行圏航法)
+    course = dep > 0 ? 90 : 270;
+    distance = Math.abs(dep);
+  } else {
+    course = deg(Math.atan2(dep, dLatMin));
+    if (course < 0) course += 360;
+
+    // 針路を小数第一位で丸める
+    course = Math.round(course * 10) / 10;
+
+    distance = Math.abs(dLatMin / Math.cos(rad(course)));
+  }
+
+  // 最終距離を小数第一位で丸める
+  distance = Math.round(distance * 10) / 10;
+
+  return {
+    course,
+    distance,
+    dLat: dLatMin,
+    dLon: dLonMin,
+    dep,
+    midLat,
+    cosValue,
+    calculationMode: "manual",
+  };
+}
