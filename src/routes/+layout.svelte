@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/state';
-  import { themeStore } from '#lib/stores/theme.svelte.js';
+  import { themeStore, THEME_COLORS } from '#lib/stores/theme.svelte.js';
   import Sidebar from '#lib/components/layout/Sidebar.svelte';
   import MobileHeader from '#lib/components/layout/MobileHeader.svelte';
   import UpdateBanner from '#lib/components/layout/UpdateBanner.svelte';
@@ -13,12 +13,14 @@
   const calcId = $derived(page.params.id ?? '');
   const calc = $derived(getCalculator(calcId));
 
-  // テーマは <html class="dark"> で切り替える（app.html の先行スクリプトと同じ場所）
+  // テーマは <html class="dark"> で切り替える（app.html の先行スクリプトと同じ場所）。
+  // theme-color もブラウザ UI の色がヘッダーと揃うように更新する
   $effect(() => {
-    document.documentElement.classList.toggle(
-      'dark',
-      themeStore.current === 'dark',
-    );
+    const theme = themeStore.current;
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', THEME_COLORS[theme]);
   });
 </script>
 
