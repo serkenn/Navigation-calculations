@@ -1,6 +1,6 @@
 import { browser } from "$app/env";
 
-/** ブラウザ UI（アドレスバーなど）の色。モバイルヘッダーの背景色に合わせる */
+/** ブラウザ UI（アドレスバーなど）の色。モバイルヘッダーの背景色に合わせる（static/manifest.json の theme_color も light と同じ値） */
 export const THEME_COLORS = { light: "#ffffff", dark: "#0f172a" } as const;
 
 function createThemeStore() {
