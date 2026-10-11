@@ -5,6 +5,7 @@
   import DMSInput from '#lib/components/shared/DMSInput.svelte';
   import NumberInput from '#lib/components/shared/NumberInput.svelte';
   import TimeInput from '#lib/components/shared/TimeInput.svelte';
+  import DateInput from '#lib/components/shared/DateInput.svelte';
   import type { DMSValue, HMSValue } from '#lib/types/navigation.js';
   import { dmsToDecimal, normalize180 } from '#lib/utils/navigationMath.js';
   import { middleLatDeadReckoning } from '#lib/utils/mercatorSailing.js';
@@ -18,6 +19,8 @@
 
   let { onResult }: { onResult: (r: any) => void } = $props();
 
+  // 観測日（答案の日付欄に表示）
+  let date = $state(new Date().toISOString().slice(0, 10));
   // 午前の観測
   let lat1: DMSValue = $state({ d: 37, m: 20, dir: 1 });
   let lon1: DMSValue = $state({ d: 146, m: 15, dir: 1 });
@@ -68,6 +71,7 @@
     const noonLon = normalize180(run.lon2 + corr.dLongCorr / 60);
 
     onResult({
+      date,
       lat1: l1,
       lon1: L1,
       hs1: dmsToDecimal(hs1),
@@ -103,6 +107,10 @@
 </script>
 
 <CalcForm onsubmit={calculate}>
+  <SectionCard cols={1}>
+    <DateInput label="観測日" bind:value={date} />
+  </SectionCard>
+
   <SectionCard title="1. 午前の太陽観測">
     <PositionInput
       bind:lat={lat1}
