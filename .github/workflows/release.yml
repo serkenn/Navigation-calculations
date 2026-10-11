@@ -51,6 +51,7 @@ jobs:
           cache: "npm"
 
       - name: Sync version from tag
+        if: startsWith(github.ref, 'refs/tags/')
         shell: bash
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
@@ -81,6 +82,7 @@ jobs:
           cache: "npm"
 
       - name: Sync version from tag
+        if: startsWith(github.ref, 'refs/tags/')
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
           npm version "$VERSION" --no-git-tag-version
@@ -122,6 +124,7 @@ jobs:
         run: npm ci
 
       - name: Sync version from tag
+        if: startsWith(github.ref, 'refs/tags/')
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
           npm version "$VERSION" --no-git-tag-version
