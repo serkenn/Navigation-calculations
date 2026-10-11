@@ -21,9 +21,15 @@ const server = http.createServer((req, res) => {
   let url = req.url.split("?")[0];
   if (url === "/") url = "/index.html";
 
-  let filePath = path.join(DIR, url);
+  let filePath = path.resolve(DIR, "." + decodeURIComponent(url));
 
-  if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
+  // DIR の外（../ など）や存在しないパスは SPA のフォールバックへ
+  const inside = filePath.startsWith(path.resolve(DIR) + path.sep);
+  if (
+    !inside ||
+    !fs.existsSync(filePath) ||
+    fs.statSync(filePath).isDirectory()
+  ) {
     filePath = path.join(DIR, "index.html");
   }
 

@@ -203,8 +203,13 @@ export function sunEvent(
       eqTime: noon.sun.eqTime,
     };
   }
-  const rise = at(noon.ph.rise).ph.rise;
-  const set = at(noon.ph.set).ph.set;
+  // 現象時刻の赤緯・均時差で 1 回反復する（極付近で反復側が不可能になったら初回の値を使う）
+  const refine = (lmt: number, key: "rise" | "set") => {
+    const ph = at(lmt).ph;
+    return ph.possible ? ph[key] : lmt;
+  };
+  const rise = refine(noon.ph.rise, "rise");
+  const set = refine(noon.ph.set, "set");
   const toZT = (lmt: number) => lmt - (lon - zoneMeridian) / 15;
   return {
     possible: true as const,

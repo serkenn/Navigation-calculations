@@ -20,7 +20,7 @@
 
 <div class="sheet-highlight p-4 text-center border {accent().highlight}">
   <div class="grid {cols} gap-4">
-    {#each items as item (item.label)}
+    {#each items as item, i (i)}
       <div>
         <p
           class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1"

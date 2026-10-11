@@ -7,15 +7,26 @@
   import type { DMSValue } from '#lib/types/navigation.js';
   import { dmsToDecimal } from '#lib/utils/navigationMath.js';
   import { sunEvents } from '#lib/utils/astronomy.js';
+  import {
+    todayLocal,
+    isValidDateString,
+    INVALID_DATE_MESSAGE,
+  } from '#lib/utils/dates.js';
 
   let { onResult }: { onResult: (r: any) => void } = $props();
 
-  let date = $state(new Date().toISOString().slice(0, 10));
+  let date = $state(todayLocal());
+  let error = $state('');
   let lat: DMSValue = $state({ d: 35, m: 0, dir: 1 });
   let lon: DMSValue = $state({ d: 139, m: 45, dir: 1 });
   let zone: DMSValue = $state({ d: 135, m: 0, dir: 1 });
 
   function calculate() {
+    if (!isValidDateString(date)) {
+      error = INVALID_DATE_MESSAGE;
+      return;
+    }
+    error = '';
     const p = {
       date,
       lat: dmsToDecimal(lat),
@@ -26,7 +37,7 @@
   }
 </script>
 
-<CalcForm onsubmit={calculate}>
+<CalcForm onsubmit={calculate} {error}>
   <SectionCard title="日付・位置">
     <div class="sm:col-span-2">
       <DateInput label="日付 (Date)" bind:value={date} />

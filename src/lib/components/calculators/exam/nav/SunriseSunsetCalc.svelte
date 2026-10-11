@@ -7,6 +7,7 @@
   import type { DMSValue } from '#lib/types/navigation.js';
   import { dmsToDecimal } from '#lib/utils/navigationMath.js';
   import { sunEvent } from '#lib/utils/astronomy.js';
+  import { isValidDateString, INVALID_DATE_MESSAGE } from '#lib/utils/dates.js';
 
   let { onResult }: { onResult: (r: any) => void } = $props();
 
@@ -17,6 +18,10 @@
   let error = $state('');
 
   function calculate() {
+    if (!isValidDateString(date)) {
+      error = INVALID_DATE_MESSAGE;
+      return;
+    }
     const p = {
       date,
       lat: dmsToDecimal(lat),

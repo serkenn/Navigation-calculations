@@ -10,7 +10,7 @@
 </script>
 
 <div class="space-y-2 border-b border-slate-200 dark:border-slate-800 pb-4">
-  {#each rows as row (row.label)}
+  {#each rows as row, i (i)}
     <ResultRow {...row} />
   {/each}
 </div>

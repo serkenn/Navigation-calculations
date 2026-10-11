@@ -9,6 +9,7 @@
   import type { DMSValue, HMSValue } from '#lib/types/navigation.js';
   import { dmsToDecimal, normalize180 } from '#lib/utils/navigationMath.js';
   import { middleLatDeadReckoning } from '#lib/utils/mercatorSailing.js';
+  import { todayLocal } from '#lib/utils/dates.js';
   import {
     intercept,
     latitudeByMeridianAltitude,
@@ -20,7 +21,7 @@
   let { onResult }: { onResult: (r: any) => void } = $props();
 
   // 観測日（答案の日付欄に表示）
-  let date = $state(new Date().toISOString().slice(0, 10));
+  let date = $state(todayLocal());
   // 午前の観測
   let lat1: DMSValue = $state({ d: 37, m: 20, dir: 1 });
   let lon1: DMSValue = $state({ d: 146, m: 15, dir: 1 });

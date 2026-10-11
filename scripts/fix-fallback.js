@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, copyFileSync } from "fs";
+import { copyFileSync } from "fs";
 
 // Copy offline server into dist for zip distribution
 copyFileSync("scripts/offline-server.cjs", "dist/server.cjs");

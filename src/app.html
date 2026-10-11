@@ -2,6 +2,19 @@
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
+    <script>
+      // 描画前にテーマを <html> に付けて、ダークモード時のちらつきを防ぐ
+      try {
+        var t = localStorage.getItem("navcalc-theme");
+        if (
+          t === "dark" ||
+          (t !== "light" &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ) {
+          document.documentElement.classList.add("dark");
+        }
+      } catch (e) {}
+    </script>
     <link rel="icon" href="%sveltekit.assets%/vite.svg" />
     <link rel="manifest" href="%sveltekit.assets%/manifest.json" />
     <meta

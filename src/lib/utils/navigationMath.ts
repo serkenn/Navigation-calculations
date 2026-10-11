@@ -39,9 +39,11 @@ export function formatDMS(
     .toFixed(decimals)
     .padStart(decimals > 0 ? 3 + decimals : 2, "0");
 
+  // 丸めて 0 になる値（例: -0.0001）に S/W を付けない
+  const positive = val >= 0 || totalMin === 0;
   let suffix = "";
-  if (type === "lat") suffix = val >= 0 ? " N" : " S";
-  if (type === "lon") suffix = val >= 0 ? " E" : " W";
+  if (type === "lat") suffix = positive ? " N" : " S";
+  if (type === "lon") suffix = positive ? " E" : " W";
   const dStr = type === "lon" ? String(d).padStart(3, "0") : String(d);
 
   return `${dStr}° ${mStr}'${suffix}`;
@@ -60,8 +62,10 @@ export function formatDirected(
   negative: string,
   unit = "'",
 ): string {
-  const dir = minutes >= 0 ? positive : negative;
-  return `${Math.abs(minutes).toFixed(1)}${unit} ${dir}`;
+  const abs = Math.abs(minutes).toFixed(1);
+  // 丸めて 0.0 になる値に負の方向記号を付けない
+  const dir = minutes >= 0 || Number(abs) === 0 ? positive : negative;
+  return `${abs}${unit} ${dir}`;
 }
 
 /** 符号付きの角度（度）を度分 + 方向記号で表記 (例: 97.83 → "97° 50.0' E") */
@@ -70,7 +74,9 @@ export function formatDirectedDMS(
   positive: string,
   negative: string,
 ): string {
-  return `${formatDMS(Math.abs(degrees))} ${degrees >= 0 ? positive : negative}`;
+  const dms = formatDMS(Math.abs(degrees));
+  const isZero = dms === formatDMS(0);
+  return `${dms} ${degrees >= 0 || isZero ? positive : negative}`;
 }
 
 /** 針路・方位を 3 桁表記 (例: 45.04 → "045.0°") */

@@ -32,6 +32,7 @@
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let result: any = $state(null);
   let showMobileResult = $state(false);
+  let sheetEl: HTMLDivElement | undefined = $state();
 
   // 計算機が切り替わったら、描画前に前の結果を破棄する
   $effect.pre(() => {
@@ -44,7 +45,8 @@
   function handleResult(r: any) {
     result = r;
     showMobileResult = true;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // ページではなく結果シート側がスクロールするので、シートを先頭に戻す
+    sheetEl?.scrollTo({ top: 0, behavior: 'smooth' });
   }
 </script>
 
@@ -77,11 +79,16 @@
       {:catch}
         <p class="text-sm text-rose-600">計算機を読み込めませんでした。</p>
       {/await}
+    {:else}
+      <p class="text-sm text-slate-500 dark:text-slate-400">
+        「{data.id}」という計算機はありません。左のメニューから選んでください。
+      </p>
     {/if}
   </div>
 
   <!-- 右パネル（Calculation Sheet） -->
   <div
+    bind:this={sheetEl}
     class="calc-sheet w-full lg:w-7/12 p-6 md:p-10 overflow-y-auto font-mono relative shadow-inner min-h-[50vh] lg:h-full transition-colors bg-[#fffdf5] dark:bg-[#1a1c23] text-slate-800 dark:text-slate-200 {showMobileResult
       ? 'block h-full'
       : 'hidden lg:block'}"

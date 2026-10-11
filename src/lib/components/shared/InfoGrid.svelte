@@ -6,7 +6,7 @@
 <div
   class="grid grid-cols-2 gap-4 border-b border-slate-200 dark:border-slate-800 pb-4"
 >
-  {#each items as item (item.label)}
+  {#each items as item, i (i)}
     <div>
       <p
         class="text-[11px] font-bold uppercase text-slate-500 dark:text-slate-400"

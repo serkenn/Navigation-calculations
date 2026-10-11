@@ -12,6 +12,14 @@
 
   const calcId = $derived(page.params.id ?? '');
   const calc = $derived(getCalculator(calcId));
+
+  // テーマは <html class="dark"> で切り替える（app.html の先行スクリプトと同じ場所）
+  $effect(() => {
+    document.documentElement.classList.toggle(
+      'dark',
+      themeStore.current === 'dark',
+    );
+  });
 </script>
 
 <!-- 計算機ページの title/description。トップ・ガイド・理論は各ページで設定する -->
@@ -22,7 +30,7 @@
   {/if}
 </svelte:head>
 
-<div class={themeStore.current}>
+<div>
   <div
     class="flex flex-col lg:flex-row h-screen bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans overflow-hidden transition-colors duration-300"
     style="padding-left: var(--sal); padding-right: var(--sar); padding-bottom: var(--sab);"

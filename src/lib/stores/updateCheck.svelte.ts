@@ -25,10 +25,17 @@ class UpdateChecker {
 
   constructor() {
     if (typeof window !== "undefined") {
-      // Web GUI (http/https) は push 時に自動デプロイされるため更新チェック不要
+      // Web 版（公開サイト）は push 時に自動デプロイされるため更新チェック不要。
+      // Electron は http://127.0.0.1、Capacitor は https://localhost / capacitor://localhost
+      // で動くので、ホスト名で見分ける
+      const { protocol, hostname } = window.location;
+      const isLocalApp =
+        hostname === "localhost" ||
+        hostname === "127.0.0.1" ||
+        protocol === "capacitor:" ||
+        protocol === "file:";
       const isWeb =
-        window.location.protocol === "http:" ||
-        window.location.protocol === "https:";
+        (protocol === "http:" || protocol === "https:") && !isLocalApp;
       if (!isWeb) {
         this.check();
         this.timer = setInterval(() => this.check(), CHECK_INTERVAL);

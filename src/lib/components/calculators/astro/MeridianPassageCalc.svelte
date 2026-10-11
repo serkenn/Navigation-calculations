@@ -10,10 +10,16 @@
     latitudeByMeridianAltitude,
     sunMeridianPassage,
   } from '#lib/utils/astronomy.js';
+  import {
+    todayLocal,
+    isValidDateString,
+    INVALID_DATE_MESSAGE,
+  } from '#lib/utils/dates.js';
 
   let { onResult }: { onResult: (r: any) => void } = $props();
 
-  let date = $state(new Date().toISOString().slice(0, 10));
+  let date = $state(todayLocal());
+  let error = $state('');
   let lon: DMSValue = $state({ d: 139, m: 45, dir: 1 });
   let zone: DMSValue = $state({ d: 135, m: 0, dir: 1 });
   let useAltitude = $state(true);
@@ -21,6 +27,11 @@
   let bearing: 'N' | 'S' = $state('S');
 
   function calculate() {
+    if (!isValidDateString(date)) {
+      error = INVALID_DATE_MESSAGE;
+      return;
+    }
+    error = '';
     const lo = dmsToDecimal(lon);
     const z = dmsToDecimal(zone);
     const pass = sunMeridianPassage(date, lo, z);
@@ -39,7 +50,7 @@
   }
 </script>
 
-<CalcForm onsubmit={calculate}>
+<CalcForm onsubmit={calculate} {error}>
   <SectionCard title="日付・経度">
     <div class="sm:col-span-2">
       <DateInput label="日付 (Date)" bind:value={date} />

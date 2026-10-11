@@ -28,8 +28,10 @@ function startServer() {
 
     // Static assets: serve the file directly
     if (ext && ext !== ".html") {
-      const filePath = path.join(DIST_DIR, url);
-      if (fs.existsSync(filePath)) {
+      const filePath = path.resolve(DIST_DIR, "." + decodeURIComponent(url));
+      // dist の外（../ など）は配信しない
+      const inside = filePath.startsWith(path.resolve(DIST_DIR) + path.sep);
+      if (inside && fs.existsSync(filePath)) {
         const contentType = MIME_TYPES[ext] || "application/octet-stream";
         fs.readFile(filePath, (err, data) => {
           if (err) {

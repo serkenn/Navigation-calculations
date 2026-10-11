@@ -6,12 +6,17 @@
   import TimeInput from '#lib/components/shared/TimeInput.svelte';
   import type { HMSValue } from '#lib/types/navigation.js';
   import { hmsToHours } from '#lib/utils/timeConversion.js';
+  import {
+    todayLocal,
+    isValidDateString,
+    INVALID_DATE_MESSAGE,
+  } from '#lib/utils/dates.js';
 
   let { onResult }: { onResult: (r: any) => void } = $props();
 
   let distance = $state(350);
   let speed = $state(14.5);
-  let depDate = $state(new Date().toISOString().slice(0, 10));
+  let depDate = $state(todayLocal());
   let depTime: HMSValue = $state({ h: 8, m: 0, s: 0, sign: 1 });
   let zoneChange = $state(0);
   let error = $state('');
@@ -19,6 +24,10 @@
   function calculate() {
     if (!(speed > 0)) {
       error = '速力は 0 より大きい値を入力してください。';
+      return;
+    }
+    if (!isValidDateString(depDate)) {
+      error = INVALID_DATE_MESSAGE;
       return;
     }
     error = '';
