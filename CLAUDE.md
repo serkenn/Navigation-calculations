@@ -75,7 +75,7 @@ src/routes/
 
 全計算機は同じ2コンポーネント構成:
 
-- **`*Calc.svelte`** — 左パネル（入力フォーム）。`onResult` コールバック prop を受け取り、計算実行時に結果オブジェクトを渡す。`CalcForm`（送信ボタン・エラー表示込み）の中に `SectionCard` と入力部品を並べる。見出しはページ側で出すので書かない。
+- **`*Calc.svelte`** — 左パネル（入力フォーム）。`onResult` コールバック prop を受け取り、計算実行時に結果オブジェクトを渡す。`CalcForm`（送信ボタン・エラー表示込み。空欄の数値・日付入力があれば計算せずに未入力エラーを出す）の中に `SectionCard` と入力部品を並べる。見出しはページ側で出すので書かない。
 - **`*Result.svelte`** — 右パネル（"Calculation Sheet"）。`result` prop を受け取り、`Sheet` の中に `InfoGrid` / `ResultRows` / `Step`（試験の解答手順）/ `Highlight`（最終答案）/ `Note` で表示する。
 
 共通部品（`src/lib/components/shared/`）:

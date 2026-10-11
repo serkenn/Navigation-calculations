@@ -1,6 +1,6 @@
-/** 入力欄の共通クラス（枠・背景・文字） */
+/** 入力欄の共通クラス（枠・背景・文字）。未入力（aria-invalid）の欄は赤枠にする */
 export const boxClass =
-  "flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-2 h-10 transition-colors";
+  "flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-2 h-10 transition-colors has-[[aria-invalid=true]]:border-rose-400 has-[[aria-invalid=true]]:bg-rose-50 dark:has-[[aria-invalid=true]]:bg-rose-900/20";
 
 export const inputClass =
   "min-w-0 w-full bg-transparent outline-none font-mono text-sm text-right text-slate-900 dark:text-white placeholder-slate-400 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none";
