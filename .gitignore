@@ -8,4 +8,4 @@ dist/
 NavCalc/.vs/
 NavCalc/NavCalc.App/obj/
 NavCalc/NavCalc.Core/obj/
-NavCalc/NavCalc.Tests/obj/
+NavCalc/NavCalc.Tests/obj/.claude/worktrees/
