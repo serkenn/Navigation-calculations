@@ -72,5 +72,8 @@
   "imports": {
     "#lib": "./src/lib/index.js",
     "#lib/*": "./src/lib/*"
+  },
+  "engines": {
+    "node": ">=22.17"
   }
 }
