@@ -70,30 +70,30 @@
   import OperationCargoByDraftResult from '$lib/components/calculators/exam/OperationCargoByDraftResult.svelte';
   import OperationDensityMeanCalc from '$lib/components/calculators/exam/OperationDensityMeanCalc.svelte';
   import OperationDensityMeanResult from '$lib/components/calculators/exam/OperationDensityMeanResult.svelte';
-   import ParallelMeridionalCalc from '$lib/components/calculators/exam/nav/ParallelMeridionalCalc.svelte';
-   import ParallelMeridionalResult from '$lib/components/calculators/exam/nav/ParallelMeridionalResult.svelte';
-   import NavGreatCircleCalc from '$lib/components/calculators/exam/nav/GreatCircleCalc.svelte';
-   import NavGreatCircleResult from '$lib/components/calculators/exam/nav/GreatCircleResult.svelte';
-   import NavTrueWindCalc from '$lib/components/calculators/exam/nav/TrueWindCalc.svelte';
-   import NavTrueWindResult from '$lib/components/calculators/exam/nav/TrueWindResult.svelte';
-   import NavCourseToSteerCalc from '$lib/components/calculators/exam/nav/CourseToSteerCalc.svelte';
-   import NavCourseToSteerResult from '$lib/components/calculators/exam/nav/CourseToSteerResult.svelte';
-   import NavDeadReckoningCalc from '$lib/components/calculators/exam/nav/DeadReckoningCalc.svelte';
-   import NavDeadReckoningResult from '$lib/components/calculators/exam/nav/DeadReckoningResult.svelte';
-   import LightRangeCalc from '$lib/components/calculators/exam/nav/LightRangeCalc.svelte';
-   import LightRangeResult from '$lib/components/calculators/exam/nav/LightRangeResult.svelte';
-   import TidalCurrentCalc from '$lib/components/calculators/exam/nav/TidalCurrentCalc.svelte';
-   import TidalCurrentResult from '$lib/components/calculators/exam/nav/TidalCurrentResult.svelte';
-   import CrossBearingCalc from '$lib/components/calculators/exam/nav/CrossBearingCalc.svelte';
-   import CrossBearingResult from '$lib/components/calculators/exam/nav/CrossBearingResult.svelte';
-   import RunningFixCalc from '$lib/components/calculators/exam/nav/RunningFixCalc.svelte';
-   import RunningFixResult from '$lib/components/calculators/exam/nav/RunningFixResult.svelte';
-   import ClockCorrectionCalc from '$lib/components/calculators/exam/nav/ClockCorrectionCalc.svelte';
-   import ClockCorrectionResult from '$lib/components/calculators/exam/nav/ClockCorrectionResult.svelte';
-   import SunriseSunsetCalc from '$lib/components/calculators/exam/nav/SunriseSunsetCalc.svelte';
-   import SunriseSunsetResult from '$lib/components/calculators/exam/nav/SunriseSunsetResult.svelte';
-   import AmplitudeGyroCalc from '$lib/components/calculators/exam/nav/AmplitudeGyroCalc.svelte';
-   import AmplitudeGyroResult from '$lib/components/calculators/exam/nav/AmplitudeGyroResult.svelte';
+  import ParallelMeridionalCalc from '$lib/components/calculators/exam/nav/ParallelMeridionalCalc.svelte';
+  import ParallelMeridionalResult from '$lib/components/calculators/exam/nav/ParallelMeridionalResult.svelte';
+  import NavGreatCircleCalc from '$lib/components/calculators/exam/nav/GreatCircleCalc.svelte';
+  import NavGreatCircleResult from '$lib/components/calculators/exam/nav/GreatCircleResult.svelte';
+  import NavTrueWindCalc from '$lib/components/calculators/exam/nav/TrueWindCalc.svelte';
+  import NavTrueWindResult from '$lib/components/calculators/exam/nav/TrueWindResult.svelte';
+  import NavCourseToSteerCalc from '$lib/components/calculators/exam/nav/CourseToSteerCalc.svelte';
+  import NavCourseToSteerResult from '$lib/components/calculators/exam/nav/CourseToSteerResult.svelte';
+  import NavDeadReckoningCalc from '$lib/components/calculators/exam/nav/DeadReckoningCalc.svelte';
+  import NavDeadReckoningResult from '$lib/components/calculators/exam/nav/DeadReckoningResult.svelte';
+  import LightRangeCalc from '$lib/components/calculators/exam/nav/LightRangeCalc.svelte';
+  import LightRangeResult from '$lib/components/calculators/exam/nav/LightRangeResult.svelte';
+  import TidalCurrentCalc from '$lib/components/calculators/exam/nav/TidalCurrentCalc.svelte';
+  import TidalCurrentResult from '$lib/components/calculators/exam/nav/TidalCurrentResult.svelte';
+  import CrossBearingCalc from '$lib/components/calculators/exam/nav/CrossBearingCalc.svelte';
+  import CrossBearingResult from '$lib/components/calculators/exam/nav/CrossBearingResult.svelte';
+  import RunningFixCalc from '$lib/components/calculators/exam/nav/RunningFixCalc.svelte';
+  import RunningFixResult from '$lib/components/calculators/exam/nav/RunningFixResult.svelte';
+  import ClockCorrectionCalc from '$lib/components/calculators/exam/nav/ClockCorrectionCalc.svelte';
+  import ClockCorrectionResult from '$lib/components/calculators/exam/nav/ClockCorrectionResult.svelte';
+  import SunriseSunsetCalc from '$lib/components/calculators/exam/nav/SunriseSunsetCalc.svelte';
+  import SunriseSunsetResult from '$lib/components/calculators/exam/nav/SunriseSunsetResult.svelte';
+  import AmplitudeGyroCalc from '$lib/components/calculators/exam/nav/AmplitudeGyroCalc.svelte';
+  import AmplitudeGyroResult from '$lib/components/calculators/exam/nav/AmplitudeGyroResult.svelte';
 
   let { data } = $props();
   let result: any = $state(null);
@@ -128,114 +128,185 @@
   }
 
   const componentMap: Record<string, { calc: any; result: any }> = {
-    'course-distance': { calc: CourseDistanceCalc, result: CourseDistanceResult },
+    'course-distance': {
+      calc: CourseDistanceCalc,
+      result: CourseDistanceResult,
+    },
     'dead-reckoning': { calc: DeadReckoningCalc, result: DeadReckoningResult },
     'great-circle': { calc: GreatCircleCalc, result: GreatCircleResult },
-    'composite-sailing': { calc: CompositeSailingCalc, result: CompositeSailingResult },
-    'eta': { calc: ETACalc, result: ETAResult },
+    'composite-sailing': {
+      calc: CompositeSailingCalc,
+      result: CompositeSailingResult,
+    },
+    eta: { calc: ETACalc, result: ETAResult },
     'cmg-smg': { calc: CMGSMGCalc, result: CMGSMGResult },
     'course-to-steer': { calc: CourseToSteerCalc, result: CourseToSteerResult },
-    'course-steer-smg': { calc: CourseSteerSMGCalc, result: CourseSteerSMGResult },
+    'course-steer-smg': {
+      calc: CourseSteerSMGCalc,
+      result: CourseSteerSMGResult,
+    },
     'set-drift': { calc: SetDriftCalc, result: SetDriftResult },
     'true-wind': { calc: TrueWindCalc, result: TrueWindResult },
     'tide-height': { calc: TideHeightCalc, result: TideHeightResult },
     'tidal-stream': { calc: TidalStreamCalc, result: TidalStreamResult },
-    'twilight': { calc: TwilightCalc, result: TwilightResult },
+    twilight: { calc: TwilightCalc, result: TwilightResult },
     'star-finder': { calc: StarFinderCalc, result: StarFinderResult },
-    'nautical-almanac': { calc: NauticalAlmanacCalc, result: NauticalAlmanacResult },
-    'lop': { calc: LOPCalc, result: LOPResult },
+    'nautical-almanac': {
+      calc: NauticalAlmanacCalc,
+      result: NauticalAlmanacResult,
+    },
+    lop: { calc: LOPCalc, result: LOPResult },
     'position-fix': { calc: PositionFixCalc, result: PositionFixResult },
     'gyro-amplitude': { calc: GyroAmplitudeCalc, result: GyroAmplitudeResult },
-    'altitude-correction': { calc: AltitudeCorrCalc, result: AltitudeCorrResult },
-    'distance-to-object': { calc: DistanceToObjectCalc, result: DistanceToObjectResult },
+    'altitude-correction': {
+      calc: AltitudeCorrCalc,
+      result: AltitudeCorrResult,
+    },
+    'distance-to-object': {
+      calc: DistanceToObjectCalc,
+      result: DistanceToObjectResult,
+    },
     'time-to-arc': { calc: TimeToArcCalc, result: TimeToArcResult },
     'arc-to-time': { calc: ArcToTimeCalc, result: ArcToTimeResult },
     'to-hms': { calc: ToHMSCalc, result: ToHMSResult },
     'to-decimal': { calc: ToDecimalCalc, result: ToDecimalResult },
-    'arithmetic': { calc: ArithmeticCalc, result: ArithmeticResult },
+    arithmetic: { calc: ArithmeticCalc, result: ArithmeticResult },
     'meripass-3n': { calc: MeripassCalc, result: MeripassResult },
-    'op-tpc-draft': { calc: OperationTPCDraftCalc, result: OperationTPCDraftResult },
-    'op-trim-load': { calc: OperationTrimLoadCalc, result: OperationTrimLoadResult },
-    'op-gm-period': { calc: OperationGMPeriodCalc, result: OperationGMPeriodResult },
-    'op-density-draft': { calc: OperationDensityDraftCalc, result: OperationDensityDraftResult },
-    'op-blind-zone': { calc: OperationBlindZoneCalc, result: OperationBlindZoneResult },
-    'op-ballast-transfer': { calc: OperationBallastTransferCalc, result: OperationBallastTransferResult },
-    'op-cargo-by-draft': { calc: OperationCargoByDraftCalc, result: OperationCargoByDraftResult },
-    'op-density-mean': { calc: OperationDensityMeanCalc, result: OperationDensityMeanResult },
-     'nav-parallel-meridional': { calc: ParallelMeridionalCalc, result: ParallelMeridionalResult },
-     'nav-great-circle': { calc: NavGreatCircleCalc, result: NavGreatCircleResult },
-     'nav-true-wind': { calc: NavTrueWindCalc, result: NavTrueWindResult },
-     'nav-course-to-steer': { calc: NavCourseToSteerCalc, result: NavCourseToSteerResult },
-     'nav-dead-reckoning': { calc: NavDeadReckoningCalc, result: NavDeadReckoningResult },
-     'nav-light-range': { calc: LightRangeCalc, result: LightRangeResult },
-     'nav-tidal-current': { calc: TidalCurrentCalc, result: TidalCurrentResult },
-     'nav-cross-bearing': { calc: CrossBearingCalc, result: CrossBearingResult },
-     'nav-running-fix': { calc: RunningFixCalc, result: RunningFixResult },
-     'nav-clock-correction': { calc: ClockCorrectionCalc, result: ClockCorrectionResult },
-     'nav-sunrise-sunset': { calc: SunriseSunsetCalc, result: SunriseSunsetResult },
-     'nav-amplitude-gyro': { calc: AmplitudeGyroCalc, result: AmplitudeGyroResult },
+    'op-tpc-draft': {
+      calc: OperationTPCDraftCalc,
+      result: OperationTPCDraftResult,
+    },
+    'op-trim-load': {
+      calc: OperationTrimLoadCalc,
+      result: OperationTrimLoadResult,
+    },
+    'op-gm-period': {
+      calc: OperationGMPeriodCalc,
+      result: OperationGMPeriodResult,
+    },
+    'op-density-draft': {
+      calc: OperationDensityDraftCalc,
+      result: OperationDensityDraftResult,
+    },
+    'op-blind-zone': {
+      calc: OperationBlindZoneCalc,
+      result: OperationBlindZoneResult,
+    },
+    'op-ballast-transfer': {
+      calc: OperationBallastTransferCalc,
+      result: OperationBallastTransferResult,
+    },
+    'op-cargo-by-draft': {
+      calc: OperationCargoByDraftCalc,
+      result: OperationCargoByDraftResult,
+    },
+    'op-density-mean': {
+      calc: OperationDensityMeanCalc,
+      result: OperationDensityMeanResult,
+    },
+    'nav-parallel-meridional': {
+      calc: ParallelMeridionalCalc,
+      result: ParallelMeridionalResult,
+    },
+    'nav-great-circle': {
+      calc: NavGreatCircleCalc,
+      result: NavGreatCircleResult,
+    },
+    'nav-true-wind': { calc: NavTrueWindCalc, result: NavTrueWindResult },
+    'nav-course-to-steer': {
+      calc: NavCourseToSteerCalc,
+      result: NavCourseToSteerResult,
+    },
+    'nav-dead-reckoning': {
+      calc: NavDeadReckoningCalc,
+      result: NavDeadReckoningResult,
+    },
+    'nav-light-range': { calc: LightRangeCalc, result: LightRangeResult },
+    'nav-tidal-current': { calc: TidalCurrentCalc, result: TidalCurrentResult },
+    'nav-cross-bearing': { calc: CrossBearingCalc, result: CrossBearingResult },
+    'nav-running-fix': { calc: RunningFixCalc, result: RunningFixResult },
+    'nav-clock-correction': {
+      calc: ClockCorrectionCalc,
+      result: ClockCorrectionResult,
+    },
+    'nav-sunrise-sunset': {
+      calc: SunriseSunsetCalc,
+      result: SunriseSunsetResult,
+    },
+    'nav-amplitude-gyro': {
+      calc: AmplitudeGyroCalc,
+      result: AmplitudeGyroResult,
+    },
   };
 
   const components = $derived(componentMap[data.id]);
 </script>
 
 {#key data.id}
-<!-- Left Panel (Input) -->
-<div
-  class="w-full lg:w-5/12 p-4 md:p-6 overflow-y-auto border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 h-full transition-colors {showMobileResult
-    ? 'hidden lg:block'
-    : 'block'}"
->
-  {#if components}
-    {@const CalcComponent = components.calc}
-    <CalcComponent onResult={handleResult} />
-  {/if}
-</div>
-
-<!-- Right Panel (Output / Calculation Sheet) -->
-<div
-  class="w-full lg:w-7/12 p-8 md:p-10 border-l border-slate-200 dark:border-slate-800 overflow-y-auto font-mono relative shadow-inner min-h-[50vh] lg:h-full transition-colors bg-[#fffdf5] dark:bg-[#1a1c23] text-slate-800 dark:text-slate-200 {showMobileResult
-    ? 'block h-full overflow-auto'
-    : 'hidden lg:block'}"
->
-  {#if showMobileResult}
-    <button
-      onclick={() => (showMobileResult = false)}
-      class="lg:hidden absolute top-4 left-4 p-2 bg-slate-200 dark:bg-slate-800 rounded-full text-slate-700 dark:text-slate-300 shadow-sm z-50"
-    >
-      <ArrowLeft size={24} />
-    </button>
-  {/if}
-
-  <div class="absolute top-6 right-6 opacity-5 pointer-events-none text-slate-800 dark:text-white">
-    <FileText size={200} />
-  </div>
+  <!-- Left Panel (Input) -->
   <div
-    class="border-b-2 border-slate-800 dark:border-slate-500 pb-4 mb-8 flex justify-between items-end mt-8 lg:mt-0"
+    class="w-full lg:w-5/12 p-4 md:p-6 overflow-y-auto border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 h-full transition-colors {showMobileResult
+      ? 'hidden lg:block'
+      : 'block'}"
   >
-    <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-      Calculation Sheet
-    </h2>
-    <div class="flex items-center gap-2">
-      <span class="text-xs font-sans text-slate-500 dark:text-slate-400">{sheetSubtitle}</span>
-      <button
-        onclick={handlePrint}
-        class="print:hidden ml-4 p-2 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
-        title="Print Calculation Sheet"
-      >
-        <Printer size={18} />
-      </button>
-    </div>
+    {#if components}
+      {@const CalcComponent = components.calc}
+      <CalcComponent onResult={handleResult} />
+    {/if}
   </div>
 
-  {#if !result}
-    <div class="h-64 flex flex-col items-center justify-center text-slate-400 dark:text-slate-600">
-      <Info size={48} class="mb-4 opacity-20" />
-      <p>No Data Calculated</p>
+  <!-- Right Panel (Output / Calculation Sheet) -->
+  <div
+    class="w-full lg:w-7/12 p-8 md:p-10 border-l border-slate-200 dark:border-slate-800 overflow-y-auto font-mono relative shadow-inner min-h-[50vh] lg:h-full transition-colors bg-[#fffdf5] dark:bg-[#1a1c23] text-slate-800 dark:text-slate-200 {showMobileResult
+      ? 'block h-full overflow-auto'
+      : 'hidden lg:block'}"
+  >
+    {#if showMobileResult}
+      <button
+        onclick={() => (showMobileResult = false)}
+        class="lg:hidden absolute top-4 left-4 p-2 bg-slate-200 dark:bg-slate-800 rounded-full text-slate-700 dark:text-slate-300 shadow-sm z-50"
+      >
+        <ArrowLeft size={24} />
+      </button>
+    {/if}
+
+    <div
+      class="absolute top-6 right-6 opacity-5 pointer-events-none text-slate-800 dark:text-white"
+    >
+      <FileText size={200} />
     </div>
-  {:else if components}
-    {@const ResultComponent = components.result}
-    <ResultComponent {result} />
-  {/if}
-</div>
+    <div
+      class="border-b-2 border-slate-800 dark:border-slate-500 pb-4 mb-8 flex justify-between items-end mt-8 lg:mt-0"
+    >
+      <h2
+        class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
+      >
+        Calculation Sheet
+      </h2>
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-sans text-slate-500 dark:text-slate-400"
+          >{sheetSubtitle}</span
+        >
+        <button
+          onclick={handlePrint}
+          class="print:hidden ml-4 p-2 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+          title="Print Calculation Sheet"
+        >
+          <Printer size={18} />
+        </button>
+      </div>
+    </div>
+
+    {#if !result}
+      <div
+        class="h-64 flex flex-col items-center justify-center text-slate-400 dark:text-slate-600"
+      >
+        <Info size={48} class="mb-4 opacity-20" />
+        <p>No Data Calculated</p>
+      </div>
+    {:else if components}
+      {@const ResultComponent = components.result}
+      <ResultComponent {result} />
+    {/if}
+  </div>
 {/key}

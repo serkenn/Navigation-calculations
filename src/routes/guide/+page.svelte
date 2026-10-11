@@ -18,13 +18,17 @@
   />
 </svelte:head>
 
-<div class="w-full p-6 overflow-y-auto bg-white dark:bg-slate-900 h-full transition-colors">
+<div
+  class="w-full p-6 overflow-y-auto bg-white dark:bg-slate-900 h-full transition-colors"
+>
   <div
     class="prose prose-sm dark:prose-invert text-slate-600 dark:text-slate-300 p-4 max-w-3xl mx-auto"
   >
     <div class="flex items-center gap-3 mb-6">
       <HelpCircle size={28} class="text-blue-500" />
-      <h1 class="text-2xl font-bold text-slate-800 dark:text-white m-0">利用ガイド</h1>
+      <h1 class="text-2xl font-bold text-slate-800 dark:text-white m-0">
+        利用ガイド
+      </h1>
     </div>
 
     <section class="mb-8">
@@ -70,17 +74,29 @@
     <section class="mb-8">
       <h2 class="text-lg font-bold">角度の入力</h2>
       <p>
-        緯度・経度は「度 分」形式で入力し、方向（N/S/E/W）をプルダウンで選択してください。
+        緯度・経度は「度
+        分」形式で入力し、方向（N/S/E/W）をプルダウンで選択してください。
       </p>
     </section>
 
     <section>
       <h2 class="text-lg font-bold">開発・フィードバック</h2>
       <p>
-        ソースコード: <a href="https://github.com/serkenn/Navigation-calculations" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">GitHub</a>
+        ソースコード: <a
+          href="https://github.com/serkenn/Navigation-calculations"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-blue-600 dark:text-blue-400 hover:underline">GitHub</a
+        >
       </p>
       <p>
-        作者: <a href="https://serken.tech" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">serken.tech</a>
+        作者: <a
+          href="https://serken.tech"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-blue-600 dark:text-blue-400 hover:underline"
+          >serken.tech</a
+        >
       </p>
     </section>
   </div>

@@ -10,18 +10,24 @@
   />
 </svelte:head>
 
-<div class="w-full p-6 overflow-y-auto bg-white dark:bg-slate-900 h-full transition-colors">
+<div
+  class="w-full p-6 overflow-y-auto bg-white dark:bg-slate-900 h-full transition-colors"
+>
   <div
     class="prose prose-sm dark:prose-invert text-slate-600 dark:text-slate-300 p-4 max-w-3xl mx-auto"
   >
     <div class="flex items-center gap-3 mb-6">
       <BookOpen size={28} class="text-indigo-500" />
-      <h1 class="text-2xl font-bold text-slate-800 dark:text-white m-0">計算理論・公式</h1>
+      <h1 class="text-2xl font-bold text-slate-800 dark:text-white m-0">
+        計算理論・公式
+      </h1>
     </div>
 
     <section class="mb-8">
       <h2 class="text-lg font-bold">メルカトル航法 (Mercator Sailing)</h2>
-      <p>メルカトル図法上の2点間の針路（Course）と航程（Distance）を求めます。</p>
+      <p>
+        メルカトル図法上の2点間の針路（Course）と航程（Distance）を求めます。
+      </p>
       <div
         class="bg-slate-50 dark:bg-slate-800 p-4 rounded font-serif text-center text-lg italic my-4"
       >
@@ -32,27 +38,32 @@
 
     <section class="mb-8">
       <h2 class="text-lg font-bold">計算精度と手計算との差異</h2>
-      <p>本アプリでは高精度なデジタル計算を行っており、従来の手計算との間で以下の差異が生じる場合があります：</p>
+      <p>
+        本アプリでは高精度なデジタル計算を行っており、従来の手計算との間で以下の差異が生じる場合があります：
+      </p>
 
       <h3 class="text-base font-semibold mt-4 mb-2">1. 楕円体モデルの違い</h3>
       <p class="text-sm mb-3">
-        <strong>アプリ：</strong> WGS84楕円体（離心率 e = 0.0818191908426）による精密計算<br>
+        <strong>アプリ：</strong> WGS84楕円体（離心率 e =
+        0.0818191908426）による精密計算<br />
         <strong>手計算：</strong> 球体近似または簡略化された楕円体モデル
       </p>
 
       <h3 class="text-base font-semibold mt-4 mb-2">2. 三角関数の精度</h3>
       <p class="text-sm mb-3">
-        <strong>アプリ：</strong> 浮動小数点演算による高精度計算<br>
+        <strong>アプリ：</strong> 浮動小数点演算による高精度計算<br />
         <strong>手計算：</strong> 三角関数表からの読み取り（通常4桁精度）
       </p>
 
       <h3 class="text-base font-semibold mt-4 mb-2">3. 中間値の丸め処理</h3>
       <p class="text-sm mb-3">
-        <strong>アプリ：</strong> 最終段階まで精密計算を継続<br>
+        <strong>アプリ：</strong> 最終段階まで精密計算を継続<br />
         <strong>手計算：</strong> 計算過程で適宜丸め処理を実行
       </p>
 
-      <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded border border-blue-200 dark:border-blue-800 mt-4">
+      <div
+        class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded border border-blue-200 dark:border-blue-800 mt-4"
+      >
         <p class="text-sm"><strong>実際の差異：</strong></p>
         <ul class="text-sm list-disc list-inside mt-2 space-y-1">
           <li>短距離（30海里以下）：±0.1海里程度</li>
@@ -68,8 +79,8 @@
       <div
         class="bg-slate-50 dark:bg-slate-800 p-4 rounded font-serif text-center text-lg italic my-4"
       >
-        cos D = sin l&#8321; sin l&#8322; + cos l&#8321; cos l&#8322; cos(&#955;&#8322; -
-        &#955;&#8321;)
+        cos D = sin l&#8321; sin l&#8322; + cos l&#8321; cos l&#8322;
+        cos(&#955;&#8322; - &#955;&#8321;)
       </div>
     </section>
 
@@ -89,7 +100,8 @@
       <div
         class="bg-slate-50 dark:bg-slate-800 p-4 rounded font-serif text-center text-lg italic my-4"
       >
-        &#916;L = (I &middot; csc Z - &#916;l &middot; cot Z) &middot; sec l&#8320;
+        &#916;L = (I &middot; csc Z - &#916;l &middot; cot Z) &middot; sec
+        l&#8320;
       </div>
     </section>
 

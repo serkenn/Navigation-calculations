@@ -8,11 +8,17 @@
   let course = $state(90);
   let speed = $state(12);
   let time = $state(2);
-  
+
   let result: any = $state(null);
 
   function handleCalculate() {
-    const drResult = calculateDeadReckoning(latitude0, longitude0, course, speed, time);
+    const drResult = calculateDeadReckoning(
+      latitude0,
+      longitude0,
+      course,
+      speed,
+      time,
+    );
 
     const calcResult = {
       ...drResult,
@@ -20,7 +26,7 @@
       longitude0,
       course,
       speed,
-      time
+      time,
     };
 
     result = calcResult;
@@ -29,12 +35,18 @@
 </script>
 
 <div class="space-y-6 p-6">
-  <div class="border-2 border-blue-300 dark:border-blue-700 rounded-lg p-4 bg-blue-50 dark:bg-blue-900/20">
-    <h3 class="text-lg font-bold text-blue-900 dark:text-blue-100 mb-4">推測位置計算 (Dead Reckoning)</h3>
-    
+  <div
+    class="border-2 border-blue-300 dark:border-blue-700 rounded-lg p-4 bg-blue-50 dark:bg-blue-900/20"
+  >
+    <h3 class="text-lg font-bold text-blue-900 dark:text-blue-100 mb-4">
+      推測位置計算 (Dead Reckoning)
+    </h3>
+
     <div class="grid grid-cols-2 gap-4">
       <div>
-        <label class="text-sm font-bold text-slate-700 dark:text-slate-300">初期緯度 (Initial Latitude) [°]</label>
+        <label class="text-sm font-bold text-slate-700 dark:text-slate-300"
+          >初期緯度 (Initial Latitude) [°]</label
+        >
         <input
           type="number"
           bind:value={latitude0}
@@ -45,7 +57,9 @@
         />
       </div>
       <div>
-        <label class="text-sm font-bold text-slate-700 dark:text-slate-300">初期経度 (Initial Longitude) [°]</label>
+        <label class="text-sm font-bold text-slate-700 dark:text-slate-300"
+          >初期経度 (Initial Longitude) [°]</label
+        >
         <input
           type="number"
           bind:value={longitude0}
@@ -56,7 +70,9 @@
         />
       </div>
       <div>
-        <label class="text-sm font-bold text-slate-700 dark:text-slate-300">進路 (Course) [°T]</label>
+        <label class="text-sm font-bold text-slate-700 dark:text-slate-300"
+          >進路 (Course) [°T]</label
+        >
         <input
           type="number"
           bind:value={course}
@@ -67,7 +83,9 @@
         />
       </div>
       <div>
-        <label class="text-sm font-bold text-slate-700 dark:text-slate-300">速力 (Speed) [kt]</label>
+        <label class="text-sm font-bold text-slate-700 dark:text-slate-300"
+          >速力 (Speed) [kt]</label
+        >
         <input
           type="number"
           bind:value={speed}
@@ -78,7 +96,9 @@
         />
       </div>
       <div class="col-span-2">
-        <label class="text-sm font-bold text-slate-700 dark:text-slate-300">経過時間 (Time Elapsed) [hours]</label>
+        <label class="text-sm font-bold text-slate-700 dark:text-slate-300"
+          >経過時間 (Time Elapsed) [hours]</label
+        >
         <input
           type="number"
           bind:value={time}
@@ -99,7 +119,9 @@
   </button>
 
   {#if result}
-    <div class="border-t-2 border-slate-300 dark:border-slate-700 pt-6 mt-6 space-y-3 animate-in fade-in">
+    <div
+      class="border-t-2 border-slate-300 dark:border-slate-700 pt-6 mt-6 space-y-3 animate-in fade-in"
+    >
       <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
         <p class="text-sm text-slate-600 dark:text-slate-400">最終緯度</p>
         <p class="text-3xl font-bold text-blue-700 dark:text-blue-400">

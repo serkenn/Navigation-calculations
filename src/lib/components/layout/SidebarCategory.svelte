@@ -1,9 +1,19 @@
 <script lang="ts">
   import { ChevronDown } from 'lucide-svelte';
-  import type { CategoryDefinition, CalculatorDefinition } from '$lib/types/calculator';
+  import type {
+    CategoryDefinition,
+    CalculatorDefinition,
+  } from '$lib/types/calculator';
   import * as icons from 'lucide-svelte';
 
-  let { category, calculators, activeId, onSelect, isOpen, onToggle }: {
+  let {
+    category,
+    calculators,
+    activeId,
+    onSelect,
+    isOpen,
+    onToggle,
+  }: {
     category: CategoryDefinition;
     calculators: CalculatorDefinition[];
     activeId: string;
@@ -13,7 +23,10 @@
   } = $props();
 
   function getIcon(name: string) {
-    const pascalName = name.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join('');
+    const pascalName = name
+      .split('-')
+      .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+      .join('');
     return (icons as any)[pascalName] ?? icons.Circle;
   }
 
@@ -29,7 +42,10 @@
       <CategoryIcon size={16} />
       {category.nameJa}
     </span>
-    <ChevronDown size={14} class="text-slate-400 transition-transform {isOpen ? 'rotate-180' : ''}" />
+    <ChevronDown
+      size={14}
+      class="text-slate-400 transition-transform {isOpen ? 'rotate-180' : ''}"
+    />
   </button>
 
   {#if isOpen}
@@ -39,7 +55,10 @@
         {@const isActive = activeId === calc.id}
         <a
           href="/calc/{calc.id}/"
-          onclick={(e) => { e.preventDefault(); onSelect(calc.id); }}
+          onclick={(e) => {
+            e.preventDefault();
+            onSelect(calc.id);
+          }}
           class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors {isActive
             ? 'bg-slate-600 dark:bg-slate-700 text-white shadow-md font-bold'
             : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'}"

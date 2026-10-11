@@ -7,7 +7,7 @@
   let lon1 = $state(139.0);
   let lat2 = $state(51.0);
   let lon2 = $state(0.0);
-  
+
   let result: any = $state(null);
 
   function handleCalculate() {
@@ -18,7 +18,7 @@
       startLat: lat1,
       startLon: lon1,
       endLat: lat2,
-      endLon: lon2
+      endLon: lon2,
     };
 
     result = calcResult;
@@ -27,12 +27,18 @@
 </script>
 
 <div class="space-y-6 p-6">
-  <div class="border-2 border-indigo-300 dark:border-indigo-700 rounded-lg p-4 bg-indigo-50 dark:bg-indigo-900/20">
-    <h3 class="text-lg font-bold text-indigo-900 dark:text-indigo-100 mb-4">大圏航路 (Great Circle Route)</h3>
-    
+  <div
+    class="border-2 border-indigo-300 dark:border-indigo-700 rounded-lg p-4 bg-indigo-50 dark:bg-indigo-900/20"
+  >
+    <h3 class="text-lg font-bold text-indigo-900 dark:text-indigo-100 mb-4">
+      大圏航路 (Great Circle Route)
+    </h3>
+
     <div class="grid grid-cols-2 gap-4 mb-4">
       <div>
-        <label class="text-sm font-bold text-slate-700 dark:text-slate-300">出発地 緯度 [度]</label>
+        <label class="text-sm font-bold text-slate-700 dark:text-slate-300"
+          >出発地 緯度 [度]</label
+        >
         <input
           type="number"
           bind:value={lat1}
@@ -43,7 +49,9 @@
         />
       </div>
       <div>
-        <label class="text-sm font-bold text-slate-700 dark:text-slate-300">出発地 経度 [度]</label>
+        <label class="text-sm font-bold text-slate-700 dark:text-slate-300"
+          >出発地 経度 [度]</label
+        >
         <input
           type="number"
           bind:value={lon1}
@@ -54,7 +62,9 @@
         />
       </div>
       <div>
-        <label class="text-sm font-bold text-slate-700 dark:text-slate-300">到着地 緯度 [度]</label>
+        <label class="text-sm font-bold text-slate-700 dark:text-slate-300"
+          >到着地 緯度 [度]</label
+        >
         <input
           type="number"
           bind:value={lat2}
@@ -65,7 +75,9 @@
         />
       </div>
       <div>
-        <label class="text-sm font-bold text-slate-700 dark:text-slate-300">到着地 経度 [度]</label>
+        <label class="text-sm font-bold text-slate-700 dark:text-slate-300"
+          >到着地 経度 [度]</label
+        >
         <input
           type="number"
           bind:value={lon2}
@@ -86,7 +98,9 @@
   </button>
 
   {#if result}
-    <div class="border-t-2 border-slate-300 dark:border-slate-700 pt-6 mt-6 space-y-3 animate-in fade-in">
+    <div
+      class="border-t-2 border-slate-300 dark:border-slate-700 pt-6 mt-6 space-y-3 animate-in fade-in"
+    >
       <div class="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg">
         <p class="text-sm text-slate-600 dark:text-slate-400">大圏距離</p>
         <p class="text-3xl font-bold text-indigo-700 dark:text-indigo-400">
@@ -102,7 +116,9 @@
       </div>
 
       <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
-        <p class="text-sm text-slate-600 dark:text-slate-400 mb-2">到着時針路</p>
+        <p class="text-sm text-slate-600 dark:text-slate-400 mb-2">
+          到着時針路
+        </p>
         <p class="text-2xl font-bold text-purple-700 dark:text-purple-400">
           {result.finalCourse.toFixed(1)}°
         </p>

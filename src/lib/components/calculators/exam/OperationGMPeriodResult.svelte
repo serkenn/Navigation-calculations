@@ -2,8 +2,12 @@
   let { result }: { result: any } = $props();
 </script>
 
-<div class="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700 text-sm">
-  <div class="print-section border border-slate-300 dark:border-slate-700 rounded-lg p-4 bg-white dark:bg-slate-900">
+<div
+  class="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700 text-sm"
+>
+  <div
+    class="print-section border border-slate-300 dark:border-slate-700 rounded-lg p-4 bg-white dark:bg-slate-900"
+  >
     <div class="print-section-title mb-3">1. A港データから船幅を逆算</div>
     <div class="print-section-content">
       <div class="print-row">
@@ -18,7 +22,9 @@
     </div>
   </div>
 
-  <div class="print-section border border-slate-300 dark:border-slate-700 rounded-lg p-4 bg-white dark:bg-slate-900">
+  <div
+    class="print-section border border-slate-300 dark:border-slate-700 rounded-lg p-4 bg-white dark:bg-slate-900"
+  >
     <div class="print-section-title mb-3">2. B港でのGM計算</div>
     <div class="print-section-content">
       <div class="print-row">
@@ -29,7 +35,9 @@
         <span class="print-row-label">GM (B港)</span>
         <span class="print-row-value">{result.gmAtPortB.toFixed(3)} m</span>
       </div>
-      <div class="text-xs text-slate-500 mt-2">式: GM_B = GM_A × (T_A / T_B)²</div>
+      <div class="text-xs text-slate-500 mt-2">
+        式: GM_B = GM_A × (T_A / T_B)²
+      </div>
     </div>
   </div>
 

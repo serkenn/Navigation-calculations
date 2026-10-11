@@ -15,7 +15,7 @@
   const seo = $derived(
     calc
       ? { title: calc.seoTitle, desc: calc.seoDescription }
-      : { title: '航法計算アプリ', desc: '航海に関する各種計算ツール' }
+      : { title: '航法計算アプリ', desc: '航海に関する各種計算ツール' },
   );
 </script>
 

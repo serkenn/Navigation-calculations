@@ -1,5 +1,11 @@
 <script lang="ts">
-  let { label, value = $bindable(), unit = '', placeholder = '', step = 1 }: {
+  let {
+    label,
+    value = $bindable(),
+    unit = '',
+    placeholder = '',
+    step = 1,
+  }: {
     label: string;
     value: number;
     unit?: string;
@@ -9,7 +15,10 @@
 </script>
 
 <div>
-  <span class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">{label}</span>
+  <span
+    class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase"
+    >{label}</span
+  >
   <div class="flex items-center gap-2 mt-1">
     <input
       type="number"
@@ -19,7 +28,9 @@
       {placeholder}
     />
     {#if unit}
-      <span class="text-sm text-slate-500 dark:text-slate-400 whitespace-nowrap">{unit}</span>
+      <span class="text-sm text-slate-500 dark:text-slate-400 whitespace-nowrap"
+        >{unit}</span
+      >
     {/if}
   </div>
 </div>

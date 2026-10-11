@@ -3,7 +3,11 @@
   import PositionInput from '$lib/components/shared/PositionInput.svelte';
   import type { DMSValue } from '$lib/types/navigation';
   import { toDecimal } from '$lib/utils/navigationMath';
-  import { middleLatCourseDistance, mercatorCourseDistance, middleLatCourseDistanceManual } from '$lib/utils/mercatorSailing';
+  import {
+    middleLatCourseDistance,
+    mercatorCourseDistance,
+    middleLatCourseDistanceManual,
+  } from '$lib/utils/mercatorSailing';
 
   let { onResult }: { onResult: (r: any) => void } = $props();
 
@@ -21,35 +25,63 @@
     const lo2 = toDecimal(lon2.d, lon2.m) * lon2.dir;
 
     if (method === 'midlat') {
-      const result = precision === 'manual'
-        ? middleLatCourseDistanceManual(la1, lo1, la2, lo2)
-        : middleLatCourseDistance(la1, lo1, la2, lo2);
-      onResult({ ...result, lat1: la1, lon1: lo1, lat2: la2, lon2: lo2, method, precision });
+      const result =
+        precision === 'manual'
+          ? middleLatCourseDistanceManual(la1, lo1, la2, lo2)
+          : middleLatCourseDistance(la1, lo1, la2, lo2);
+      onResult({
+        ...result,
+        lat1: la1,
+        lon1: lo1,
+        lat2: la2,
+        lon2: lo2,
+        method,
+        precision,
+      });
     } else {
       const result = mercatorCourseDistance(la1, lo1, la2, lo2);
-      onResult({ ...result, lat1: la1, lon1: lo1, lat2: la2, lon2: lo2, method, precision });
+      onResult({
+        ...result,
+        lat1: la1,
+        lon1: lo1,
+        lat2: la2,
+        lon2: lo2,
+        method,
+        precision,
+      });
     }
   }
 </script>
 
 <div class="space-y-8 pb-20">
   <header>
-    <h2 class="text-2xl font-bold text-slate-800 dark:text-white border-l-4 border-blue-600 pl-3">針路・航程</h2>
-    <p class="text-xs text-slate-400 mt-1 pl-4">2地点間の針路と航程を計算します</p>
+    <h2
+      class="text-2xl font-bold text-slate-800 dark:text-white border-l-4 border-blue-600 pl-3"
+    >
+      針路・航程
+    </h2>
+    <p class="text-xs text-slate-400 mt-1 pl-4">
+      2地点間の針路と航程を計算します
+    </p>
   </header>
 
-  <section class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-6 transition-colors">
+  <section
+    class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-6 transition-colors"
+  >
     <div>
-      <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold block uppercase mb-1">航法タイプ (Sailing Method)</label>
+      <label
+        class="text-[10px] text-slate-500 dark:text-slate-400 font-bold block uppercase mb-1"
+        >航法タイプ (Sailing Method)</label
+      >
       <div class="flex gap-2">
         <button
-          onclick={() => method = 'midlat'}
+          onclick={() => (method = 'midlat')}
           class={`flex-1 py-2 px-4 rounded-lg font-bold border transition-colors ${method === 'midlat' ? 'bg-blue-100 dark:bg-blue-900/40 border-blue-400 text-blue-700 dark:text-blue-300' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400'}`}
         >
           中分緯度航法
         </button>
         <button
-          onclick={() => method = 'mercator'}
+          onclick={() => (method = 'mercator')}
           class={`flex-1 py-2 px-4 rounded-lg font-bold border transition-colors ${method === 'mercator' ? 'bg-emerald-100 dark:bg-emerald-900/40 border-emerald-400 text-emerald-700 dark:text-emerald-300' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400'}`}
         >
           漸長緯度航法
@@ -58,40 +90,60 @@
     </div>
 
     {#if method === 'midlat'}
-    <div>
-      <label class="text-[10px] text-slate-500 dark:text-slate-400 font-bold block uppercase mb-1">計算精度 (Calculation Precision)</label>
-      <div class="flex gap-2">
-        <button
-          onclick={() => precision = 'high'}
-          class={`flex-1 py-2 px-3 rounded-lg text-sm font-bold border transition-colors ${precision === 'high' ? 'bg-purple-100 dark:bg-purple-900/40 border-purple-400 text-purple-700 dark:text-purple-300' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400'}`}
+      <div>
+        <label
+          class="text-[10px] text-slate-500 dark:text-slate-400 font-bold block uppercase mb-1"
+          >計算精度 (Calculation Precision)</label
         >
-          高精度計算
-        </button>
-        <button
-          onclick={() => precision = 'manual'}
-          class={`flex-1 py-2 px-3 rounded-lg text-sm font-bold border transition-colors ${precision === 'manual' ? 'bg-orange-100 dark:bg-orange-900/40 border-orange-400 text-orange-700 dark:text-orange-300' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400'}`}
-        >
-          手計算相当
-        </button>
+        <div class="flex gap-2">
+          <button
+            onclick={() => (precision = 'high')}
+            class={`flex-1 py-2 px-3 rounded-lg text-sm font-bold border transition-colors ${precision === 'high' ? 'bg-purple-100 dark:bg-purple-900/40 border-purple-400 text-purple-700 dark:text-purple-300' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400'}`}
+          >
+            高精度計算
+          </button>
+          <button
+            onclick={() => (precision = 'manual')}
+            class={`flex-1 py-2 px-3 rounded-lg text-sm font-bold border transition-colors ${precision === 'manual' ? 'bg-orange-100 dark:bg-orange-900/40 border-orange-400 text-orange-700 dark:text-orange-300' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400'}`}
+          >
+            手計算相当
+          </button>
+        </div>
+        <p class="text-[10px] text-slate-400 mt-1">
+          {precision === 'high'
+            ? 'WGS84楕円体による高精度計算'
+            : '三角関数表を使った手計算に近い精度'}
+        </p>
       </div>
-      <p class="text-[10px] text-slate-400 mt-1">
-        {precision === 'high' ? 'WGS84楕円体による高精度計算' : '三角関数表を使った手計算に近い精度'}
-      </p>
-    </div>
     {/if}
   </section>
 
-  <section class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4 transition-colors">
-    <div class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">出発点 (From)</div>
+  <section
+    class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4 transition-colors"
+  >
+    <div
+      class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2"
+    >
+      出発点 (From)
+    </div>
     <PositionInput bind:lat={lat1} bind:lon={lon1} />
   </section>
 
-  <section class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4 transition-colors">
-    <div class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">到着点 (To)</div>
+  <section
+    class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4 transition-colors"
+  >
+    <div
+      class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2"
+    >
+      到着点 (To)
+    </div>
     <PositionInput bind:lat={lat2} bind:lon={lon2} />
   </section>
 
-  <button onclick={handleCalculate} class="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex justify-center items-center gap-2">
+  <button
+    onclick={handleCalculate}
+    class="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex justify-center items-center gap-2"
+  >
     <Route size={20} /> 計算実行 (CALC)
   </button>
 </div>

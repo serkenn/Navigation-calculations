@@ -14,11 +14,7 @@ export function altitudeCorrection(
   hs: number,
   heightOfEye: number,
   bodyType:
-    | "sun_lower"
-    | "sun_upper"
-    | "star"
-    | "moon"
-    | "planet" = "sun_lower",
+    "sun_lower" | "sun_upper" | "star" | "moon" | "planet" = "sun_lower",
   temp: number = 10,
   pressure: number = 1010,
   HP: number = 0,

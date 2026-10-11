@@ -2,8 +2,12 @@
   let { result }: { result: any } = $props();
 </script>
 
-<div class="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700 text-sm">
-  <div class="print-section border border-slate-300 dark:border-slate-700 rounded-lg p-4 bg-white dark:bg-slate-900">
+<div
+  class="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700 text-sm"
+>
+  <div
+    class="print-section border border-slate-300 dark:border-slate-700 rounded-lg p-4 bg-white dark:bg-slate-900"
+  >
     <div class="print-section-title mb-3">計算過程</div>
     <div class="print-section-content">
       <div class="print-row">
@@ -16,7 +20,9 @@
       </div>
       <div class="print-row">
         <span class="print-row-label">日付</span>
-        <span class="print-row-value">{result?.month}月{result?.day}日 (通日 {result?.dayOfYear})</span>
+        <span class="print-row-value"
+          >{result?.month}月{result?.day}日 (通日 {result?.dayOfYear})</span
+        >
       </div>
       <div class="print-row">
         <span class="print-row-label">太陽赤緯</span>
