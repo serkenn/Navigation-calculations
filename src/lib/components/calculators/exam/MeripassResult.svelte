@@ -2,6 +2,7 @@
   /**
    * 天体による船位の決定（メリパス）— 海技試験の手書き答案の形式で表示する
    * 値はすべて MeripassCalc が共通関数（astronomy / mercatorSailing）で求めたもの
+   * 画面が広いとき・印刷時は答案用紙と同じ 3 列構成、狭いときは 1 列に積む
    */
   let { result }: { result: any } = $props();
 
@@ -130,134 +131,132 @@
 {/snippet}
 
 <div
-  class="exam-sheet @container space-y-7 font-mono text-[13px] leading-relaxed tabular-nums"
+  class="exam-sheet @container font-mono text-[13px] leading-relaxed tabular-nums"
 >
-  <!-- ━━━ 問題の整理: 航走図 ━━━ -->
-  <section class="grid grid-cols-[auto_1fr_auto] items-center gap-x-4 gap-y-1">
-    <div class="space-y-0.5">
-      <div class="font-bold underline underline-offset-4 decoration-1">
-        {dateStr} 午前観測
+  <div class="exam-grid grid gap-x-6 gap-y-5 @lg:grid-cols-3">
+    <!-- ━━━ 1. 航走図（全幅） ━━━ -->
+    <section
+      class="@lg:col-span-3 grid grid-cols-[auto_1fr_auto] items-center gap-x-4 gap-y-1"
+    >
+      <div class="space-y-0.5">
+        <div class="font-bold underline underline-offset-4 decoration-1">
+          {dateStr} 午前観測
+        </div>
+        <div><span class={faint}>l₁</span> {lat(r.lat1)}</div>
+        <div><span class={faint}>L₁</span> {lon(r.lon1)}</div>
+        <div><span class={faint}>⊙</span> {dm(r.hs1)}</div>
       </div>
-      <div><span class={faint}>l₁</span> {lat(r.lat1)}</div>
-      <div><span class={faint}>L₁</span> {lon(r.lon1)}</div>
-      <div><span class={faint}>⊙</span> {dm(r.hs1)}</div>
-    </div>
-    <div class="text-center min-w-0">
-      <div>Co. {r.course}°</div>
-      <div class="flex items-center">
-        <span class="flex-1 border-t-[1.5px] {ink}"></span>
-        <span class="-ml-1 leading-none">▶</span>
+      <div class="text-center min-w-0">
+        <div>Co. {r.course}°</div>
+        <div class="flex items-center">
+          <span class="flex-1 border-t-[1.5px] {ink}"></span>
+          <span class="-ml-1 leading-none">▶</span>
+        </div>
+        <div>Dist. {r.distance}'</div>
       </div>
-      <div>Dist. {r.distance}'</div>
-    </div>
-    <div class="space-y-0.5">
-      <div class="font-bold underline underline-offset-4 decoration-1">
-        Noon
+      <div class="space-y-0.5">
+        <div class="font-bold underline underline-offset-4 decoration-1">
+          Noon
+        </div>
+        <div><span class={faint}>l₂</span> {lat(run.lat2)}</div>
+        <div><span class={faint}>L₂</span> {lon(run.lon2)}</div>
+        <div><span class={faint}>⊙</span> {dm(r.hs2)}</div>
       </div>
-      <div><span class={faint}>l₂</span> {lat(run.lat2)}</div>
-      <div><span class={faint}>L₂</span> {lon(run.lon2)}</div>
-      <div><span class={faint}>⊙</span> {dm(r.hs2)}</div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ━━━ 天測暦からの値 ━━━ -->
-  <section class="overflow-x-auto">
-    <table class="mx-auto text-center border-collapse">
-      <thead>
-        <tr class="{faint} text-xs">
-          <th class="px-3 font-normal">観測</th>
-          <th class="px-3 font-normal border-l {ink}">hG</th>
-          <th class="px-3 font-normal border-l {ink}">Eq. of T</th>
-          <th class="px-3 font-normal border-l {ink}">d</th>
-          <th class="px-3 font-normal border-l {ink}">Corr</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="px-3">午前</td>
-          <td class="px-3 border-l {ink}">{dm(r.gha1)}</td>
-          <td class="px-3 border-l {ink}">—</td>
-          <td class="px-3 border-l {ink}">{lat(r.dec1)}</td>
-          <td class="px-3 border-l {ink}">{corrStr(r.corr1)}</td>
-        </tr>
-        <tr>
-          <td class="px-3">Noon</td>
-          <td class="px-3 border-l {ink}">—</td>
-          <td class="px-3 border-l {ink} whitespace-nowrap">
-            {signed(r.eqt)}
-            {hms(Math.abs(r.eqt), false).replace(/^0ʰ /, '')}
-          </td>
-          <td class="px-3 border-l {ink}">{lat(r.dec2)}</td>
-          <td class="px-3 border-l {ink}">{corrStr(r.corr2)}</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
+    <!-- ━━━ 2. 天測暦からの値（全幅・中央） ━━━ -->
+    <section class="min-w-0 @lg:col-span-3 overflow-x-auto">
+      <table class="mx-auto text-center border-collapse whitespace-nowrap">
+        <thead>
+          <tr class="{faint} text-xs">
+            <th class="px-3 font-normal">観測</th>
+            <th class="px-3 font-normal border-l {ink}">hG</th>
+            <th class="px-3 font-normal border-l {ink}">Eq. of T</th>
+            <th class="px-3 font-normal border-l {ink}">d</th>
+            <th class="px-3 font-normal border-l {ink}">Corr</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="px-3">午前</td>
+            <td class="px-3 border-l {ink}">{dm(r.gha1)}</td>
+            <td class="px-3 border-l {ink}">—</td>
+            <td class="px-3 border-l {ink}">{lat(r.dec1)}</td>
+            <td class="px-3 border-l {ink}">{corrStr(r.corr1)}</td>
+          </tr>
+          <tr>
+            <td class="px-3">Noon</td>
+            <td class="px-3 border-l {ink}">—</td>
+            <td class="px-3 border-l {ink} whitespace-nowrap">
+              {signed(r.eqt)}
+              {hms(Math.abs(r.eqt), false).replace(/^0ʰ /, '')}
+            </td>
+            <td class="px-3 border-l {ink}">{lat(r.dec2)}</td>
+            <td class="px-3 border-l {ink}">{corrStr(r.corr2)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
 
-  <!-- ━━━ (1) 正午推測位置 ━━━ -->
-  <section>
-    <div class="grid gap-x-6 gap-y-4 @lg:grid-cols-3">
-      <div>
-        {@render heading('D.Lat.')}
-        <div class="whitespace-nowrap">
-          {r.distance}·cos({r.course}°) = {run.dLatMin < 0 ? '−' : ''}{mins(
-            run.dLatMin,
-          )}
-        </div>
-        <div class="mt-2">
-          {@render stack(
-            [
-              ['l₁', lat(r.lat1)],
-              ['l₂', lat(run.lat2)],
-            ],
-            ['Mid.l', lat(run.midLat)],
-            '(+)÷2',
-          )}
-        </div>
+    <!-- ━━━ 3. 正午推測位置: D.Lat / Dep / D.Long ━━━ -->
+    <section class="min-w-0">
+      {@render heading('D.Lat.')}
+      <div class="whitespace-nowrap">
+        {r.distance}·cos({r.course}°) = {run.dLatMin < 0 ? '−' : ''}{mins(
+          run.dLatMin,
+        )}
       </div>
-      <div>
-        {@render heading('Dep.')}
-        <div class="whitespace-nowrap">
-          {r.distance}·sin({r.course}°) = {run.dep < 0 ? '−' : ''}{Math.abs(
-            run.dep,
-          ).toFixed(3)}
-        </div>
-        <div
-          class="mt-3 inline-block border-[1.5px] {ink} px-3 py-1.5 space-y-0.5"
-        >
-          <div class="text-xs {faint}">D.R.P</div>
-          <div class="font-bold">l₂ {lat(run.lat2)}</div>
-          <div class="font-bold">L₂ {lon(run.lon2)}</div>
-        </div>
+      <div class="mt-2">
+        {@render stack(
+          [
+            ['l₁', lat(r.lat1)],
+            ['l₂', lat(run.lat2)],
+          ],
+          ['Mid.l', lat(run.midLat)],
+          '(+)÷2',
+        )}
       </div>
-      <div>
-        {@render heading('D.Long.')}
-        <div class="inline-flex items-center gap-2 whitespace-nowrap">
-          <span class="inline-flex flex-col items-center">
-            <span class="px-1"
-              >{run.dep < 0 ? '−' : ''}{Math.abs(run.dep).toFixed(3)}</span
-            >
-            <span class="px-1 border-t {ink}">cos({sdm(run.midLat)})</span>
-          </span>
-          <span>= {run.dLonMin < 0 ? '−' : ''}{mins(run.dLonMin)}</span>
-        </div>
-        <div class="mt-2">
-          {@render stack(
-            [
-              ['L₁', lon(r.lon1)],
-              ['D.L', `${mins(run.dLonMin)} ${run.dLonMin >= 0 ? 'E' : 'W'}`],
-            ],
-            ['L₂', lon(run.lon2)],
-            r.lon1 >= 0 === run.dLonMin >= 0 ? '(+' : '(−',
-          )}
-        </div>
+    </section>
+    <section class="min-w-0">
+      {@render heading('Dep.')}
+      <div class="whitespace-nowrap">
+        {r.distance}·sin({r.course}°) = {run.dep < 0 ? '−' : ''}{Math.abs(
+          run.dep,
+        ).toFixed(3)}
       </div>
-    </div>
-  </section>
+      <div
+        class="mt-3 inline-block border-[1.5px] {ink} px-3 py-1.5 space-y-0.5"
+      >
+        <div class="text-xs {faint}">D.R.P</div>
+        <div class="font-bold">l₂ {lat(run.lat2)}</div>
+        <div class="font-bold">L₂ {lon(run.lon2)}</div>
+      </div>
+    </section>
+    <section class="min-w-0">
+      {@render heading('D.Long.')}
+      <div class="inline-flex items-center gap-2 whitespace-nowrap">
+        <span class="inline-flex flex-col items-center">
+          <span class="px-1"
+            >{run.dep < 0 ? '−' : ''}{Math.abs(run.dep).toFixed(3)}</span
+          >
+          <span class="px-1 border-t {ink}">cos({sdm(run.midLat)})</span>
+        </span>
+        <span>= {run.dLonMin < 0 ? '−' : ''}{mins(run.dLonMin)}</span>
+      </div>
+      <div class="mt-2">
+        {@render stack(
+          [
+            ['L₁', lon(r.lon1)],
+            ['D.L', `${mins(run.dLonMin)} ${run.dLonMin >= 0 ? 'E' : 'W'}`],
+          ],
+          ['L₂', lon(run.lon2)],
+          r.lon1 >= 0 === run.dLonMin >= 0 ? '(+' : '(−',
+        )}
+      </div>
+    </section>
 
-  <!-- ━━━ (2) 正中時 / 正午緯度 ━━━ -->
-  <section class="grid gap-x-8 gap-y-5 @md:grid-cols-2">
-    <div>
+    <!-- ━━━ 4. 正中時 / 正午緯度 / 経度改正 ━━━ -->
+    <section class="min-w-0">
       {@render heading('Noon 正中時')}
       {@render chain([
         { l: 'L.A.T', v: `${dateStr} 12ʰ 00ᵐ 00ˢ` },
@@ -279,9 +278,8 @@
           {hms(r.zt)} //
         </div>
       </div>
-    </div>
-
-    <div>
+    </section>
+    <section class="min-w-0">
       {@render heading('Noon 子午線高度緯度')}
       {@render chain([
         ...noonPair.map((row, i) => ({
@@ -313,12 +311,29 @@
           r.corr2 >= 0 ? '(+' : '(−',
         )}
       </div>
-    </div>
-  </section>
+    </section>
+    <section class="min-w-0">
+      {@render heading('経度改正')}
+      {@render stack(
+        [
+          ['L₂', lon(run.lon2)],
+          ['D.L', `${mins(r.dLongCorr)} ${dlDir}`],
+        ],
+        ['L', lon(r.noonLon)],
+        dlOp,
+      )}
+      <div class="text-xs {faint} mt-3">
+        D.L = (I·cosec Z − Δl·cot Z)·sec l₂
+      </div>
+      <div class="text-xs pl-[1.5em] -indent-[1em] break-words">
+        = ({paren(r.a1)}·cosec {r.z1.toFixed(1)}° − {paren(r.deltaLat)}·cot {r.z1.toFixed(
+          1,
+        )}°)·sec {dm(run.lat2)}
+      </div>
+    </section>
 
-  <!-- ━━━ (3) 午前観測: 計算高度・方位角 ━━━ -->
-  <section class="grid gap-x-8 gap-y-5 @md:grid-cols-2">
-    <div>
+    <!-- ━━━ 5. 午前観測: hL / Ac・I / Ans ━━━ -->
+    <section class="min-w-0">
       {@render heading('午前観測 hL')}
       {@render chain(lhaChain)}
       <table class="exam-left mt-3 border-collapse border-[1.5px] {ink}">
@@ -340,9 +355,8 @@
           </tr>
         </tbody>
       </table>
-    </div>
-
-    <div>
+    </section>
+    <section class="min-w-0">
       {@render heading('Ac / I')}
       {@render stack(
         [
@@ -367,10 +381,41 @@
           ? 'Ao > Ac → 天体に向かう (Toward)'
           : 'Ao < Ac → 天体から離れる (Away)'}
       </div>
-    </div>
+      <!-- Ⓐ Ⓑ -->
+      <div class="flex flex-wrap gap-x-6 gap-y-2 items-center mt-3">
+        <div class="flex items-center gap-1.5">
+          <span class="text-lg">Ⓐ</span>
+          <span class="text-4xl font-light leading-none {faint}">{'{'}</span>
+          <div class="font-bold space-y-0.5">
+            <div>I = {signed(r.a1)} {mins(r.a1)}</div>
+            <div>Z = {halfAz(r.z1)}</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="text-lg">Ⓑ</span>
+          <span class="text-4xl font-light leading-none {faint}">{'{'}</span>
+          <div class="font-bold">I = {mins(r.deltaLat)} {iNoonDir}</div>
+        </div>
+      </div>
+    </section>
+    <section class="min-w-0 self-end">
+      <div class="border-[1.5px] {ink} px-4 py-3 space-y-1">
+        <div class="font-bold text-base">Ans</div>
+        <div class="flex gap-4 flex-wrap">
+          <span>正中時</span>
+          <span class="font-bold">{dateStr} {hms(r.zt)}</span>
+        </div>
+        <div>視正午船位</div>
+        <div class="pl-6 font-bold">lat {lat(r.noonLat)}</div>
+        <div class="pl-6 font-bold">Long {lon(r.noonLon)}</div>
+        <div class="text-right font-bold -mt-1">//</div>
+      </div>
+    </section>
 
-    <!-- 計算式（全幅） -->
-    <div class="@md:col-span-2 border-l-[1.5px] {ink} pl-3 space-y-2">
+    <!-- ━━━ 6. 計算式（全幅） ━━━ -->
+    <section
+      class="min-w-0 @lg:col-span-3 border-l-[1.5px] {ink} pl-3 space-y-2"
+    >
       <div class="whitespace-nowrap overflow-x-auto">
         sin Ac = sin({sdm(r.dec1)})·sin({sdm(r.lat1)})
         <br />
@@ -391,60 +436,6 @@
         </span>
       </div>
       <div class="pl-[2.5em] font-bold">Z = {halfAz(r.z1)}</div>
-    </div>
-  </section>
-
-  <!-- ━━━ Ⓐ Ⓑ ━━━ -->
-  <section class="flex flex-wrap gap-x-10 gap-y-3 items-center">
-    <div class="flex items-center gap-2">
-      <span class="text-lg">Ⓐ</span>
-      <span class="text-4xl font-light leading-none {faint}">{'{'}</span>
-      <div class="font-bold space-y-0.5">
-        <div>I = {signed(r.a1)} {mins(r.a1)}</div>
-        <div>Z = {halfAz(r.z1)}</div>
-      </div>
-    </div>
-    <div class="flex items-center gap-2">
-      <span class="text-lg">Ⓑ</span>
-      <span class="text-4xl font-light leading-none {faint}">{'{'}</span>
-      <div class="font-bold">I = {mins(r.deltaLat)} {iNoonDir}</div>
-    </div>
-  </section>
-
-  <!-- ━━━ (4) 経度改正・答 ━━━ -->
-  <section class="grid gap-x-8 gap-y-5 @md:grid-cols-2">
-    <div class="min-w-0">
-      {@render heading('経度改正')}
-      <div class="text-xs {faint} mb-1">
-        D.L = (I·cosec Z − Δl·cot Z)·sec l₂
-      </div>
-      <div class="text-xs mb-2 pl-[2.5em] -indent-[1em]">
-        = ({paren(r.a1)}·cosec {r.z1.toFixed(1)}° − {paren(r.deltaLat)}·cot {r.z1.toFixed(
-          1,
-        )}°)·sec {dm(run.lat2)}
-      </div>
-      {@render stack(
-        [
-          ['L₂', lon(run.lon2)],
-          ['D.L', `${mins(r.dLongCorr)} ${dlDir}`],
-        ],
-        ['L', lon(r.noonLon)],
-        dlOp,
-      )}
-    </div>
-
-    <div class="self-end">
-      <div class="border-[1.5px] {ink} px-4 py-3 space-y-1">
-        <div class="font-bold text-base">Ans</div>
-        <div class="flex gap-4 flex-wrap">
-          <span>正中時</span>
-          <span class="font-bold">{dateStr} {hms(r.zt)}</span>
-        </div>
-        <div>視正午船位</div>
-        <div class="pl-6 font-bold">lat {lat(r.noonLat)}</div>
-        <div class="pl-6 font-bold">Long {lon(r.noonLon)}</div>
-        <div class="text-right font-bold -mt-1">//</div>
-      </div>
-    </div>
-  </section>
+    </section>
+  </div>
 </div>

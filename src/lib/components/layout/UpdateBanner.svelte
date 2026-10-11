@@ -5,7 +5,7 @@
 
 {#if updateChecker.hasUpdate}
   <div
-    class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[100] max-w-md w-[calc(100%-2rem)] bg-blue-600 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300"
+    class="print:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-[100] max-w-md w-[calc(100%-2rem)] bg-blue-600 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300"
     style="padding-bottom: max(0.75rem, var(--sab));"
   >
     <Download size={20} class="shrink-0" />
