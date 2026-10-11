@@ -23,7 +23,7 @@
     "@capacitor/ios": "^8.5.3",
     "@hono/node-server": "^1.14.0",
     "hono": "^4.13.13",
-    "lucide-svelte": "^0.469.0"
+    "lucide-svelte": "^1.0.1"
   },
   "build": {
     "appId": "com.navcalc.app",
