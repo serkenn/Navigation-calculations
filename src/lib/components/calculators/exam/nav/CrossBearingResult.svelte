@@ -1,47 +1,42 @@
 <script lang="ts">
+  import Sheet from '$lib/components/shared/Sheet.svelte';
+  import Step from '$lib/components/shared/Step.svelte';
+  import Highlight from '$lib/components/shared/Highlight.svelte';
+  import Note from '$lib/components/shared/Note.svelte';
+  import {
+    formatLat,
+    formatLon,
+    formatBearing,
+  } from '$lib/utils/navigationMath';
+
   let { result }: { result: any } = $props();
 </script>
 
-<div
-  class="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700 text-sm"
->
-  <div
-    class="print-section border border-slate-300 dark:border-slate-700 rounded-lg p-4 bg-white dark:bg-slate-900"
-  >
-    <div class="print-section-title mb-3">入力データ</div>
-    <div class="print-section-content">
-      <div class="print-row">
-        <span class="print-row-label">物標A 位置</span>
-        <span class="print-row-value"
-          >{result?.obj1Lat?.toFixed(3)}°, {result?.obj1Lon?.toFixed(3)}°</span
-        >
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">物標A 方位</span>
-        <span class="print-row-value">{result?.bearing1?.toFixed(1)}°</span>
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">物標B 位置</span>
-        <span class="print-row-value"
-          >{result?.obj2Lat?.toFixed(3)}°, {result?.obj2Lon?.toFixed(3)}°</span
-        >
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">物標B 方位</span>
-        <span class="print-row-value">{result?.bearing2?.toFixed(1)}°</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="print-final-answer">
-    <div class="print-final-answer-title">【最終答案】</div>
-    <div class="print-final-answer-box">
-      <span class="print-answer-label">船位 (緯度)</span>
-      <span class="print-answer-value">{result?.shipLatDMS}</span>
-    </div>
-    <div class="print-final-answer-box">
-      <span class="print-answer-label">船位 (経度)</span>
-      <span class="print-answer-value">{result?.shipLonDMS}</span>
-    </div>
-  </div>
-</div>
+<Sheet title="Cross Bearing Fix">
+  <Step
+    title="1. 物標と方位"
+    lines={[
+      `A ${formatLat(result.aLat)} ${formatLon(result.aLon)}  方位 ${formatBearing(result.bearingA)}`,
+      `B ${formatLat(result.bLat)} ${formatLon(result.bLon)}  方位 ${formatBearing(result.bearingB)}`,
+      `交角 ${result.cutAngle.toFixed(1)}°`,
+    ]}
+  />
+  <Step
+    title="2. 各物標までの距離（方位線の交点から）"
+    lines={[
+      `A まで ${result.distA.toFixed(2)}'　B まで ${result.distB.toFixed(2)}'`,
+    ]}
+  />
+  <Highlight
+    items={[
+      { label: '船位 緯度', value: formatLat(result.lat) },
+      { label: '船位 経度', value: formatLon(result.lon) },
+    ]}
+  />
+  {#if result.cutAngle < 30 || result.cutAngle > 150}
+    <Note tone="warn"
+      >交角が 30° 未満（150° 超）なので、船位の精度は低くなります。</Note
+    >
+  {/if}
+  <Note>物標付近の狭い範囲なので、平面（中分緯度）近似で計算しています。</Note>
+</Sheet>

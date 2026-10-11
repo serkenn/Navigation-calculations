@@ -3,9 +3,12 @@
  * Meeus簡略法: 黄経→赤経赤緯→GHA
  */
 
-const PI = Math.PI;
-const radF = (d: number) => (d * PI) / 180;
-const degF = (r: number) => (r * 180) / PI;
+import {
+  rad as radF,
+  deg as degF,
+  normalize180,
+  normalize360,
+} from "./navigationMath";
 
 /**
  * 太陽のGHAとDecを計算 (簡易法)
@@ -70,12 +73,10 @@ export function solarPosition(
     360;
 
   // GHA = GMST - RA
-  let gha = gmst - ra;
-  while (gha < 0) gha += 360;
-  while (gha >= 360) gha -= 360;
+  const gha = normalize360(gmst - ra);
 
-  // Equation of Time (minutes)
-  const eqTime = 4 * (L0 - ra); // approximate, in minutes
+  // 均時差（分、視太陽時 − 平均太陽時）。差は ±180° に正規化して日をまたぐ跳びを防ぐ
+  const eqTime = 4 * normalize180(L0 - 0.0057183 - ra);
 
-  return { gha, dec, ra, eqTime, gmst };
+  return { gha, dec, ra: normalize360(ra), eqTime, gmst: normalize360(gmst) };
 }

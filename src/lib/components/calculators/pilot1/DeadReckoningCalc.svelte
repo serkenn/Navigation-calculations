@@ -1,8 +1,11 @@
 <script lang="ts">
-  import { MapPin } from 'lucide-svelte';
+  import CalcForm from '$lib/components/shared/CalcForm.svelte';
+  import SectionCard from '$lib/components/shared/SectionCard.svelte';
   import PositionInput from '$lib/components/shared/PositionInput.svelte';
+  import NumberInput from '$lib/components/shared/NumberInput.svelte';
+  import Segmented from '$lib/components/shared/Segmented.svelte';
   import type { DMSValue } from '$lib/types/navigation';
-  import { toDecimal } from '$lib/utils/navigationMath';
+  import { dmsToDecimal } from '$lib/utils/navigationMath';
   import {
     middleLatDeadReckoning,
     mercatorDeadReckoning,
@@ -12,115 +15,39 @@
 
   let lat1: DMSValue = $state({ d: 35, m: 0, dir: 1 });
   let lon1: DMSValue = $state({ d: 139, m: 45, dir: 1 });
-  let course: number = $state(225);
-  let distance: number = $state(120);
+  let course = $state(225);
+  let distance = $state(120);
   let method: 'midlat' | 'mercator' = $state('midlat');
 
-  function handleCalculate() {
-    const la1 = toDecimal(lat1.d, lat1.m) * lat1.dir;
-    const lo1 = toDecimal(lon1.d, lon1.m) * lon1.dir;
-    if (method === 'midlat') {
-      const result = middleLatDeadReckoning(la1, lo1, course, distance);
-      onResult({ lat1: la1, lon1: lo1, course, distance, method, ...result });
-    } else {
-      const result = mercatorDeadReckoning(la1, lo1, course, distance);
-      onResult({ lat1: la1, lon1: lo1, course, distance, method, ...result });
-    }
+  function calculate() {
+    const la = dmsToDecimal(lat1);
+    const lo = dmsToDecimal(lon1);
+    const r =
+      method === 'mercator'
+        ? mercatorDeadReckoning(la, lo, course, distance)
+        : middleLatDeadReckoning(la, lo, course, distance);
+    onResult({ lat1: la, lon1: lo, course, distance, method, ...r });
   }
 </script>
 
-<div class="space-y-8 pb-20">
-  <header>
-    <h2
-      class="text-2xl font-bold text-slate-800 dark:text-white border-l-4 border-blue-600 pl-3"
-    >
-      到着点
-    </h2>
-    <p class="text-xs text-slate-400 mt-1 pl-4">
-      出発位置、針路、航程から到着点を計算します
-    </p>
-  </header>
+<CalcForm onsubmit={calculate}>
+  <SectionCard cols={1}>
+    <Segmented
+      label="航法"
+      bind:value={method}
+      options={[
+        { value: 'midlat', label: '中分緯度航法' },
+        { value: 'mercator', label: '漸長緯度航法' },
+      ]}
+    />
+  </SectionCard>
 
-  <section
-    class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-6 transition-colors"
-  >
-    <div>
-      <label
-        class="text-[10px] text-slate-500 dark:text-slate-400 font-bold block uppercase mb-1"
-        >航法タイプ (Sailing Method)</label
-      >
-      <div class="flex gap-2">
-        <button
-          onclick={() => (method = 'midlat')}
-          class={`flex-1 py-2 px-4 rounded-lg font-bold border transition-colors ${method === 'midlat' ? 'bg-blue-100 dark:bg-blue-900/40 border-blue-400 text-blue-700 dark:text-blue-300' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400'}`}
-        >
-          中分緯度航法
-        </button>
-        <button
-          onclick={() => (method = 'mercator')}
-          class={`flex-1 py-2 px-4 rounded-lg font-bold border transition-colors ${method === 'mercator' ? 'bg-emerald-100 dark:bg-emerald-900/40 border-emerald-400 text-emerald-700 dark:text-emerald-300' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400'}`}
-        >
-          漸長緯度航法
-        </button>
-      </div>
-    </div>
-  </section>
-
-  <section
-    class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4 transition-colors"
-  >
-    <div
-      class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2"
-    >
-      出発点 (From)
-    </div>
+  <SectionCard title="出発点 (From)">
     <PositionInput bind:lat={lat1} bind:lon={lon1} />
-  </section>
+  </SectionCard>
 
-  <section
-    class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4 transition-colors"
-  >
-    <div
-      class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2"
-    >
-      針路・航程
-    </div>
-    <div class="grid grid-cols-2 gap-4">
-      <div>
-        <span
-          class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase"
-          >針路 (Course)</span
-        >
-        <div class="flex items-center gap-2 mt-1">
-          <input
-            type="number"
-            class="w-full p-2 border border-slate-300 dark:border-slate-600 rounded font-mono bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none"
-            bind:value={course}
-          />
-          <span class="text-sm text-slate-500">&deg;</span>
-        </div>
-      </div>
-      <div>
-        <span
-          class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase"
-          >航程 (Distance)</span
-        >
-        <div class="flex items-center gap-2 mt-1">
-          <input
-            type="number"
-            class="w-full p-2 border border-slate-300 dark:border-slate-600 rounded font-mono bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none"
-            bind:value={distance}
-          />
-          <span class="text-sm text-slate-500">NM</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <button
-    onclick={handleCalculate}
-    class="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex justify-center items-center gap-2"
-  >
-    <MapPin size={20} /> 計算実行 (CALC)
-  </button>
-</div>
+  <SectionCard title="針路・航程">
+    <NumberInput label="針路 (Course)" bind:value={course} unit="°" />
+    <NumberInput label="航程 (Distance)" bind:value={distance} unit="NM" />
+  </SectionCard>
+</CalcForm>

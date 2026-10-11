@@ -1,70 +1,63 @@
 <script lang="ts">
+  import Field from './Field.svelte';
+  import { boxClass, inputClass, unitClass, selectClass } from './inputStyles';
+  import { useAccent } from '$lib/theme/accent';
   import type { DMSValue } from '$lib/types/navigation';
 
+  /**
+   * 度・分（分は小数可）の入力
+   * sign: NS/EW は方向選択、pm は ± 選択、none は符号なし
+   */
   let {
-    value = $bindable(),
     label,
-    showSign = false,
-    signType = 'NS',
+    value = $bindable(),
+    sign = 'none',
+    hint = '',
   }: {
-    value: DMSValue;
     label: string;
-    showSign?: boolean;
-    signType?: 'NS' | 'EW';
+    value: DMSValue;
+    sign?: 'NS' | 'EW' | 'pm' | 'none';
+    hint?: string;
   } = $props();
+
+  const dirLabels = { NS: ['N', 'S'], EW: ['E', 'W'] } as const;
+
+  const accent = useAccent();
 </script>
 
-<div class="flex flex-col">
-  <span
-    class="text-[10px] text-slate-500 dark:text-slate-400 font-semibold uppercase"
-    >{label}</span
-  >
-  <div
-    class="flex items-center gap-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded p-1 shadow-sm transition-colors"
-  >
+<Field {label} {hint}>
+  <div class="{boxClass} {accent().focus}">
+    {#if sign === 'pm'}
+      <select class={selectClass} bind:value={value.dir} aria-label="符号">
+        <option value={1}>+</option>
+        <option value={-1}>−</option>
+      </select>
+    {/if}
     <input
       type="number"
-      class="w-10 text-right outline-none font-mono text-sm bg-transparent text-slate-900 dark:text-white placeholder-slate-400"
+      inputmode="numeric"
+      class="{inputClass} !w-12 flex-none"
       bind:value={value.d}
-      placeholder="deg"
+      min={0}
+      step={1}
+      aria-label="{label} 度"
     />
-    <span class="text-slate-400 text-xs">&deg;</span>
+    <span class={unitClass}>°</span>
     <input
       type="number"
-      class="w-12 text-right outline-none font-mono text-sm bg-transparent text-slate-900 dark:text-white placeholder-slate-400"
+      inputmode="decimal"
+      class={inputClass}
       bind:value={value.m}
-      placeholder="min"
+      min={0}
+      step="any"
+      aria-label="{label} 分"
     />
-    <span class="text-slate-400 text-xs">&apos;</span>
-    {#if showSign}
-      <select
-        class="text-xs bg-transparent outline-none font-bold text-slate-700 dark:text-slate-200"
-        bind:value={value.dir}
-      >
-        {#if signType === 'NS'}
-          <option
-            value={1}
-            class="text-slate-900 bg-white dark:bg-slate-800 dark:text-white"
-            >N</option
-          >
-          <option
-            value={-1}
-            class="text-slate-900 bg-white dark:bg-slate-800 dark:text-white"
-            >S</option
-          >
-        {:else}
-          <option
-            value={1}
-            class="text-slate-900 bg-white dark:bg-slate-800 dark:text-white"
-            >E</option
-          >
-          <option
-            value={-1}
-            class="text-slate-900 bg-white dark:bg-slate-800 dark:text-white"
-            >W</option
-          >
-        {/if}
+    <span class={unitClass}>'</span>
+    {#if sign === 'NS' || sign === 'EW'}
+      <select class={selectClass} bind:value={value.dir} aria-label="方向">
+        <option value={1}>{dirLabels[sign][0]}</option>
+        <option value={-1}>{dirLabels[sign][1]}</option>
       </select>
     {/if}
   </div>
-</div>
+</Field>

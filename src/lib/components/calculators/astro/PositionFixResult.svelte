@@ -1,63 +1,41 @@
 <script lang="ts">
-  import { formatDMS } from '$lib/utils/navigationMath';
-  import type { PositionFixResult } from '$lib/types/navigation';
+  import Sheet from '$lib/components/shared/Sheet.svelte';
+  import InfoGrid from '$lib/components/shared/InfoGrid.svelte';
+  import ResultRows from '$lib/components/shared/ResultRows.svelte';
+  import Highlight from '$lib/components/shared/Highlight.svelte';
+  import {
+    formatLat,
+    formatLon,
+    formatBearing,
+    formatDirected,
+  } from '$lib/utils/navigationMath';
 
-  interface Props {
-    result: PositionFixResult;
-  }
+  let { result }: { result: any } = $props();
 
-  let { result }: Props = $props();
+  const lopLine = (l: { a: number; z: number }) =>
+    `${Math.abs(l.a).toFixed(1)}' ${l.a >= 0 ? 'T' : 'A'}  Zn ${formatBearing(l.z)}`;
 </script>
 
-<div class="space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
-  <div class="relative">
-    <h3
-      class="text-sm font-bold bg-amber-700 text-white inline-block px-3 py-1 mb-3"
-    >
-      Position Fix
-    </h3>
-    <div
-      class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 p-6 text-sm shadow-sm space-y-4"
-    >
-      <div class="border-b border-slate-200 dark:border-slate-800 pb-3">
-        <p
-          class="text-xs text-slate-500 dark:text-slate-400 uppercase font-bold mb-1"
-        >
-          DR Position
-        </p>
-        <p class="font-mono">
-          {formatDMS(result.drLat, 'lat')} / {formatDMS(result.drLon, 'lon')}
-        </p>
-      </div>
-
-      <div
-        class="space-y-2 border-b border-slate-200 dark:border-slate-800 pb-3"
-      >
-        {#each result.lops as lop, i}
-          <div class="flex justify-between">
-            <span>LOP {i + 1}</span>
-            <span class="font-mono">
-              I = {Math.abs(lop.intercept).toFixed(1)}' {lop.intercept >= 0
-                ? 'T'
-                : 'A'}, Z = {lop.azimuth.toFixed(1)}&deg;
-            </span>
-          </div>
-        {/each}
-      </div>
-
-      <div
-        class="bg-white dark:bg-slate-900 border-4 border-double border-slate-800 dark:border-slate-400 p-4 text-center shadow-lg"
-      >
-        <p class="text-xs text-slate-400 uppercase tracking-widest mb-2">
-          FIX POSITION
-        </p>
-        <div
-          class="flex justify-center gap-8 text-2xl font-bold text-amber-700 dark:text-amber-400 font-mono"
-        >
-          <span>{formatDMS(result.fixLat, 'lat')}</span>
-          <span>{formatDMS(result.fixLon, 'lon')}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<Sheet title="Position Fix">
+  <InfoGrid
+    items={[
+      {
+        label: '推測位置 DR',
+        lines: [formatLat(result.drLat), formatLon(result.drLon)],
+      },
+      { label: '位置の線 LOP', lines: result.lops.map(lopLine) },
+    ]}
+  />
+  <ResultRows
+    rows={[
+      { label: '変緯 D.Lat', value: formatDirected(result.dLat, 'N', 'S') },
+      { label: '東西距 Dep', value: formatDirected(result.dep, 'E', 'W') },
+    ]}
+  />
+  <Highlight
+    items={[
+      { label: '船位 緯度', value: formatLat(result.lat) },
+      { label: '船位 経度', value: formatLon(result.lon) },
+    ]}
+  />
+</Sheet>

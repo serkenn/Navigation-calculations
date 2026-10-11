@@ -1,109 +1,51 @@
 <script lang="ts">
-  import { formatDMS } from '$lib/utils/navigationMath';
+  import Sheet from '$lib/components/shared/Sheet.svelte';
+  import InfoGrid from '$lib/components/shared/InfoGrid.svelte';
+  import ResultRows from '$lib/components/shared/ResultRows.svelte';
+  import Highlight from '$lib/components/shared/Highlight.svelte';
+  import {
+    formatLat,
+    formatLon,
+    formatDirected,
+    formatBearing,
+  } from '$lib/utils/navigationMath';
   import { meridionalParts } from '$lib/utils/mercatorSailing';
 
   let { result }: { result: any } = $props();
 
   const isMercator = $derived(result.method === 'mercator');
-  const dmp = $derived(
+
+  const rows = $derived([
+    { label: '変緯 D.Lat', value: formatDirected(result.dLat * 60, 'N', 'S') },
+    { label: '東西距 Dep', value: formatDirected(result.dep, 'E', 'W') },
     isMercator
-      ? meridionalParts(result.lat2) - meridionalParts(result.lat1)
-      : 0,
-  );
+      ? {
+          label: '漸長緯度差 DMP',
+          value: `${(meridionalParts(result.lat2) - meridionalParts(result.lat1)).toFixed(1)}'`,
+        }
+      : { label: '中分緯度 Mid.Lat', value: formatLat(result.midLat) },
+    { label: '変経 D.Long', value: formatDirected(result.dLon * 60, 'E', 'W') },
+  ]);
 </script>
 
-<div class="space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
-  <div class="relative">
-    <h3
-      class="text-sm font-bold text-white inline-block px-3 py-1 mb-3 {isMercator
-        ? 'bg-emerald-700'
-        : 'bg-blue-700'}"
-    >
-      {isMercator ? 'Mercator Sailing' : 'Middle Latitude Sailing'}
-    </h3>
-    <div
-      class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 p-6 text-sm shadow-sm space-y-4"
-    >
-      <div class="border-b border-slate-200 dark:border-slate-800 pb-4">
-        <p
-          class="text-slate-500 dark:text-slate-400 text-xs uppercase font-bold mb-1"
-        >
-          Departure
-        </p>
-        <p class="font-mono">
-          {formatDMS(result.lat1, 'lat')} / {formatDMS(result.lon1, 'lon')}
-        </p>
-        <p class="mt-1">
-          Course: {result.course}&deg; / Distance: {result.distance} NM
-        </p>
-      </div>
-
-      <div
-        class="space-y-2 border-b border-slate-200 dark:border-slate-800 pb-4"
-      >
-        {#if isMercator}
-          <div class="flex justify-between">
-            <span>D.Lat</span>
-            <span class="font-mono"
-              >{(result.dLat * 60).toFixed(1)}' {result.dLat >= 0
-                ? 'N'
-                : 'S'}</span
-            >
-          </div>
-          <div class="flex justify-between">
-            <span>Dep</span>
-            <span class="font-mono">{result.dep.toFixed(1)}'</span>
-          </div>
-          <div class="flex justify-between">
-            <span>DMP</span> <span class="font-mono">{dmp.toFixed(1)}'</span>
-          </div>
-          <div class="flex justify-between">
-            <span>D.Long</span>
-            <span class="font-mono"
-              >{(result.dLon * 60).toFixed(1)}' {result.dLon >= 0
-                ? 'E'
-                : 'W'}</span
-            >
-          </div>
-        {:else}
-          <div class="flex justify-between">
-            <span>D.Lat</span>
-            <span class="font-mono"
-              >{result.dLatMin.toFixed(1)}' {result.dLat >= 0 ? 'N' : 'S'}</span
-            >
-          </div>
-          <div class="flex justify-between">
-            <span>Dep</span>
-            <span class="font-mono">{result.dep.toFixed(1)}'</span>
-          </div>
-          <div class="flex justify-between">
-            <span>Mid.Lat</span>
-            <span class="font-mono">{formatDMS(result.midLat, 'lat')}</span>
-          </div>
-          <div class="flex justify-between">
-            <span>D.Long</span>
-            <span class="font-mono"
-              >{result.dLonMin.toFixed(1)}' {result.dLon >= 0 ? 'E' : 'W'}</span
-            >
-          </div>
-        {/if}
-      </div>
-
-      <div
-        class="bg-blue-50 dark:bg-blue-900/40 p-4 text-center border border-blue-200 dark:border-blue-800"
-      >
-        <p
-          class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2"
-        >
-          到着点 (Arrival Position)
-        </p>
-        <div
-          class="flex justify-center gap-8 text-2xl font-mono font-bold text-blue-700 dark:text-blue-400"
-        >
-          <span>{formatDMS(result.lat2, 'lat')}</span>
-          <span>{formatDMS(result.lon2, 'lon')}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<Sheet title={isMercator ? 'Mercator Sailing' : 'Middle Latitude Sailing'}>
+  <InfoGrid
+    items={[
+      {
+        label: '出発点',
+        lines: [formatLat(result.lat1), formatLon(result.lon1)],
+      },
+      {
+        label: '針路・航程',
+        lines: [formatBearing(result.course), `${result.distance} NM`],
+      },
+    ]}
+  />
+  <ResultRows {rows} />
+  <Highlight
+    items={[
+      { label: '到着点 緯度', value: formatLat(result.lat2) },
+      { label: '到着点 経度', value: formatLon(result.lon2) },
+    ]}
+  />
+</Sheet>

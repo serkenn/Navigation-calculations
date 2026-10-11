@@ -1,47 +1,35 @@
 <script lang="ts">
+  import Sheet from '$lib/components/shared/Sheet.svelte';
+  import Step from '$lib/components/shared/Step.svelte';
+  import Highlight from '$lib/components/shared/Highlight.svelte';
+
   let { result }: { result: any } = $props();
 </script>
 
-<div
-  class="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700 text-sm"
->
-  <div
-    class="print-section border border-slate-300 dark:border-slate-700 rounded-lg p-4 bg-white dark:bg-slate-900"
-  >
-    <div class="print-section-title mb-3">噂溻貨物重量鄻算</div>
-    <div class="print-section-content">
-      <div class="print-row">
-        <span class="print-row-label">積載前平均喫水</span>
-        <span class="print-row-value"
-          >{result.initialMeanDraftM.toFixed(3)} m</span
-        >
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">積載後平均喫水</span>
-        <span class="print-row-value"
-          >{result.finalMeanDraftM.toFixed(3)} m</span
-        >
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">喫水変化</span>
-        <span class="print-row-value">{result.draftChangeCm.toFixed(1)} cm</span
-        >
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">TPC</span>
-        <span class="print-row-value"
-          >{result.tpcTonPerCm.toFixed(2)} ton/cm</span
-        >
-      </div>
-    </div>
-  </div>
-
-  <!-- Final Answer Box -->
-  <div class="print-final-answer">
-    <div class="print-final-answer-title">【最終答案】</div>
-    <div class="print-final-answer-box">
-      <span class="print-answer-label">積載重量</span>
-      <span class="print-answer-value">{result.cargoTon.toFixed(1)} ton</span>
-    </div>
-  </div>
-</div>
+<Sheet title="Cargo from End Draft Change">
+  <Step
+    title="1. 平均喫水"
+    lines={[
+      `積荷前 (${result.fwd1} + ${result.aft1}) / 2 = ${result.initialMeanDraftM.toFixed(3)} m`,
+      `積荷後 (${result.fwd2} + ${result.aft2}) / 2 = ${result.finalMeanDraftM.toFixed(3)} m`,
+      `平均喫水の変化 ${result.draftChangeCm.toFixed(1)} cm`,
+    ]}
+  />
+  <Step
+    title="2. TPC = L × B × 0.01 × ρ"
+    lines={[
+      `${result.length} × ${result.breadth} × 0.01 × ${result.density} = ${result.tpcTonPerCm.toFixed(2)} t/cm`,
+    ]}
+  />
+  <Step
+    title="3. 積載量 = TPC × 平均喫水の変化"
+    lines={[
+      `${result.tpcTonPerCm.toFixed(2)} × ${result.draftChangeCm.toFixed(1)} = ${result.cargoTon.toFixed(1)} t`,
+    ]}
+  />
+  <Highlight
+    items={[
+      { label: '積載重量', value: result.cargoTon.toFixed(1), unit: 't' },
+    ]}
+  />
+</Sheet>

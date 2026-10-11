@@ -1,30 +1,33 @@
 <script lang="ts">
-  import type { Snippet, Component } from 'svelte';
+  import type { Snippet } from 'svelte';
+
+  /** 入力フォームのまとまり。cols で中身をグリッド配置する */
   let {
-    icon: Icon,
-    title,
+    title = '',
+    cols = 2,
     children,
-    accentBg = 'bg-slate-50 dark:bg-slate-800',
-    accentText = 'text-slate-700 dark:text-slate-300',
   }: {
-    icon: Component;
-    title: string;
+    title?: string;
+    cols?: 1 | 2 | 3;
     children: Snippet;
-    accentBg?: string;
-    accentText?: string;
   } = $props();
+
+  const grid = {
+    1: 'grid-cols-1',
+    2: 'grid-cols-1 sm:grid-cols-2',
+    3: 'grid-cols-3',
+  };
 </script>
 
 <section
-  class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden transition-colors"
+  class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm transition-colors"
 >
-  <div
-    class="{accentBg} px-4 py-2 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2 font-bold {accentText} text-sm"
-  >
-    <Icon size={16} />
-    {title}
-  </div>
-  <div class="p-4">
+  {#if title}
+    <h3 class="mb-3 text-sm font-bold text-slate-700 dark:text-slate-300">
+      {title}
+    </h3>
+  {/if}
+  <div class="grid {grid[cols]} gap-3">
     {@render children()}
   </div>
 </section>

@@ -1,42 +1,44 @@
 <script lang="ts">
+  import Sheet from '$lib/components/shared/Sheet.svelte';
+  import Step from '$lib/components/shared/Step.svelte';
+  import Highlight from '$lib/components/shared/Highlight.svelte';
+  import {
+    formatLat,
+    formatLon,
+    formatDirected,
+    formatBearing,
+    formatDuration,
+  } from '$lib/utils/navigationMath';
+
   let { result }: { result: any } = $props();
 </script>
 
-<div class="space-y-4 p-4">
-  <div class="print-section">
-    <div class="print-section-title">推測位置計算</div>
-    <div class="print-section-content">
-      <div class="print-row">
-        <span class="print-row-label">初期位置</span>
-        <span class="print-row-value">
-          {result.latitude0.toFixed(4)}° / {result.longitude0.toFixed(4)}°
-        </span>
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">進路</span>
-        <span class="print-row-value">{result.course.toFixed(1)}°T</span>
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">速力</span>
-        <span class="print-row-value">{result.speed.toFixed(1)} kt</span>
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">経過時間</span>
-        <span class="print-row-value">{result.time.toFixed(1)} h</span>
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">走行距離</span>
-        <span class="print-row-value">{result.distance.toFixed(1)} nm</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="print-final-answer">
-    <div class="print-answer-box">
-      <span class="print-answer-label">推測位置 (Estimated Position)</span>
-      <span class="print-answer-value">
-        {result.endLatitude.toFixed(4)}° / {result.endLongitude.toFixed(4)}°
-      </span>
-    </div>
-  </div>
-</div>
+<Sheet title="Dead Reckoning (Mid. Lat. Sailing)">
+  <Step
+    title="1. 航程"
+    lines={[
+      `${result.speed} kn × ${formatDuration(result.hours, false)} = ${result.distance.toFixed(1)}'`,
+    ]}
+  />
+  <Step
+    title="2. 変緯・東西距"
+    lines={[
+      `D.Lat = ${result.distance.toFixed(1)}' × cos ${formatBearing(result.course)} = ${formatDirected(result.dLatMin, 'N', 'S')}`,
+      `Dep = ${result.distance.toFixed(1)}' × sin ${formatBearing(result.course)} = ${formatDirected(result.dep, 'E', 'W')}`,
+    ]}
+  />
+  <Step
+    title="3. 中分緯度と変経"
+    lines={[
+      `到着緯度 l2 = ${formatLat(result.lat2)}`,
+      `Mid.Lat = (l1 + l2) / 2 = ${formatLat(result.midLat)}`,
+      `D.Long = Dep / cos Mid.Lat = ${formatDirected(result.dLonMin, 'E', 'W')}`,
+    ]}
+  />
+  <Highlight
+    items={[
+      { label: '推測位置 緯度', value: formatLat(result.lat2) },
+      { label: '推測位置 経度', value: formatLon(result.lon2) },
+    ]}
+  />
+</Sheet>

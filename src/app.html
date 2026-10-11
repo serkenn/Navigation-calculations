@@ -22,7 +22,8 @@
     <div style="display: contents">%sveltekit.body%</div>
     <script>
       if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("./sw.js");
+        // ルートから登録する（相対パスだと /calc/xxx/sw.js を探して 404 になる）
+        navigator.serviceWorker.register("/sw.js", { scope: "/" });
       }
     </script>
   </body>

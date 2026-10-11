@@ -1,73 +1,39 @@
 <script lang="ts">
+  import Sheet from '$lib/components/shared/Sheet.svelte';
+  import Step from '$lib/components/shared/Step.svelte';
+  import Highlight from '$lib/components/shared/Highlight.svelte';
+  import { formatBearing } from '$lib/utils/navigationMath';
+
   let { result }: { result: any } = $props();
+
+  const r = (deg: number) => (deg * Math.PI) / 180;
+  // 風が「吹いてくる方向」を正とした成分（東・北）
+  const ax = $derived(result.appSpeed * Math.sin(r(result.appDir)));
+  const ay = $derived(result.appSpeed * Math.cos(r(result.appDir)));
+  const sx = $derived(result.shipSpeed * Math.sin(r(result.heading)));
+  const sy = $derived(result.shipSpeed * Math.cos(r(result.heading)));
+  const f = (v: number) => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(2);
 </script>
 
-<div
-  class="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700 text-sm"
->
-  <div
-    class="print-section border border-slate-300 dark:border-slate-700 rounded-lg p-4 bg-white dark:bg-slate-900"
-  >
-    <div class="print-section-title mb-3">1. 入力条件</div>
-    <div class="print-section-content">
-      <div class="print-row">
-        <span class="print-row-label">船の方位</span>
-        <span class="print-row-value"
-          >{result?.shipHeading?.toFixed(1) || 'N/A'}°T</span
-        >
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">船速</span>
-        <span class="print-row-value"
-          >{result?.shipSpeed?.toFixed(1) || 'N/A'} kt</span
-        >
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">見掛風向</span>
-        <span class="print-row-value"
-          >{result?.apparentWindDir?.toFixed(1) || 'N/A'}°</span
-        >
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">見掛風速</span>
-        <span class="print-row-value"
-          >{result?.apparentWindSpeed?.toFixed(1) || 'N/A'} kt</span
-        >
-      </div>
-    </div>
-  </div>
-
-  <div
-    class="print-section border border-slate-300 dark:border-slate-700 rounded-lg p-4 bg-white dark:bg-slate-900"
-  >
-    <div class="print-section-title mb-3">2. ベクトル計算</div>
-    <div class="print-section-content">
-      <div class="print-row">
-        <span class="print-row-label">相対方位</span>
-        <span class="print-row-value"
-          >{result?.relativeDirection?.toFixed(1) || 'N/A'}°</span
-        >
-      </div>
-      <div class="text-xs text-slate-500 mt-2">
-        真風 = 見掛風 + 船のベクトル
-      </div>
-    </div>
-  </div>
-
-  <!-- Final Answer Box -->
-  <div class="print-final-answer">
-    <div class="print-final-answer-title">【最終答案】</div>
-    <div class="print-final-answer-box">
-      <span class="print-answer-label">真風風向</span>
-      <span class="print-answer-value"
-        >{result?.trueWindDirection?.toFixed(1) || 'N/A'}°</span
-      >
-    </div>
-    <div class="print-final-answer-box">
-      <span class="print-answer-label">真風風速</span>
-      <span class="print-answer-value"
-        >{result?.trueWindSpeed?.toFixed(1) || 'N/A'} kt</span
-      >
-    </div>
-  </div>
-</div>
+<Sheet title="True Wind">
+  <Step
+    title="1. 視風を東西・南北成分に分解（吹いてくる方向を正）"
+    lines={[
+      `視風 ${formatBearing(result.appDir)} ${result.appSpeed.toFixed(1)} kn`,
+      `東西 ${f(ax)}　南北 ${f(ay)}`,
+    ]}
+  />
+  <Step
+    title="2. 船の進行による風（船首方向から吹く）を差し引く"
+    lines={[
+      `船 ${formatBearing(result.heading)} ${result.shipSpeed.toFixed(1)} kn → 東西 ${f(sx)}　南北 ${f(sy)}`,
+      `真風 = 視風 − 船速風 → 東西 ${f(ax - sx)}　南北 ${f(ay - sy)}`,
+    ]}
+  />
+  <Highlight
+    items={[
+      { label: '真風向', value: formatBearing(result.trueDir) },
+      { label: '真風速', value: result.trueSpeed.toFixed(1), unit: 'kn' },
+    ]}
+  />
+</Sheet>

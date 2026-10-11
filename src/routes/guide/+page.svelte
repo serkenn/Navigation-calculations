@@ -1,13 +1,9 @@
 <script lang="ts">
-  import {
-    HelpCircle,
-    Navigation,
-    Ship,
-    Star,
-    Telescope,
-    Clock,
-    Calculator,
-  } from 'lucide-svelte';
+  import { HelpCircle } from 'lucide-svelte';
+  import { getChildCategories } from '$lib/data/calculatorRegistry';
+  import { accentClasses } from '$lib/theme/accent';
+
+  const topCategories = getChildCategories(undefined);
 </script>
 
 <svelte:head>
@@ -34,31 +30,20 @@
     <section class="mb-8">
       <h2 class="text-lg font-bold">カテゴリ一覧</h2>
       <ul class="space-y-2">
-        <li class="flex items-center gap-2">
-          <Navigation size={16} class="text-blue-500" />
-          <strong>航海計画 PILOT 1</strong>: 針路・航程、大圏航法など
-        </li>
-        <li class="flex items-center gap-2">
-          <Ship size={16} class="text-cyan-500" />
-          <strong>その他の航法 PILOT 2</strong>: 潮流計算、風向計算など
-        </li>
-        <li class="flex items-center gap-2">
-          <Star size={16} class="text-amber-500" />
-          <strong>天文航法 ASTRO</strong>: 薄明時、索星、位置の線など
-        </li>
-        <li class="flex items-center gap-2">
-          <Telescope size={16} class="text-purple-500" />
-          <strong>六分儀 SEXTANT</strong>: 測高度改正、物標距離
-        </li>
-        <li class="flex items-center gap-2">
-          <Clock size={16} class="text-green-500" />
-          <strong>時間と弧度 TIME & ARC</strong>: 時間⇔弧度変換
-        </li>
-        <li class="flex items-center gap-2">
-          <Calculator size={16} class="text-rose-500" />
-          <strong>四則計算 TIME Calc</strong>: 時分秒の四則演算
-        </li>
+        {#each topCategories as cat (cat.id)}
+          <li class="flex items-center gap-2">
+            <cat.icon
+              size={16}
+              class="shrink-0 {accentClasses[cat.accent].text}"
+            />
+            <span><strong>{cat.nameJa}</strong>: {cat.summary}</span>
+          </li>
+        {/each}
       </ul>
+      <p class="text-xs">
+        カテゴリ構成と名称は TAMAYA 航法計算機 NC-2200
+        の機能一覧に準拠しています。
+      </p>
     </section>
 
     <section class="mb-8">
@@ -74,8 +59,8 @@
     <section class="mb-8">
       <h2 class="text-lg font-bold">角度の入力</h2>
       <p>
-        緯度・経度は「度
-        分」形式で入力し、方向（N/S/E/W）をプルダウンで選択してください。
+        緯度・経度・角度は「度・分」形式で入力します（分は小数可）。緯度経度は方向（N/S/E/W）をプルダウンで選択してください。時刻は「時・分」で入力します。入力後は
+        Enter キーでも計算できます。
       </p>
     </section>
 

@@ -146,9 +146,11 @@ export function calculateDraftByDensityAndConsumption(
 
   const predictedMeanDraftCm = meanDraftAfterConsumeCm + densityChangeCm;
 
+  // 消費（重量の除去）によるトリムモーメントは浮面心 (LCF) まわりで取る
+  // 位置は船体中央から前方を正とし、前方の重量を除くと船尾トリムが増える
   const trimMomentByStern =
-    fuelConsumedTon * fuelPosFromMidshipM +
-    freshWaterConsumedTon * freshPosFromMidshipM;
+    fuelConsumedTon * (fuelPosFromMidshipM - lcfFromMidshipM) +
+    freshWaterConsumedTon * (freshPosFromMidshipM - lcfFromMidshipM);
   const trimBySternCm =
     mtcTonMPerCm === 0 ? 0 : trimMomentByStern / mtcTonMPerCm;
 

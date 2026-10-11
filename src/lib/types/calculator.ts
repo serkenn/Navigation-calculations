@@ -1,3 +1,6 @@
+import type { Icon } from "lucide-svelte";
+import type { Accent } from "$lib/theme/accent";
+
 export type CategoryId =
   | "pilot1"
   | "pilot2"
@@ -10,13 +13,18 @@ export type CategoryId =
   | "exam-3n-navigation"
   | "exam-3n-operation";
 
+// lucide-svelte のアイコンコンポーネント
+export type IconComponent = typeof Icon;
+
 export interface CategoryDefinition {
   id: CategoryId;
   parentId?: CategoryId;
   nameJa: string;
   nameEn: string;
-  iconName: string;
-  accentColor: string;
+  /** トップページに表示する内容の要約 */
+  summary?: string;
+  icon: IconComponent;
+  accent: Accent;
 }
 
 export interface CalculatorDefinition {
@@ -24,10 +32,12 @@ export interface CalculatorDefinition {
   category: CategoryId;
   nameJa: string;
   nameEn: string;
-  iconName: string;
-  seoTitle: string;
-  seoDescription: string;
-  accentColor: string;
-  borderColor: string;
-  buttonColor: string;
+  /** 画面見出し下の説明・meta description */
+  description: string;
+  icon: IconComponent;
+  /**
+   * components/calculators 以下のパス（拡張子・Calc/Result 接尾辞なし）
+   * 例: "pilot1/CourseDistance" → CourseDistanceCalc.svelte / CourseDistanceResult.svelte
+   */
+  component: string;
 }

@@ -1,4 +1,4 @@
-import { rad, deg } from "./navigationMath";
+import { rad, deg, normalize360 } from "./navigationMath";
 
 /**
  * 実航針路・実航速力 (CMG/SMG)
@@ -52,7 +52,8 @@ export function courseToSteer(
 
 /**
  * 視針路・実航速力 (Course to Steer & SMG)
- * 船速固定、目標CMG方向へ進むための視針路とSMG
+ * 船速を固定し、目標の実航針路 (CMG) 上を進むための視針路と実航速力
+ * 針路線に直交する成分を打ち消す: V sin(C − CMG) = −c sin(Set − CMG)
  */
 export function courseToSteerSMG(
   requiredCMG: number,
@@ -60,25 +61,21 @@ export function courseToSteerSMG(
   setDir: number,
   driftSpeed: number,
 ) {
-  const cmgR = rad(requiredCMG),
-    sdR = rad(setDir);
-  // 潮流方向とCMGの角度差
-  const alpha = sdR - cmgR;
-  // 正弦定理で船の針路偏角を求める
-  const sinBeta = (driftSpeed / shipSpeed) * Math.sin(alpha);
-  if (Math.abs(sinBeta) > 1) {
+  const alpha = rad(setDir - requiredCMG);
+  const sinBeta = -(driftSpeed / shipSpeed) * Math.sin(alpha);
+  if (shipSpeed <= 0 || Math.abs(sinBeta) > 1) {
     return { shipCourse: NaN, smg: NaN, possible: false };
   }
   const beta = Math.asin(sinBeta);
-  let shipCourse = requiredCMG + deg(beta);
-  if (shipCourse < 0) shipCourse += 360;
-  if (shipCourse >= 360) shipCourse -= 360;
-
-  // SMG = 正弦定理から
-  const gamma = Math.PI - alpha - beta;
-  const smg = (shipSpeed * Math.sin(gamma)) / Math.sin(alpha || 1e-10);
-
-  return { shipCourse, smg: Math.abs(smg), possible: true };
+  const smg = shipSpeed * Math.cos(beta) + driftSpeed * Math.cos(alpha);
+  if (smg <= 0) {
+    return { shipCourse: NaN, smg: NaN, possible: false };
+  }
+  return {
+    shipCourse: normalize360(requiredCMG + deg(beta)),
+    smg,
+    possible: true,
+  };
 }
 
 /**

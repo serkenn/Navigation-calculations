@@ -6,7 +6,7 @@
   <title>計算理論・公式 | 航法計算アプリ</title>
   <meta
     name="description"
-    content="メリパス計算や出没方位角計算に使用している数理モデルと公式の紹介です。"
+    content="各計算機で使用している数理モデルと公式の紹介です。"
   />
 </svelte:head>
 
@@ -42,11 +42,13 @@
         本アプリでは高精度なデジタル計算を行っており、従来の手計算との間で以下の差異が生じる場合があります：
       </p>
 
-      <h3 class="text-base font-semibold mt-4 mb-2">1. 楕円体モデルの違い</h3>
+      <h3 class="text-base font-semibold mt-4 mb-2">1. 地球モデルの違い</h3>
       <p class="text-sm mb-3">
-        <strong>アプリ：</strong> WGS84楕円体（離心率 e =
-        0.0818191908426）による精密計算<br />
-        <strong>手計算：</strong> 球体近似または簡略化された楕円体モデル
+        <strong>漸長緯度航法：</strong> 漸長緯度を WGS84 楕円体（離心率 e =
+        0.0818191908426）の式で計算<br />
+        <strong>中分緯度航法・大圏航法：</strong> 球体モデル（1′ = 1 海里）<br
+        />
+        <strong>手計算：</strong> 漸長緯度表（楕円体）または球体近似
       </p>
 
       <h3 class="text-base font-semibold mt-4 mb-2">2. 三角関数の精度</h3>

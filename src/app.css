@@ -69,14 +69,12 @@
   }
 
   /* Hide left panel (input form) */
-  main > div:first-child {
+  .calc-input-panel {
     display: none !important;
   }
 
   /* Hide watermark icon, back button, print button */
-  main > div:last-child > div.absolute,
-  main > div:last-child > button,
-  main > div:last-child button {
+  .calc-sheet button {
     display: none !important;
   }
 
@@ -88,7 +86,7 @@
     height: auto !important;
   }
 
-  main > div:last-child {
+  .calc-sheet {
     display: block !important;
     width: 100% !important;
     max-width: 100% !important;
@@ -102,20 +100,20 @@
   }
 
   /* ── Sheet header (compact) ── */
-  main > div:last-child > div.border-b-2 {
+  .calc-sheet .sheet-header {
     border-bottom: 1.5pt solid #1e293b !important;
     padding-bottom: 3pt !important;
     margin-bottom: 6pt !important;
     margin-top: 0 !important;
   }
 
-  main > div:last-child > div.border-b-2 h2 {
+  .calc-sheet .sheet-header h2 {
     font-size: 11pt !important;
     font-weight: 700 !important;
     letter-spacing: 0.1em !important;
   }
 
-  main > div:last-child > div.border-b-2 span {
+  .calc-sheet .sheet-header span {
     font-size: 7pt !important;
   }
 
@@ -229,30 +227,32 @@
     font-size: 9.5pt !important;
   }
 
-  /* ── Section headings (border-b-2 pattern in result components) ── */
-  section > div.border-b-2,
-  div > div.border-b-2 {
-    padding-bottom: 1pt !important;
-    margin-bottom: 3pt !important;
+  /* ── Result sheet parts (shared/Sheet, Highlight, Step) ── */
+  .sheet-section {
+    page-break-inside: avoid !important;
   }
 
-  /* ── Answer/result boxes ── */
-  div.border-2,
-  div.border-4 {
+  .sheet-badge {
+    border: 0.5pt solid #1e293b !important;
+  }
+
+  .sheet-body {
+    border: 0.5pt solid #94a3b8 !important;
+    padding: 3pt 5pt !important;
+  }
+
+  .sheet-highlight {
+    border: 1pt solid #1e293b !important;
     padding: 3pt 5pt !important;
     margin-top: 3pt !important;
   }
 
-  /* ── Final answer values: keep readable ── */
-  div.border-4 .font-bold.text-base,
-  div.border-4 .font-bold.text-lg {
-    font-size: 8.5pt !important;
+  .sheet-highlight .text-2xl {
+    font-size: 10pt !important;
   }
 
-  /* ── Blue result box (Course/Distance) ── */
-  .text-blue-700,
-  .text-blue-400 {
-    color: #1e3a5f !important;
+  .sheet-step {
+    padding-bottom: 2pt !important;
   }
 
   /* ── max-w-sm / max-w-md: remove width cap ── */
@@ -290,59 +290,6 @@
   th {
     font-weight: 700 !important;
     background: #f1f5f9 !important;
-  }
-
-  /* ── Named print classes (legacy) ── */
-  .print-section {
-    margin-bottom: 5pt !important;
-    padding: 3pt 5pt !important;
-    border: 0.5pt solid #94a3b8 !important;
-    border-radius: 0 !important;
-    page-break-inside: avoid !important;
-  }
-
-  .print-section-title {
-    font-size: 7.5pt !important;
-    font-weight: 700 !important;
-    padding: 1pt 4pt !important;
-    margin-bottom: 3pt !important;
-  }
-
-  .print-row {
-    padding: 1pt 0 !important;
-    font-size: 7pt !important;
-  }
-
-  .print-row-value {
-    font-size: 7pt !important;
-  }
-
-  .print-final-answer {
-    padding: 4pt 6pt !important;
-    margin-top: 5pt !important;
-  }
-
-  .print-answer-value {
-    font-size: 8.5pt !important;
-  }
-
-  /* ── DRP 計算: D.Lat / 中分緯度+Dep / D.Long を3列横並び ── */
-  .drp-calc-grid {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr 1fr !important;
-    gap: 0 6pt !important;
-    margin-left: 0 !important;
-  }
-
-  .drp-calc-grid > * {
-    margin-top: 0 !important;
-    border-left: 0.5pt solid #cbd5e1;
-    padding-left: 4pt !important;
-  }
-
-  .drp-calc-grid > *:first-child {
-    border-left: none;
-    padding-left: 0 !important;
   }
 
   /* ── Misc ── */

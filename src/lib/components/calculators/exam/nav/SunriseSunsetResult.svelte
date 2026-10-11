@@ -1,57 +1,55 @@
 <script lang="ts">
+  import Sheet from '$lib/components/shared/Sheet.svelte';
+  import Step from '$lib/components/shared/Step.svelte';
+  import Highlight from '$lib/components/shared/Highlight.svelte';
+  import Note from '$lib/components/shared/Note.svelte';
+  import {
+    formatLat,
+    formatLon,
+    formatClock,
+    formatDirectedDMS,
+  } from '$lib/utils/navigationMath';
+  import { formatHMS } from '$lib/utils/timeConversion';
+
   let { result }: { result: any } = $props();
+
+  // 経度時差 = (経度 − 標準子午線) / 15。東にあれば LMT から引く
+  const diff = $derived((result.lon - result.zone) / 15);
+  const diffText = $derived(
+    `(${diff >= 0 ? '−' : '+'}) ${formatHMS(Math.abs(diff), 0)}`,
+  );
 </script>
 
-<div
-  class="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700 text-sm"
->
-  <div
-    class="print-section border border-slate-300 dark:border-slate-700 rounded-lg p-4 bg-white dark:bg-slate-900"
+<Sheet title="Sunrise & Sunset">
+  <Step
+    title="1. 日付・位置"
+    lines={[
+      `${result.date}  ${formatLat(result.lat)}  ${formatLon(result.lon)}`,
+      `赤緯 ${formatLat(result.dec)}　均時差 ${result.eqTime >= 0 ? '+' : '−'}${Math.abs(result.eqTime).toFixed(1)} 分`,
+    ]}
+  />
+  <Step
+    title="2. 地方平時 (LMT)"
+    lines={[
+      `日出 ${formatClock(result.riseLMT)}　日没 ${formatClock(result.setLMT)}`,
+    ]}
+  />
+  <Step
+    title="3. 経度時差で標準時へ"
+    lines={[
+      `経度 − 標準子午線 = ${formatDirectedDMS(result.lon - result.zone, 'E', 'W')} → ${diffText}`,
+      `日出 ${formatClock(result.riseLMT)} ${diffText} = ${formatClock(result.riseZT)}`,
+      `日没 ${formatClock(result.setLMT)} ${diffText} = ${formatClock(result.setZT)}`,
+    ]}
+  />
+  <Highlight
+    items={[
+      { label: '日出 (標準時)', value: formatClock(result.riseZT) },
+      { label: '日没 (標準時)', value: formatClock(result.setZT) },
+    ]}
+  />
+  <Note
+    >太陽の中心高度 −50′（大気差 34′ + 視半径
+    16′）で計算。赤緯・均時差は簡易暦による概算です。</Note
   >
-    <div class="print-section-title mb-3">計算過程</div>
-    <div class="print-section-content">
-      <div class="print-row">
-        <span class="print-row-label">緯度</span>
-        <span class="print-row-value">{result?.latitudeDeg}°</span>
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">経度</span>
-        <span class="print-row-value">{result?.longitudeDeg}°</span>
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">日付</span>
-        <span class="print-row-value"
-          >{result?.month}月{result?.day}日 (通日 {result?.dayOfYear})</span
-        >
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">太陽赤緯</span>
-        <span class="print-row-value">{result?.declination}°</span>
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">均時差</span>
-        <span class="print-row-value">{result?.equationOfTime} 分</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="print-final-answer">
-    <div class="print-final-answer-title">【最終答案】</div>
-    <div class="print-final-answer-box">
-      <span class="print-answer-label">常用日出時</span>
-      <span class="print-answer-value">{result?.sunriseLocal}</span>
-    </div>
-    <div class="print-final-answer-box">
-      <span class="print-answer-label">正午</span>
-      <span class="print-answer-value">{result?.solarNoonLocal}</span>
-    </div>
-    <div class="print-final-answer-box">
-      <span class="print-answer-label">常用日没時</span>
-      <span class="print-answer-value">{result?.sunsetLocal}</span>
-    </div>
-    <div class="print-final-answer-box">
-      <span class="print-answer-label">可照時間</span>
-      <span class="print-answer-value">{result?.daylightHours} 時間</span>
-    </div>
-  </div>
-</div>
+</Sheet>

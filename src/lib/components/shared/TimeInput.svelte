@@ -1,45 +1,66 @@
 <script lang="ts">
+  import Field from './Field.svelte';
+  import { boxClass, inputClass, unitClass, selectClass } from './inputStyles';
+  import { useAccent } from '$lib/theme/accent';
+  import type { HMSValue } from '$lib/types/navigation';
+
+  /** 時・分（・秒）の入力。signed で ± 選択を表示（均時差など） */
   let {
     label,
-    hours = $bindable(),
-    minutes = $bindable(),
-    seconds = $bindable(),
+    value = $bindable(),
+    seconds = false,
+    signed = false,
+    hint = '',
   }: {
     label: string;
-    hours: number;
-    minutes: number;
-    seconds: number;
+    value: HMSValue;
+    seconds?: boolean;
+    signed?: boolean;
+    hint?: string;
   } = $props();
+
+  const accent = useAccent();
 </script>
 
-<div>
-  <span
-    class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase"
-    >{label}</span
-  >
-  <div
-    class="flex items-center gap-1 mt-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded p-1 shadow-sm transition-colors"
-  >
+<Field {label} {hint}>
+  <div class="{boxClass} {accent().focus}">
+    {#if signed}
+      <select class={selectClass} bind:value={value.sign} aria-label="符号">
+        <option value={1}>+</option>
+        <option value={-1}>−</option>
+      </select>
+    {/if}
     <input
       type="number"
-      class="w-12 text-right outline-none font-mono text-sm bg-transparent text-slate-900 dark:text-white"
-      bind:value={hours}
-      placeholder="h"
+      inputmode="numeric"
+      class={inputClass}
+      bind:value={value.h}
+      min={0}
+      step={1}
+      aria-label="{label} 時"
     />
-    <span class="text-slate-400 text-xs">h</span>
+    <span class={unitClass}>h</span>
     <input
       type="number"
-      class="w-12 text-right outline-none font-mono text-sm bg-transparent text-slate-900 dark:text-white"
-      bind:value={minutes}
-      placeholder="m"
+      inputmode="numeric"
+      class={inputClass}
+      bind:value={value.m}
+      min={0}
+      step={1}
+      aria-label="{label} 分"
     />
-    <span class="text-slate-400 text-xs">m</span>
-    <input
-      type="number"
-      class="w-12 text-right outline-none font-mono text-sm bg-transparent text-slate-900 dark:text-white"
-      bind:value={seconds}
-      placeholder="s"
-    />
-    <span class="text-slate-400 text-xs">s</span>
+    <span class={unitClass}>m</span>
+    {#if seconds}
+      <input
+        type="number"
+        inputmode="decimal"
+        class={inputClass}
+        bind:value={value.s}
+        min={0}
+        step="any"
+        aria-label="{label} 秒"
+      />
+      <span class={unitClass}>s</span>
+    {/if}
   </div>
-</div>
+</Field>

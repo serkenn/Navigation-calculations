@@ -1,36 +1,40 @@
 <script lang="ts">
+  import Field from './Field.svelte';
+  import { boxClass, inputClass, unitClass } from './inputStyles';
+  import { useAccent } from '$lib/theme/accent';
+
   let {
     label,
     value = $bindable(),
     unit = '',
-    placeholder = '',
-    step = 1,
+    hint = '',
+    step = 'any',
+    min,
+    max,
   }: {
     label: string;
     value: number;
     unit?: string;
-    placeholder?: string;
-    step?: number;
+    hint?: string;
+    step?: number | 'any';
+    min?: number;
+    max?: number;
   } = $props();
+
+  const accent = useAccent();
 </script>
 
-<div>
-  <span
-    class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase"
-    >{label}</span
-  >
-  <div class="flex items-center gap-2 mt-1">
+<Field {label} {hint}>
+  <div class="{boxClass} {accent().focus}">
     <input
       type="number"
-      {step}
-      class="w-full p-2 border border-slate-300 dark:border-slate-600 rounded font-mono bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:border-blue-500 transition-colors"
+      inputmode="decimal"
+      class={inputClass}
       bind:value
-      {placeholder}
+      {step}
+      {min}
+      {max}
     />
-    {#if unit}
-      <span class="text-sm text-slate-500 dark:text-slate-400 whitespace-nowrap"
-        >{unit}</span
-      >
-    {/if}
+    {#if unit}<span class={unitClass}>{unit}</span>{/if}
   </div>
-</div>
+</Field>

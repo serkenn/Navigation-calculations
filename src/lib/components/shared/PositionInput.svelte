@@ -6,7 +6,7 @@
     lat = $bindable(),
     lon = $bindable(),
     latLabel = '緯度 (Lat)',
-    lonLabel = '経度 (Lon)',
+    lonLabel = '経度 (Long)',
   }: {
     lat: DMSValue;
     lon: DMSValue;
@@ -15,7 +15,5 @@
   } = $props();
 </script>
 
-<div class="grid grid-cols-2 gap-4">
-  <DMSInput label={latLabel} bind:value={lat} showSign signType="NS" />
-  <DMSInput label={lonLabel} bind:value={lon} showSign signType="EW" />
-</div>
+<DMSInput label={latLabel} bind:value={lat} sign="NS" />
+<DMSInput label={lonLabel} bind:value={lon} sign="EW" />

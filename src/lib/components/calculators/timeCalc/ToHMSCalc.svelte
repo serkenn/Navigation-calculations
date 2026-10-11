@@ -1,49 +1,55 @@
 <script lang="ts">
-  import { Clock } from 'lucide-svelte';
-  import { decimalToHMS } from '$lib/utils/timeConversion';
+  import CalcForm from '$lib/components/shared/CalcForm.svelte';
+  import SectionCard from '$lib/components/shared/SectionCard.svelte';
+  import NumberInput from '$lib/components/shared/NumberInput.svelte';
+  import Segmented from '$lib/components/shared/Segmented.svelte';
 
   let { onResult }: { onResult: (r: any) => void } = $props();
-  let decimal: number = $state(9.4083);
 
-  const handleCalculate = () => {
-    const result = decimalToHMS(decimal);
-    onResult({ ...result, inputDecimal: decimal });
-  };
+  let mode: 'convert' | 'run' = $state('convert');
+  let decimal = $state(9.4083);
+  let distance = $state(120);
+  let speed = $state(13.5);
+  let error = $state('');
+
+  function calculate() {
+    if (mode === 'run') {
+      if (!(speed > 0)) {
+        error = '速力は 0 より大きい値を入力してください。';
+        return;
+      }
+      error = '';
+      onResult({ mode, distance, speed, hours: distance / speed });
+      return;
+    }
+    error = '';
+    onResult({ mode, hours: decimal });
+  }
 </script>
 
-<div class="space-y-8 pb-20">
-  <header>
-    <h2
-      class="text-2xl font-bold text-slate-800 dark:text-white border-l-4 border-rose-600 pl-3"
-    >
-      Decimal → HMS
-    </h2>
-    <p class="text-xs text-slate-400 mt-1 pl-4">
-      10進数時間を時分秒に変換します
-    </p>
-  </header>
-
-  <section
-    class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4 transition-colors"
-  >
-    <div>
-      <span
-        class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase"
-        >10進数時間 (Decimal Hours)</span
-      >
-      <input
-        type="number"
-        step="0.0001"
-        class="w-full p-3 mt-1 border border-slate-300 dark:border-slate-600 rounded font-mono text-lg text-center bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none"
-        bind:value={decimal}
+<CalcForm onsubmit={calculate} {error}>
+  <SectionCard cols={1}>
+    <Segmented
+      label="計算の種類"
+      bind:value={mode}
+      options={[
+        { value: 'convert', label: '時分秒変換' },
+        { value: 'run', label: '航走時間 (距離 ÷ 速力)' },
+      ]}
+    />
+  </SectionCard>
+  {#if mode === 'convert'}
+    <SectionCard cols={1}>
+      <NumberInput label="10 進数の時間" bind:value={decimal} unit="h" />
+    </SectionCard>
+  {:else}
+    <SectionCard>
+      <NumberInput
+        label="航走距離 (Distance)"
+        bind:value={distance}
+        unit="NM"
       />
-    </div>
-  </section>
-
-  <button
-    onclick={handleCalculate}
-    class="w-full py-4 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex justify-center items-center gap-2"
-  >
-    <Clock size={20} /> 変換 (Convert)
-  </button>
-</div>
+      <NumberInput label="速力 (Speed)" bind:value={speed} unit="kn" />
+    </SectionCard>
+  {/if}
+</CalcForm>

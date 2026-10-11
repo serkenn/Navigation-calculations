@@ -1,65 +1,97 @@
 <script lang="ts">
+  import Sheet from '$lib/components/shared/Sheet.svelte';
+  import InfoGrid from '$lib/components/shared/InfoGrid.svelte';
+  import ResultRows from '$lib/components/shared/ResultRows.svelte';
+  import Highlight from '$lib/components/shared/Highlight.svelte';
+  import Note from '$lib/components/shared/Note.svelte';
+  import {
+    formatDMS,
+    formatLat,
+    formatBearing,
+  } from '$lib/utils/navigationMath';
+
   let { result }: { result: any } = $props();
 </script>
 
-<div class="space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
-  <div class="relative">
-    <h3
-      class="text-sm font-bold bg-amber-700 text-white inline-block px-3 py-1 mb-3"
-    >
-      Star Finder
-    </h3>
-    <div
-      class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 p-6 text-sm shadow-sm space-y-4"
-    >
-      <div class="text-xs text-slate-500 dark:text-slate-400 mb-2">
-        GHA Aries: {result.ghaAries.toFixed(1)}° | 観測可能: {result.stars
-          .length}星
-      </div>
-
-      {#if result.stars.length === 0}
-        <p class="text-center text-slate-400 py-4">
-          条件に該当する恒星がありません
-        </p>
-      {:else}
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead>
-              <tr
-                class="border-b-2 border-slate-300 dark:border-slate-600 text-xs text-slate-500 dark:text-slate-400 uppercase"
-              >
-                <th class="text-left py-1 pr-2">Star</th>
-                <th class="text-right py-1 px-2">SHA</th>
-                <th class="text-right py-1 px-2">Dec</th>
-                <th class="text-right py-1 px-2">Alt</th>
-                <th class="text-right py-1 pl-2">Az</th>
-              </tr>
-            </thead>
-            <tbody>
-              {#each result.stars as star}
-                <tr class="border-b border-slate-100 dark:border-slate-800">
-                  <td
-                    class="py-1.5 pr-2 font-bold text-amber-700 dark:text-amber-400"
-                    >{star.name}</td
-                  >
-                  <td class="py-1.5 px-2 text-right font-mono"
-                    >{star.sha.toFixed(1)}°</td
-                  >
-                  <td class="py-1.5 px-2 text-right font-mono"
-                    >{star.dec.toFixed(1)}°</td
-                  >
-                  <td class="py-1.5 px-2 text-right font-mono font-bold"
-                    >{star.alt.toFixed(1)}°</td
-                  >
-                  <td class="py-1.5 pl-2 text-right font-mono font-bold"
-                    >{star.az.toFixed(1)}°</td
-                  >
-                </tr>
-              {/each}
-            </tbody>
-          </table>
-        </div>
-      {/if}
-    </div>
-  </div>
-</div>
+{#if result.mode === 'predict'}
+  <Sheet title="Prediction">
+    <InfoGrid
+      items={[
+        { label: '推測緯度', lines: [formatLat(result.lat)] },
+        { label: 'LHA ♈', lines: [formatDMS(result.lhaAries)] },
+      ]}
+    />
+    {#if result.stars.length === 0}
+      <Note tone="warn">指定した高度範囲に観測できる恒星はありません。</Note>
+    {:else}
+      <table class="w-full text-sm font-mono">
+        <thead>
+          <tr
+            class="text-xs text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800"
+          >
+            <th class="text-left font-sans py-1">恒星</th>
+            <th class="text-right py-1">高度 Hc</th>
+            <th class="text-right py-1">方位 Zn</th>
+          </tr>
+        </thead>
+        <tbody>
+          {#each result.stars as s (s.name)}
+            <tr class="border-b border-slate-100 dark:border-slate-800">
+              <td class="font-sans py-1">{s.name}</td>
+              <td class="text-right">{formatDMS(s.hc)}</td>
+              <td class="text-right">{formatBearing(s.z)}</td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+      <Note
+        >方位順に {result.stars.length} 個表示しています（{result.minAlt}°〜{result.maxAlt}°）。</Note
+      >
+    {/if}
+  </Sheet>
+{:else}
+  <Sheet title="Identification">
+    <InfoGrid
+      items={[
+        {
+          label: '推測緯度 / LHA ♈',
+          lines: [formatLat(result.lat), formatDMS(result.lhaAries)],
+        },
+        {
+          label: '観測値',
+          lines: [
+            `h ${formatDMS(result.alt)}`,
+            `Zn ${formatBearing(result.az)}`,
+          ],
+        },
+      ]}
+    />
+    <ResultRows
+      rows={[
+        { label: '赤緯 Dec', value: formatLat(result.dec) },
+        { label: '地方時角 LHA', value: formatDMS(result.lha) },
+        { label: '恒星時角 SHA = LHA − LHA♈', value: formatDMS(result.sha) },
+      ]}
+    />
+    <Highlight
+      items={[
+        {
+          label: '該当する恒星',
+          value: result.candidates[0].name,
+          sub: `SHA ${formatDMS(result.candidates[0].sha)}  Dec ${formatLat(result.candidates[0].dec)}`,
+        },
+      ]}
+    />
+    {#if result.candidates[0].distance > 3}
+      <Note tone="warn">
+        一致する恒星との差が {result.candidates[0].distance.toFixed(1)}°
+        あります。惑星の可能性や、観測値・LHA♈ の誤りを確認してください。
+      </Note>
+    {/if}
+    <Note>
+      候補: {result.candidates
+        .map((c: any) => `${c.name} (差 ${c.distance.toFixed(1)}°)`)
+        .join('、')}
+    </Note>
+  </Sheet>
+{/if}

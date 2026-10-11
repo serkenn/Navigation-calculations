@@ -1,7 +1,55 @@
-import { rad, deg } from "./navigationMath";
+import { rad, deg, normalize360, normalize180 } from "./navigationMath";
+
+const clamp1 = (x: number) => Math.max(-1, Math.min(1, x));
+
+type Vec3 = [number, number, number];
+
+const toVec = (lat: number, lon: number): Vec3 => {
+  const L = rad(lat);
+  const l = rad(lon);
+  return [Math.cos(L) * Math.cos(l), Math.cos(L) * Math.sin(l), Math.sin(L)];
+};
+const cross = (a: Vec3, b: Vec3): Vec3 => [
+  a[1] * b[2] - a[2] * b[1],
+  a[2] * b[0] - a[0] * b[2],
+  a[0] * b[1] - a[1] * b[0],
+];
+const dot = (a: Vec3, b: Vec3) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+
+/** 大圏上の初針路（出発点での真針路） */
+export function initialCourse(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+) {
+  const L1 = rad(lat1);
+  const L2 = rad(lat2);
+  const dl = rad(normalize180(lon2 - lon1));
+  const y = Math.sin(dl) * Math.cos(L2);
+  const x =
+    Math.cos(L1) * Math.sin(L2) - Math.sin(L1) * Math.cos(L2) * Math.cos(dl);
+  return normalize360(deg(Math.atan2(y, x)));
+}
+
+/** 大圏距離（海里） cos D = sin L1 sin L2 + cos L1 cos L2 cos DLo */
+export function greatCircleDistance(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+) {
+  const L1 = rad(lat1);
+  const L2 = rad(lat2);
+  const dl = rad(normalize180(lon2 - lon1));
+  const cosD =
+    Math.sin(L1) * Math.sin(L2) + Math.cos(L1) * Math.cos(L2) * Math.cos(dl);
+  return deg(Math.acos(clamp1(cosD))) * 60;
+}
 
 /**
- * 大圏航法: 距離と初針路
+ * 大圏航法: 距離・初針路・終針路・頂点
+ * 頂点緯度は cos Lv = cos L1 · sin C と同値（大圏面の法線から求める）
  */
 export function greatCircleSailing(
   lat1: number,
@@ -9,35 +57,40 @@ export function greatCircleSailing(
   lat2: number,
   lon2: number,
 ) {
-  const l1 = rad(lat1),
-    l2 = rad(lat2);
-  let dLon = rad(lon2 - lon1);
-  while (dLon > Math.PI) dLon -= 2 * Math.PI;
-  while (dLon < -Math.PI) dLon += 2 * Math.PI;
+  const distance = greatCircleDistance(lat1, lon1, lat2, lon2);
+  const course = initialCourse(lat1, lon1, lat2, lon2);
+  // 終針路 = 到着点から出発点への初針路の反方位
+  const finalCourse = normalize360(initialCourse(lat2, lon2, lat1, lon1) + 180);
+  const dLon = normalize180(lon2 - lon1);
 
-  // Distance
-  const cosD =
-    Math.sin(l1) * Math.sin(l2) + Math.cos(l1) * Math.cos(l2) * Math.cos(dLon);
-  const d = Math.acos(Math.max(-1, Math.min(1, cosD)));
-  const distNM = deg(d) * 60;
+  // 頂点: 大圏面に地軸を射影した方向
+  const n = cross(toVec(lat1, lon1), toVec(lat2, lon2));
+  const nn = Math.sqrt(dot(n, n));
+  let vertex: { lat: number; lon: number; onRoute: boolean } | null = null;
+  if (nn > 1e-12) {
+    const k = n[2] / nn;
+    let v: Vec3 = [-k * (n[0] / nn), -k * (n[1] / nn), 1 - k * k];
+    const vn = Math.sqrt(dot(v, v));
+    if (vn > 1e-12) {
+      v = [v[0] / vn, v[1] / vn, v[2] / vn];
+      // 航路の側（南半球航路なら南の頂点）を採用
+      if (lat1 + lat2 < 0) v = [-v[0], -v[1], -v[2]];
+      const vLat = deg(Math.asin(clamp1(v[2])));
+      const vLon = deg(Math.atan2(v[1], v[0]));
+      // 頂点が出発点〜到着点の間にあるか（経度差で判定）
+      const dv = normalize180(vLon - lon1);
+      const onRoute = dLon >= 0 ? dv >= 0 && dv <= dLon : dv <= 0 && dv >= dLon;
+      vertex = { lat: vLat, lon: vLon, onRoute };
+    }
+  }
 
-  // Initial course
-  const sinC = Math.sin(dLon) * Math.cos(l2);
-  const cosC =
-    Math.cos(l1) * Math.sin(l2) - Math.sin(l1) * Math.cos(l2) * Math.cos(dLon);
-  let course = deg(Math.atan2(sinC, cosC));
-  if (course < 0) course += 360;
-
-  // Vertex (最高緯度)
-  const sinLv =
-    Math.sin(l1) / Math.sin(rad(course > 180 ? 360 - course : course) || 1e-10);
-  const latVertex = deg(Math.asin(Math.max(-1, Math.min(1, sinLv))));
-
-  return { distance: distNM, course, latVertex };
+  return { distance, course, finalCourse, dLon, vertex };
 }
 
 /**
- * 集成大圏航法: 制限緯度を超えない大圏＋平行圏航行
+ * 集成大圏航法: 制限緯度を超えない「大圏 → 平行圏 → 大圏」
+ * 出発点から制限緯度に接する大圏:
+ *   sin C1 = cos Lv / cos L1, cos DLo1 = tan L1 / tan Lv, cos D1 = sin L1 / sin Lv
  */
 export function compositeSailing(
   lat1: number,
@@ -46,74 +99,72 @@ export function compositeSailing(
   lon2: number,
   limitLat: number,
 ) {
-  const l1 = rad(lat1),
-    l2 = rad(lat2);
-  const lv = rad(limitLat);
-
-  // Check if great circle vertex exceeds limit
   const gc = greatCircleSailing(lat1, lon1, lat2, lon2);
-  if (Math.abs(gc.latVertex) <= Math.abs(limitLat)) {
-    // No need for composite, pure great circle suffices
-    return {
-      totalDistance: gc.distance,
-      initialCourse: gc.course,
-      gcDist1: gc.distance,
-      gcDist2: 0,
-      parallelDist: 0,
-      lonV1: 0,
-      lonV2: 0,
-      isComposite: false,
-    };
+  const lv = Math.abs(limitLat) * Math.sign(lat1 + lat2 || 1);
+  const pure = {
+    ...gc,
+    limitLat: lv,
+    isComposite: false,
+    totalDistance: gc.distance,
+    initialCourse: gc.course,
+    gcDist1: gc.distance,
+    gcDist2: 0,
+    parallelDist: 0,
+    lonV1: NaN,
+    lonV2: NaN,
+  };
+
+  // 頂点が制限緯度を超えなければ通常の大圏で良い
+  if (
+    !gc.vertex ||
+    !gc.vertex.onRoute ||
+    Math.abs(gc.vertex.lat) <= Math.abs(lv)
+  ) {
+    return pure;
+  }
+  if (Math.abs(lat1) >= Math.abs(lv) || Math.abs(lat2) >= Math.abs(lv)) {
+    return { ...pure, error: "出発点または到着点が制限緯度を超えています" };
   }
 
-  // Phase 1: GC from departure to limiting latitude
-  const cosC1 = Math.tan(l1) / Math.tan(lv);
-  const c1Deg = deg(Math.acos(Math.max(-1, Math.min(1, cosC1))));
-  const initialCourse =
-    lat1 >= 0
-      ? lon2 > lon1
-        ? c1Deg
-        : 360 - c1Deg
-      : lon2 > lon1
-        ? 180 - c1Deg
-        : 180 + c1Deg;
+  const LV = rad(lv);
+  const leg = (lat: number) => {
+    const L = rad(lat);
+    const c = deg(Math.asin(clamp1(Math.cos(LV) / Math.cos(L))));
+    const dLo = deg(Math.acos(clamp1(Math.tan(L) / Math.tan(LV))));
+    const d = deg(Math.acos(clamp1(Math.sin(L) / Math.sin(LV)))) * 60;
+    return { c, dLo, d };
+  };
+  const a = leg(lat1);
+  const b = leg(lat2);
 
-  // GC distance 1
-  const cosD1 = Math.sin(l1) / Math.sin(lv);
-  const d1 = Math.acos(Math.max(-1, Math.min(1, cosD1)));
-  const gcDist1 = deg(d1) * 60;
+  const east = gc.dLon >= 0;
+  const dir = east ? 1 : -1;
+  const parallelDLo = Math.abs(gc.dLon) - a.dLo - b.dLo;
+  if (parallelDLo < 0) return pure;
 
-  // Longitude of vertex 1
-  const cosDLon1 =
-    Math.cos(d1) / (Math.cos(l1) * Math.cos(lv)) - Math.tan(l1) * Math.tan(lv);
-  const dLon1 = deg(Math.acos(Math.max(-1, Math.min(1, cosDLon1))));
-  const lonV1 = lon1 + (lon2 > lon1 ? dLon1 : -dLon1);
+  const north = lv > 0;
+  const initial = north
+    ? east
+      ? a.c
+      : 360 - a.c
+    : east
+      ? 180 - a.c
+      : 180 + a.c;
 
-  // Phase 3: GC from limiting latitude to destination
-
-  const cosD2 = Math.sin(l2) / Math.sin(lv);
-  const d2 = Math.acos(Math.max(-1, Math.min(1, cosD2)));
-  const gcDist2 = deg(d2) * 60;
-
-  const cosDLon2 =
-    Math.cos(d2) / (Math.cos(l2) * Math.cos(lv)) - Math.tan(l2) * Math.tan(lv);
-  const dLon2 = deg(Math.acos(Math.max(-1, Math.min(1, cosDLon2))));
-  const lonV2 = lon2 + (lon2 > lon1 ? -dLon2 : dLon2);
-
-  // Phase 2: Parallel sailing along limiting latitude
-  const dLonParallel = Math.abs(lonV2 - lonV1);
-  const parallelDist = dLonParallel * 60 * Math.cos(lv);
-
-  const totalDistance = gcDist1 + parallelDist + gcDist2;
+  const lonV1 = normalize180(lon1 + dir * a.dLo);
+  const lonV2 = normalize180(lon2 - dir * b.dLo);
+  const parallelDist = parallelDLo * 60 * Math.cos(LV);
 
   return {
-    totalDistance,
-    initialCourse,
-    gcDist1,
-    gcDist2,
+    ...gc,
+    limitLat: lv,
+    isComposite: true,
+    totalDistance: a.d + parallelDist + b.d,
+    initialCourse: initial,
+    gcDist1: a.d,
+    gcDist2: b.d,
     parallelDist,
     lonV1,
     lonV2,
-    isComposite: true,
   };
 }

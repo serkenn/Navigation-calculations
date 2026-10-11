@@ -71,41 +71,23 @@ export function altitudeCorrection(
 }
 
 /**
- * 物標距離 (Distance by Vertical Angle)
- * angle: 物標の垂直角 (度)
- * height: 物標の高さ (m)
- * heightOfEye: 眼高 (m)
+ * 垂直角による物標距離 (Distance by Vertical Angle)
+ * 物標の頂部と水際（基部）との垂直角 α を測ったとき、
+ * 頂部の仰角と水際の俯角の和が α になるので D ≈ H / tan α
+ * angle: 垂直角 (度)、height: 物標の高さ (m)
  */
-export function distanceByVerticalAngle(
-  angle: number,
-  height: number,
-  heightOfEye: number,
-) {
-  const h = height - heightOfEye;
-  if (angle <= 0 || h <= 0) return { distance: 0, distanceNM: 0 };
-
-  const angleR = rad(angle);
-  // D = h / tan(angle)
-  const distanceM = h / Math.tan(angleR);
-  const distanceNM = distanceM / 1852;
-
-  return { distance: distanceM, distanceNM };
+export function distanceByVerticalAngle(angle: number, height: number) {
+  if (angle <= 0 || height <= 0) return { distanceM: NaN, distanceNM: NaN };
+  const distanceM = height / Math.tan(rad(angle));
+  return { distanceM, distanceNM: distanceM / 1852 };
 }
 
 /**
- * 地理学的視距離 (Geographical Range)
- * height: 灯台の高さ (m)
- * heightOfEye: 眼高 (m)
+ * 地理学的光達距離 (Geographical Range)
+ * D = 2.083 (√H + √h) 海里（H: 灯高 m、h: 眼高 m）
  */
 export function geographicalRange(height: number, heightOfEye: number) {
-  // D = 2.08 * (√H + √h) (NM) - 標準大気
-  const range = 2.08 * (Math.sqrt(height) + Math.sqrt(heightOfEye));
-  return { range };
-}
-
-/**
- * 水平線距離 (Distance to Horizon)
- */
-export function distanceToHorizon(heightOfEye: number) {
-  return { distance: 2.08 * Math.sqrt(heightOfEye) };
+  const lightPart = 2.083 * Math.sqrt(height);
+  const eyePart = 2.083 * Math.sqrt(heightOfEye);
+  return { lightPart, eyePart, range: lightPart + eyePart };
 }

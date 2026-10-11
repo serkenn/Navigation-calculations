@@ -68,43 +68,52 @@ src/routes/
   theory/+page.svelte     # 計算理論・公式
 ```
 
-`calc/[id]/+page.svelte` がコア。`componentMap`（id → `{ calc, result }` のペア）で計算機コンポーネントを管理している。**新しい計算機を追加する手順**: ① このファイルの `componentMap` に追加 → ② `calculatorRegistry.ts` に登録 → ③ 該当カテゴリフォルダに `*Calc.svelte` + `*Result.svelte` を作成。
+`calc/[id]/+page.svelte` がコア。レジストリの `component` パスから `import.meta.glob` で `*Calc.svelte` / `*Result.svelte` を遅延読み込みし、見出し（名称・説明）もレジストリから描画する。カテゴリ色は `setAccent()` でコンテキストに流し、共通コンポーネントが `useAccent()` で参照する。**新しい計算機を追加する手順**: ① `calculatorRegistry.ts` に登録（`component: "カテゴリ/Name"`）→ ② `src/lib/components/calculators/カテゴリ/` に `NameCalc.svelte` + `NameResult.svelte` を作成。ルート側の変更は不要。
 
 ### 計算機コンポーネントの規約
 
 全計算機は同じ2コンポーネント構成:
 
-- **`*Calc.svelte`** — 左パネル（入力フォーム）。`onResult` コールバック prop を受け取り、計算実行時に結果オブジェクトを渡す。
-- **`*Result.svelte`** — 右パネル（"Calculation Sheet"、紙風の `bg-[#fffdf5]`）。`result` prop を受け取り整形して表示。
+- **`*Calc.svelte`** — 左パネル（入力フォーム）。`onResult` コールバック prop を受け取り、計算実行時に結果オブジェクトを渡す。`CalcForm`（送信ボタン・エラー表示込み）の中に `SectionCard` と入力部品を並べる。見出しはページ側で出すので書かない。
+- **`*Result.svelte`** — 右パネル（"Calculation Sheet"）。`result` prop を受け取り、`Sheet` の中に `InfoGrid` / `ResultRows` / `Step`（試験の解答手順）/ `Highlight`（最終答案）/ `Note` で表示する。
 
-共通入力コンポーネント（`src/lib/components/shared/`）: `DMSInput`, `PositionInput`, `NumberInput`, `TimeInput`, `SectionCard`, `ResultBox`, `ResultRow`, `ResultSection`, `CalculateButton`, `EmptyResult`。
+共通部品（`src/lib/components/shared/`）:
+
+- 入力: `CalcForm`, `SectionCard`, `NumberInput`, `DMSInput`（度・分 + N/S/E/W/±）, `PositionInput`, `TimeInput`（時・分・秒）, `DateInput`, `Segmented`
+- 結果: `Sheet`, `InfoGrid`, `ResultRow(s)`, `Highlight`, `Step`, `Note`
+
+表記は `navigationMath.ts` の `formatLat` / `formatLon` / `formatBearing` / `formatDirected` / `formatClock` などを使い、各コンポーネントで独自に整形しない。
+
+カテゴリ構成・名称は TAMAYA 航法計算機 NC-2200（https://tamaya-technics.com/navigation/）の機能一覧に準拠させる。
 
 ### 計算ロジック
 
 `src/lib/utils/` に純粋関数として実装（副作用なし）:
 
-| ファイル             | 内容                                                       |
-| -------------------- | ---------------------------------------------------------- |
-| `navigationMath.ts`  | 基本ヘルパー: `rad/deg`, `formatDMS`, `toDecimal`, `toDMS` |
-| `mercatorSailing.ts` | 針路・航程、推測航法（WGS84 子午線弧長）                   |
-| `greatCircle.ts`     | 大圏航法・集成大圏航法                                     |
-| `astronomy.ts`       | 薄明時刻、出没方位角、索星                                 |
-| `ephemeris.ts`       | 太陽 GHA・赤緯の簡易計算                                   |
-| `tide.ts`            | 潮高計算（cos 補間法）                                     |
-| `wind.ts`            | 真風向・風速ベクトル                                       |
-| `currentVector.ts`   | CMG/SMG、流向・流速                                        |
-| `sextant.ts`         | 測高度改正、物標距離                                       |
-| `timeConversion.ts`  | 弧度⇔時間変換、時分秒四則演算                              |
-| `examNavigation.ts`  | 海技試験 3N 航海カテゴリの計算                             |
-| `examOperation.ts`   | 海技試験 3N 運用カテゴリの計算                             |
+| ファイル             | 内容                                                                    |
+| -------------------- | ----------------------------------------------------------------------- |
+| `navigationMath.ts`  | 基本ヘルパー: `rad/deg`、角度正規化、度分・時刻・方位の表記フォーマット |
+| `mercatorSailing.ts` | 中分緯度航法・漸長緯度航法（漸長緯度は WGS84）                          |
+| `greatCircle.ts`     | 大圏航法（頂点含む）・集成大圏航法                                      |
+| `astronomy.ts`       | 高度方位角、薄明・日出没、出没方位角、正中時、LOP の交点、天体の同定    |
+| `ephemeris.ts`       | 太陽 GHA・赤緯・均時差の簡易計算                                        |
+| `tide.ts`            | 潮高（cos 補間法）、潮流（正弦法）                                      |
+| `wind.ts`            | 真風向・風速ベクトル                                                    |
+| `currentVector.ts`   | CMG/SMG、視針路、流向・流速                                             |
+| `sextant.ts`         | 測高度改正、垂直角による距離、光達距離                                  |
+| `timeConversion.ts`  | 時間⇔弧度、時分秒の分解・表記、四則演算                                 |
+| `examNavigation.ts`  | 海技試験 3N 航海の試験固有計算（クロス方位・両測方位・時計改正など）    |
+| `examOperation.ts`   | 海技試験 3N 運用の計算                                                  |
+
+PILOT/ASTRO と同じ計算は試験側でも同じ関数を使う（試験用に再実装しない）。
 
 ### 計算機レジストリ
 
-`src/lib/data/calculatorRegistry.ts` が全計算機のメタデータ（id・カテゴリ・日英名・SEO タイトル/説明・アクセントカラー）の唯一の正。`CategoryId` 型は `src/lib/types/calculator.ts` で定義。
+`src/lib/data/calculatorRegistry.ts` が全計算機・カテゴリのメタデータ（id・カテゴリ・日英名・説明・アイコン・コンポーネントパス、カテゴリ色）の唯一の正。サイドバー・トップページ・利用ガイド・SEO はここから生成する。`CategoryId` 型は `src/lib/types/calculator.ts` で定義。
 
 ### 印刷スタイル
 
-`src/app.css` に `@media print` ルールを一括管理。印刷時は左パネルとサイドバーを非表示にし、右パネルを A4 全幅で展開、全スペーシング・フォントサイズを圧縮して1ページに収める。Result コンポーネントのレイアウトを変更する際は、印刷 CSS のセレクター（`main > div:last-child`、`div.border-b-2` 等）との整合性を確認すること。
+`src/app.css` に `@media print` ルールを一括管理。印刷時は左パネルとサイドバーを非表示にし、右パネルを A4 全幅で展開、全スペーシング・フォントサイズを圧縮して1ページに収める。印刷 CSS は `.calc-input-panel` / `.calc-sheet` / `.sheet-header` / `.sheet-section` / `.sheet-highlight` などのクラスを対象にしている。
 
 ### アプリバージョン
 

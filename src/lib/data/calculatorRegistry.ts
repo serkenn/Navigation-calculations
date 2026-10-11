@@ -1,3 +1,42 @@
+/**
+ * 全計算機のメタデータ（唯一の正）
+ * カテゴリ構成と名称は TAMAYA 航法計算機 NC-2200 の機能一覧に準拠する
+ * https://tamaya-technics.com/navigation/
+ */
+import {
+  Activity,
+  Anchor,
+  ArrowLeftRight,
+  ArrowRightLeft,
+  ArrowUpDown,
+  Briefcase,
+  Calculator,
+  Clock,
+  Compass,
+  Crosshair,
+  Droplets,
+  Eye,
+  Gauge,
+  Globe,
+  GraduationCap,
+  Layers,
+  MapPin,
+  MoveHorizontal,
+  MoveRight,
+  Navigation,
+  Package,
+  RotateCcw,
+  Route,
+  Ship,
+  Star,
+  Sun,
+  Sunset,
+  Telescope,
+  Timer,
+  View,
+  Waves,
+  Wind,
+} from "lucide-svelte";
 import type {
   CategoryDefinition,
   CategoryId,
@@ -9,705 +48,579 @@ export const categories: CategoryDefinition[] = [
     id: "pilot1",
     nameJa: "航海計画 PILOT 1",
     nameEn: "Voyage Planning",
-    iconName: "navigation",
-    accentColor: "text-blue-600 dark:text-blue-400",
+    summary: "針路・航程、到着点、大圏航法、到着時刻",
+    icon: Navigation,
+    accent: "blue",
   },
   {
     id: "pilot2",
     nameJa: "その他の航法 PILOT 2",
     nameEn: "Other Navigation",
-    iconName: "ship",
-    accentColor: "text-cyan-600 dark:text-cyan-400",
+    summary: "潮流航法、真風向・風速、潮高、潮流",
+    icon: Ship,
+    accent: "cyan",
   },
   {
     id: "astro",
     nameJa: "天文航法 ASTRO. NAV",
     nameEn: "Celestial Navigation",
-    iconName: "star",
-    accentColor: "text-amber-600 dark:text-amber-400",
+    summary: "薄明時、索星、天測暦、位置の線、船位決定、正中時",
+    icon: Star,
+    accent: "amber",
   },
   {
     id: "sextant",
     nameJa: "六分儀 SEXTANT",
     nameEn: "Sextant",
-    iconName: "telescope",
-    accentColor: "text-purple-600 dark:text-purple-400",
+    summary: "測高度改正、物標までの距離",
+    icon: Telescope,
+    accent: "purple",
   },
   {
     id: "timeArc",
     nameJa: "時間と弧度 TIME & ARC",
     nameEn: "Time & Arc",
-    iconName: "clock",
-    accentColor: "text-green-600 dark:text-green-400",
+    summary: "時間計算と弧度換算、角度計算と時間換算",
+    icon: Clock,
+    accent: "emerald",
   },
   {
     id: "timeCalc",
-    nameJa: "四則計算 TIME Calc",
+    nameJa: "四則計算と時変換 TIME Calculations",
     nameEn: "Time Calculations",
-    iconName: "calculator",
-    accentColor: "text-rose-600 dark:text-rose-400",
+    summary: "時分秒変換・航走時間、10進数時変換・速力・航走距離、四則計算",
+    icon: Calculator,
+    accent: "rose",
   },
   {
     id: "exam",
     nameJa: "海技試験 EXAM",
     nameEn: "Maritime Exam",
-    iconName: "graduation-cap",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
+    summary: "3級海技士 航海・運用の計算問題（解答形式）",
+    icon: GraduationCap,
+    accent: "indigo",
   },
   {
     id: "exam-3n",
     parentId: "exam",
     nameJa: "3N",
     nameEn: "3N",
-    iconName: "layers",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
+    icon: Layers,
+    accent: "indigo",
   },
   {
     id: "exam-3n-navigation",
     parentId: "exam-3n",
     nameJa: "航海",
     nameEn: "Navigation",
-    iconName: "navigation",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
+    icon: Navigation,
+    accent: "indigo",
   },
   {
     id: "exam-3n-operation",
     parentId: "exam-3n",
     nameJa: "運用",
     nameEn: "Operation",
-    iconName: "briefcase",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
+    icon: Briefcase,
+    accent: "indigo",
   },
 ];
 
 export const calculators: CalculatorDefinition[] = [
-  // PILOT 1
+  // ── 航海計画 PILOT 1 ──
   {
     id: "course-distance",
     category: "pilot1",
-    nameJa: "針路・航程",
-    nameEn: "Course & Distance",
-    iconName: "route",
-    seoTitle: "針路・航程計算 | 航法計算アプリ",
-    seoDescription: "中分緯度航法・漸長緯度航法による針路と航程を計算します。",
-    accentColor: "text-blue-600 dark:text-blue-400",
-    borderColor: "border-blue-600",
-    buttonColor:
-      "from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600",
+    nameJa: "針路・航程の計算",
+    nameEn: "Course and Distance",
+    description:
+      "中分緯度航法・漸長緯度航法により 2 地点間の針路と航程を求めます。",
+    icon: Route,
+    component: "pilot1/CourseDistance",
   },
   {
     id: "dead-reckoning",
     category: "pilot1",
-    nameJa: "到着点",
+    nameJa: "到着点の計算",
     nameEn: "Dead Reckoning",
-    iconName: "map-pin",
-    seoTitle: "到着点計算 | 航法計算アプリ",
-    seoDescription: "出発位置、針路、航程から到着点を計算します。",
-    accentColor: "text-blue-600 dark:text-blue-400",
-    borderColor: "border-blue-600",
-    buttonColor:
-      "from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600",
+    description: "出発点・針路・航程から到着点の緯度経度を求めます。",
+    icon: MapPin,
+    component: "pilot1/DeadReckoning",
   },
   {
     id: "great-circle",
     category: "pilot1",
-    nameJa: "大圏航法",
+    nameJa: "大圏航法の計算",
     nameEn: "Great Circle",
-    iconName: "globe",
-    seoTitle: "大圏航法計算 | 航法計算アプリ",
-    seoDescription: "大圏航法による最短距離と初針路を計算します。",
-    accentColor: "text-blue-600 dark:text-blue-400",
-    borderColor: "border-blue-600",
-    buttonColor:
-      "from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600",
+    description: "大圏距離・初針路・終針路と頂点の位置を求めます。",
+    icon: Globe,
+    component: "pilot1/GreatCircle",
   },
   {
     id: "composite-sailing",
     category: "pilot1",
-    nameJa: "集成大圏航法",
+    nameJa: "集成大圏航法の計算",
     nameEn: "Composite Sailing",
-    iconName: "globe",
-    seoTitle: "集成大圏航法計算 | 航法計算アプリ",
-    seoDescription: "制限緯度を考慮した集成大圏航法を計算します。",
-    accentColor: "text-blue-600 dark:text-blue-400",
-    borderColor: "border-blue-600",
-    buttonColor:
-      "from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600",
+    description: "制限緯度を超えない「大圏＋平行圏＋大圏」の航路を求めます。",
+    icon: Globe,
+    component: "pilot1/CompositeSailing",
   },
   {
     id: "eta",
     category: "pilot1",
-    nameJa: "到着時刻",
-    nameEn: "ETA",
-    iconName: "timer",
-    seoTitle: "到着時刻計算 | 航法計算アプリ",
-    seoDescription: "出発時刻と航程から到着予定時刻を計算します。",
-    accentColor: "text-blue-600 dark:text-blue-400",
-    borderColor: "border-blue-600",
-    buttonColor:
-      "from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600",
+    nameJa: "到着時刻の計算",
+    nameEn: "Estimated Time of Arrival",
+    description: "航程・速力・出発日時から航海時間と到着予定日時を求めます。",
+    icon: Timer,
+    component: "pilot1/ETA",
   },
 
-  // PILOT 2
+  // ── その他の航法 PILOT 2 ──
   {
     id: "cmg-smg",
     category: "pilot2",
-    nameJa: "実航針路・速力",
-    nameEn: "CMG / SMG",
-    iconName: "move-right",
-    seoTitle: "実航針路・速力計算 | 航法計算アプリ",
-    seoDescription: "実航針路（CMG）と実航速力（SMG）を計算します。",
-    accentColor: "text-cyan-600 dark:text-cyan-400",
-    borderColor: "border-cyan-600",
-    buttonColor:
-      "from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600",
+    nameJa: "実航針路・実航速力",
+    nameEn: "Course and Speed Made Good",
+    description:
+      "船の針路・速力と潮流から実航針路 (CMG)・実航速力 (SMG) を求めます。",
+    icon: MoveRight,
+    component: "pilot2/CMGSMG",
   },
   {
     id: "course-to-steer",
     category: "pilot2",
     nameJa: "視針路・対水速力",
-    nameEn: "Course to Steer",
-    iconName: "compass",
-    seoTitle: "視針路・対水速力計算 | 航法計算アプリ",
-    seoDescription: "潮流を考慮した視針路と対水速力を計算します。",
-    accentColor: "text-cyan-600 dark:text-cyan-400",
-    borderColor: "border-cyan-600",
-    buttonColor:
-      "from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600",
+    nameEn: "Course and Speed to Make Good",
+    description:
+      "目標の実航針路・実航速力と潮流から、取るべき視針路と対水速力を求めます。",
+    icon: Compass,
+    component: "pilot2/CourseToSteer",
   },
   {
     id: "course-steer-smg",
     category: "pilot2",
     nameJa: "視針路・実航速力",
-    nameEn: "Course to Steer & SMG",
-    iconName: "compass",
-    seoTitle: "視針路・実航速力計算 | 航法計算アプリ",
-    seoDescription: "潮流を考慮した視針路と実航速力を計算します。",
-    accentColor: "text-cyan-600 dark:text-cyan-400",
-    borderColor: "border-cyan-600",
-    buttonColor:
-      "from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600",
+    nameEn: "Course to Steer and Speed Made Good",
+    description:
+      "対水速力を一定として、目標の実航針路を進む視針路と実航速力を求めます。",
+    icon: Compass,
+    component: "pilot2/CourseSteerSMG",
   },
   {
     id: "set-drift",
     category: "pilot2",
-    nameJa: "流向・流速",
-    nameEn: "Set & Drift",
-    iconName: "waves",
-    seoTitle: "流向・流速計算 | 航法計算アプリ",
-    seoDescription: "流向と流速を計算します。",
-    accentColor: "text-cyan-600 dark:text-cyan-400",
-    borderColor: "border-cyan-600",
-    buttonColor:
-      "from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600",
+    nameJa: "潮の流向・流速",
+    nameEn: "Set and Drift",
+    description:
+      "船の針路・速力と実航針路・実航速力から潮の流向・流速を求めます。",
+    icon: Waves,
+    component: "pilot2/SetDrift",
   },
   {
     id: "true-wind",
     category: "pilot2",
-    nameJa: "真風向・風速",
-    nameEn: "True Wind",
-    iconName: "wind",
-    seoTitle: "真風向・風速計算 | 航法計算アプリ",
-    seoDescription: "船速と相対風から真風向・真風速を計算します。",
-    accentColor: "text-cyan-600 dark:text-cyan-400",
-    borderColor: "border-cyan-600",
-    buttonColor:
-      "from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600",
+    nameJa: "真風向・風速の計算",
+    nameEn: "Direction and Speed of True Wind",
+    description: "視風向・視風速と船の針路・速力から真風向・真風速を求めます。",
+    icon: Wind,
+    component: "pilot2/TrueWind",
   },
   {
     id: "tide-height",
     category: "pilot2",
     nameJa: "潮高計算",
-    nameEn: "Tide Height",
-    iconName: "arrow-up-down",
-    seoTitle: "潮高計算 | 航法計算アプリ",
-    seoDescription: "任意の時刻における潮高を計算します。",
-    accentColor: "text-cyan-600 dark:text-cyan-400",
-    borderColor: "border-cyan-600",
-    buttonColor:
-      "from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600",
+    nameEn: "Tide at Standard Port",
+    description:
+      "高潮・低潮の時刻と潮高から、任意の時刻の潮高を cos 補間で求めます。",
+    icon: ArrowUpDown,
+    component: "pilot2/TideHeight",
   },
   {
     id: "tidal-stream",
     category: "pilot2",
     nameJa: "潮流計算",
     nameEn: "Tidal Stream",
-    iconName: "rotate-ccw",
-    seoTitle: "潮流計算 | 航法計算アプリ",
-    seoDescription: "潮流の流向と流速を計算します。",
-    accentColor: "text-cyan-600 dark:text-cyan-400",
-    borderColor: "border-cyan-600",
-    buttonColor:
-      "from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600",
+    description:
+      "転流時・最強時・最強流速から、任意の時刻の流速を正弦法で求めます。",
+    icon: RotateCcw,
+    component: "pilot2/TidalStream",
   },
 
-  // ASTRO
+  // ── 天文航法 ASTRO. NAV ──
   {
     id: "twilight",
     category: "astro",
-    nameJa: "薄明時",
+    nameJa: "薄明時の計算",
     nameEn: "Twilight",
-    iconName: "sunset",
-    seoTitle: "薄明時計算 | 航法計算アプリ",
-    seoDescription: "薄明の開始・終了時刻を計算します。",
-    accentColor: "text-amber-600 dark:text-amber-400",
-    borderColor: "border-amber-600",
-    buttonColor:
-      "from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600",
+    description:
+      "日出没時と市民・航海・天文薄明の時刻を地方平時と標準時で求めます。",
+    icon: Sunset,
+    component: "astro/Twilight",
   },
   {
     id: "star-finder",
     category: "astro",
-    nameJa: "索星",
-    nameEn: "Star Finder",
-    iconName: "star",
-    seoTitle: "索星計算 | 航法計算アプリ",
-    seoDescription: "観測可能な天体の高度・方位角を計算します。",
-    accentColor: "text-amber-600 dark:text-amber-400",
-    borderColor: "border-amber-600",
-    buttonColor:
-      "from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600",
+    nameJa: "索星の計算",
+    nameEn: "Prediction & Identification",
+    description:
+      "推測緯度と春分点の地方時角から、観測に適した恒星の高度・方位を求めます。",
+    icon: Star,
+    component: "astro/StarFinder",
   },
   {
     id: "nautical-almanac",
     category: "astro",
-    nameJa: "天測暦",
+    nameJa: "天測暦の計算",
     nameEn: "Nautical Almanac",
-    iconName: "eye",
-    seoTitle: "天測暦計算 | 航法計算アプリ",
-    seoDescription: "天測暦データから天体の位置を計算します。",
-    accentColor: "text-amber-600 dark:text-amber-400",
-    borderColor: "border-amber-600",
-    buttonColor:
-      "from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600",
+    description:
+      "日時（UT）から太陽のグリニッジ時角・赤緯・均時差を求めます（概算）。",
+    icon: Eye,
+    component: "astro/NauticalAlmanac",
   },
   {
     id: "lop",
     category: "astro",
-    nameJa: "位置の線",
+    nameJa: "位置の線の計算",
     nameEn: "Line of Position",
-    iconName: "crosshair",
-    seoTitle: "位置の線計算 | 航法計算アプリ",
-    seoDescription: "天体観測から位置の線（LOP）を計算します。",
-    accentColor: "text-amber-600 dark:text-amber-400",
-    borderColor: "border-amber-600",
-    buttonColor:
-      "from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600",
+    description: "推測位置と観測高度から計算高度・方位角・修正差を求めます。",
+    icon: Crosshair,
+    component: "astro/LOP",
   },
   {
     id: "position-fix",
     category: "astro",
-    nameJa: "船位決定",
+    nameJa: "船位決定の計算",
     nameEn: "Position Fix",
-    iconName: "anchor",
-    seoTitle: "船位決定計算 | 航法計算アプリ",
-    seoDescription: "複数の位置の線から船位を決定します。",
-    accentColor: "text-amber-600 dark:text-amber-400",
-    borderColor: "border-amber-600",
-    buttonColor:
-      "from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600",
+    description: "2 本の位置の線（修正差・方位角）の交点から船位を求めます。",
+    icon: Anchor,
+    component: "astro/PositionFix",
   },
   {
-    id: "gyro-amplitude",
+    id: "meridian-passage",
     category: "astro",
-    nameJa: "出没方位角",
-    nameEn: "Gyro & Amplitude",
-    iconName: "compass",
-    seoTitle: "出没方位角計算 | 航法計算アプリ",
-    seoDescription: "太陽の出没方位角からジャイロ誤差を計算します。",
-    accentColor: "text-amber-600 dark:text-amber-400",
-    borderColor: "border-amber-600",
-    buttonColor:
-      "from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600",
+    nameJa: "正中時の計算",
+    nameEn: "Meridian Passage",
+    description: "太陽の正中時刻を求め、子午線高度から緯度を求めます。",
+    icon: Sun,
+    component: "astro/MeridianPassage",
   },
 
-  // SEXTANT
+  // ── 六分儀 SEXTANT ──
   {
     id: "altitude-correction",
     category: "sextant",
-    nameJa: "測高度改正",
-    nameEn: "Altitude Correction",
-    iconName: "telescope",
-    seoTitle: "測高度改正計算 | 航法計算アプリ",
-    seoDescription: "六分儀で測定した高度に各種補正を適用します。",
-    accentColor: "text-purple-600 dark:text-purple-400",
-    borderColor: "border-purple-600",
-    buttonColor:
-      "from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600",
+    nameJa: "測高度改正の計算",
+    nameEn: "Altitude Corrections",
+    description:
+      "六分儀高度に眼高差・大気差・視差・視半径を改正して真高度を求めます。",
+    icon: Telescope,
+    component: "sextant/AltitudeCorr",
   },
   {
     id: "distance-to-object",
     category: "sextant",
-    nameJa: "物標距離",
+    nameJa: "物標までの距離",
     nameEn: "Distance to Object",
-    iconName: "eye",
-    seoTitle: "物標距離計算 | 航法計算アプリ",
-    seoDescription: "六分儀による垂直角測定から物標までの距離を計算します。",
-    accentColor: "text-purple-600 dark:text-purple-400",
-    borderColor: "border-purple-600",
-    buttonColor:
-      "from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600",
+    description: "物標の垂直角または光達距離から物標までの距離を求めます。",
+    icon: Gauge,
+    component: "sextant/DistanceToObject",
   },
 
-  // TIME & ARC
+  // ── 時間と弧度 TIME & ARC ──
   {
     id: "time-to-arc",
     category: "timeArc",
-    nameJa: "時間→弧度",
-    nameEn: "Time to Arc",
-    iconName: "arrow-right-left",
-    seoTitle: "時間→弧度変換 | 航法計算アプリ",
-    seoDescription: "時間を弧度（度・分・秒）に変換します。",
-    accentColor: "text-green-600 dark:text-green-400",
-    borderColor: "border-green-600",
-    buttonColor:
-      "from-green-600 to-green-700 hover:from-green-500 hover:to-green-600",
+    nameJa: "時間計算と弧度換算",
+    nameEn: "Time Computation",
+    description: "時分秒の加減算を行い、結果を弧度（度分秒）に換算します。",
+    icon: ArrowRightLeft,
+    component: "timeArc/TimeToArc",
   },
   {
     id: "arc-to-time",
     category: "timeArc",
-    nameJa: "弧度→時間",
-    nameEn: "Arc to Time",
-    iconName: "arrow-right-left",
-    seoTitle: "弧度→時間変換 | 航法計算アプリ",
-    seoDescription: "弧度（度・分・秒）を時間に変換します。",
-    accentColor: "text-green-600 dark:text-green-400",
-    borderColor: "border-green-600",
-    buttonColor:
-      "from-green-600 to-green-700 hover:from-green-500 hover:to-green-600",
+    nameJa: "角度計算と時間換算",
+    nameEn: "Arc Computation",
+    description: "度分秒の加減算を行い、結果を時間（時分秒）に換算します。",
+    icon: ArrowLeftRight,
+    component: "timeArc/ArcToTime",
   },
 
-  // TIME Calc
+  // ── 四則計算と時変換 TIME Calculations ──
   {
     id: "to-hms",
     category: "timeCalc",
-    nameJa: "時分秒変換",
+    nameJa: "時分秒変換・航走時間計算",
     nameEn: "To HMS",
-    iconName: "clock",
-    seoTitle: "時分秒変換 | 航法計算アプリ",
-    seoDescription: "10進数の時間を時分秒形式に変換します。",
-    accentColor: "text-rose-600 dark:text-rose-400",
-    borderColor: "border-rose-600",
-    buttonColor:
-      "from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600",
+    description:
+      "10 進数の時間を時分秒に変換し、航程と速力から航走時間を求めます。",
+    icon: Clock,
+    component: "timeCalc/ToHMS",
   },
   {
     id: "to-decimal",
     category: "timeCalc",
-    nameJa: "10進数時変換",
-    nameEn: "To Decimal",
-    iconName: "calculator",
-    seoTitle: "10進数時変換 | 航法計算アプリ",
-    seoDescription: "時分秒を10進数の時間に変換します。",
-    accentColor: "text-rose-600 dark:text-rose-400",
-    borderColor: "border-rose-600",
-    buttonColor:
-      "from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600",
+    nameJa: "10進数時変換・速力、航走距離計算",
+    nameEn: "To HHH",
+    description:
+      "時分秒を 10 進数の時間に変換し、速力または航走距離を求めます。",
+    icon: Timer,
+    component: "timeCalc/ToDecimal",
   },
   {
     id: "arithmetic",
     category: "timeCalc",
     nameJa: "四則計算",
-    nameEn: "Arithmetic",
-    iconName: "calculator",
-    seoTitle: "四則計算 | 航法計算アプリ",
-    seoDescription: "時分秒の加減乗除を計算します。",
-    accentColor: "text-rose-600 dark:text-rose-400",
-    borderColor: "border-rose-600",
-    buttonColor:
-      "from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600",
+    nameEn: "Normal Computations",
+    description: "数値または時分秒の加減乗除を行います。",
+    icon: Calculator,
+    component: "timeCalc/Arithmetic",
   },
 
-  // EXAM
+  // ── 海技試験 3N 航海 ──
   {
     id: "meripass-3n",
     category: "exam-3n-navigation",
     nameJa: "天体による船位の決定",
-    nameEn: "Position Determination by Celestial Bodies",
-    iconName: "graduation-cap",
-    seoTitle: "天体による船位の決定 | 航法計算アプリ",
-    seoDescription: "3級海技士（航海）の天体による船位の決定を計算します。",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
-    borderColor: "border-indigo-600",
-    buttonColor:
-      "from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600",
+    nameEn: "Position by Celestial Bodies",
+    description:
+      "午前の太陽観測と正午の子午線高度から正午位置を求めます（3 級海技士 航海）。",
+    icon: GraduationCap,
+    component: "exam/Meripass",
   },
   {
     id: "nav-parallel-meridional",
     category: "exam-3n-navigation",
-    nameJa: "平行線・正子午線航",
-    nameEn: "Parallel & Meridional Sailing",
-    iconName: "navigation",
-    seoTitle: "平行線・正子午線航計算 | 航法計算アプリ",
-    seoDescription: "平行線および正子午線に沿った航海距離を計算します。",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
-    borderColor: "border-indigo-600",
-    buttonColor:
-      "from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600",
+    nameJa: "平行航法・正子午線航法",
+    nameEn: "Parallel & Meridian Sailing",
+    description: "同一緯度線上・同一子午線上を航行するときの航程を求めます。",
+    icon: Navigation,
+    component: "exam/nav/ParallelMeridional",
   },
   {
     id: "nav-great-circle",
     category: "exam-3n-navigation",
-    nameJa: "大圏航路",
-    nameEn: "Great Circle Route",
-    iconName: "globe",
-    seoTitle: "大圏航路計算 | 航法計算アプリ",
-    seoDescription: "二点間の最短経路である大圏航路を計算します。",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
-    borderColor: "border-indigo-600",
-    buttonColor:
-      "from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600",
+    nameJa: "大圏航法",
+    nameEn: "Great Circle Sailing",
+    description: "大圏距離・初針路・終針路を解答形式で求めます。",
+    icon: Globe,
+    component: "exam/nav/GreatCircle",
   },
   {
     id: "nav-true-wind",
     category: "exam-3n-navigation",
-    nameJa: "真風計算",
-    nameEn: "True Wind Calculation",
-    iconName: "wind",
-    seoTitle: "真風計算 | 航法計算アプリ",
-    seoDescription: "船速と相対風から真風向・真風速を計算します。",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
-    borderColor: "border-indigo-600",
-    buttonColor:
-      "from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600",
+    nameJa: "真風の計算",
+    nameEn: "True Wind",
+    description:
+      "視風向（真方位）・視風速と船の針路・速力から真風を解答形式で求めます。",
+    icon: Wind,
+    component: "exam/nav/TrueWind",
   },
   {
     id: "nav-course-to-steer",
     category: "exam-3n-navigation",
-    nameJa: "進行軸計算",
-    nameEn: "Course to Steer",
-    iconName: "compass",
-    seoTitle: "進行軸計算 | 航法計算アプリ",
-    seoDescription: "潮流を考慮した進行軸（操舵進路）を計算します。",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
-    borderColor: "border-indigo-600",
-    buttonColor:
-      "from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600",
+    nameJa: "潮流中の針路",
+    nameEn: "Course to Steer in Current",
+    description:
+      "潮流がある海域で目的の針路線上を進むための視針路を解答形式で求めます。",
+    icon: Compass,
+    component: "exam/nav/CourseToSteer",
   },
   {
     id: "nav-dead-reckoning",
     category: "exam-3n-navigation",
-    nameJa: "推測位置計算",
-    nameEn: "Dead Reckoning (EP)",
-    iconName: "map-pin",
-    seoTitle: "推測位置計算 | 航法計算アプリ",
-    seoDescription: "進路・速力・時間から推測位置（EP）を計算します。",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
-    borderColor: "border-indigo-600",
-    buttonColor:
-      "from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600",
+    nameJa: "推測位置の計算",
+    nameEn: "Dead Reckoning",
+    description: "針路・速力・航走時間から推測位置を中分緯度航法で求めます。",
+    icon: MapPin,
+    component: "exam/nav/DeadReckoning",
   },
   {
     id: "nav-light-range",
     category: "exam-3n-navigation",
     nameJa: "光達距離",
     nameEn: "Geographic Light Range",
-    iconName: "eye",
-    seoTitle: "光達距離計算 | 航法計算アプリ",
-    seoDescription: "灯台の灯高と観測者の眼高から地理的光達距離を計算します。",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
-    borderColor: "border-indigo-600",
-    buttonColor:
-      "from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600",
+    description: "灯高と眼高から地理学的光達距離を求めます。",
+    icon: Eye,
+    component: "exam/nav/LightRange",
   },
   {
     id: "nav-tidal-current",
     category: "exam-3n-navigation",
-    nameJa: "潮汐表の使用法",
+    nameJa: "潮汐表の使用法（潮流）",
     nameEn: "Tidal Current Table",
-    iconName: "waves",
-    seoTitle: "潮汐表の使用法 | 航法計算アプリ",
-    seoDescription: "潮汐表から転流時刻と最強流速を計算します。",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
-    borderColor: "border-indigo-600",
-    buttonColor:
-      "from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600",
+    description:
+      "潮汐表の転流時・最強時・最強流速から任意時刻の流速を解答形式で求めます。",
+    icon: Waves,
+    component: "exam/nav/TidalCurrent",
   },
   {
     id: "nav-cross-bearing",
     category: "exam-3n-navigation",
     nameJa: "クロス方位法",
     nameEn: "Cross Bearing Fix",
-    iconName: "crosshair",
-    seoTitle: "クロス方位法 | 航法計算アプリ",
-    seoDescription: "2つの物標の方位から船位を決定します。",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
-    borderColor: "border-indigo-600",
-    buttonColor:
-      "from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600",
+    description: "位置が分かっている 2 物標の真方位から船位を求めます。",
+    icon: Crosshair,
+    component: "exam/nav/CrossBearing",
   },
   {
     id: "nav-running-fix",
     category: "exam-3n-navigation",
-    nameJa: "転位法（Running Fix）",
+    nameJa: "両測方位法",
     nameEn: "Running Fix",
-    iconName: "move-right",
-    seoTitle: "転位法 | 航法計算アプリ",
-    seoDescription: "転位による船位決定を計算します。",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
-    borderColor: "border-indigo-600",
-    buttonColor:
-      "from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600",
+    description: "1 物標を 2 回測った真方位とその間の航走から船位を求めます。",
+    icon: MoveRight,
+    component: "exam/nav/RunningFix",
   },
   {
     id: "nav-clock-correction",
     category: "exam-3n-navigation",
     nameJa: "船内時計の改正",
-    nameEn: "Ship Clock Correction",
-    iconName: "clock",
-    seoTitle: "船内時計の改正 | 航法計算アプリ",
-    seoDescription: "経度差から時差と船内時計の改正量を計算します。",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
-    borderColor: "border-indigo-600",
-    buttonColor:
-      "from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600",
+    nameEn: "Ship's Clock Correction",
+    description: "経度差から船内時計を進める（遅らせる）時間を求めます。",
+    icon: Clock,
+    component: "exam/nav/ClockCorrection",
   },
   {
     id: "nav-sunrise-sunset",
     category: "exam-3n-navigation",
     nameJa: "常用日出没時",
     nameEn: "Sunrise & Sunset",
-    iconName: "sunset",
-    seoTitle: "常用日出没時 | 航法計算アプリ",
-    seoDescription: "任意の位置と日付における常用日出没時を計算します。",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
-    borderColor: "border-indigo-600",
-    buttonColor:
-      "from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600",
+    description: "日付と位置から日出没時を地方平時と標準時で求めます。",
+    icon: Sunset,
+    component: "exam/nav/SunriseSunset",
   },
   {
     id: "nav-amplitude-gyro",
     category: "exam-3n-navigation",
     nameJa: "出没方位角・ジャイロ誤差",
     nameEn: "Amplitude & Gyro Error",
-    iconName: "compass",
-    seoTitle: "出没方位角・ジャイロ誤差 | 航法計算アプリ",
-    seoDescription: "天体の出没方位角からジャイロ誤差を計算します。",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
-    borderColor: "border-indigo-600",
-    buttonColor:
-      "from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600",
+    description: "太陽の出没方位角を求め、ジャイロコンパスの誤差を求めます。",
+    icon: Compass,
+    component: "exam/nav/AmplitudeGyro",
   },
+
+  // ── 海技試験 3N 運用 ──
   {
     id: "op-tpc-draft",
     category: "exam-3n-operation",
     nameJa: "TPC・平均喫水",
     nameEn: "TPC and Mean Draft",
-    iconName: "ship",
-    seoTitle: "TPC・平均喫水 | 航法計算アプリ",
-    seoDescription:
-      "箱形船のTPC、積載後平均喫水、喫水差からの積載重量を計算します。",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
-    borderColor: "border-indigo-600",
-    buttonColor:
-      "from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600",
+    description:
+      "箱形船の TPC、積載後の平均喫水、喫水変化からの積載重量を求めます。",
+    icon: Ship,
+    component: "exam/OperationTPCDraft",
   },
   {
     id: "op-trim-load",
     category: "exam-3n-operation",
     nameJa: "トリム・前後喫水変化",
     nameEn: "Trim and End Draft Changes",
-    iconName: "move-horizontal",
-    seoTitle: "トリム・前後喫水変化 | 航法計算アプリ",
-    seoDescription:
-      "貨物積載位置とMTC/TPC/LCFから前後喫水変化とトリムを計算します。",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
-    borderColor: "border-indigo-600",
-    buttonColor:
-      "from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600",
+    description:
+      "貨物の積載・移動による平均沈下・トリム・船首尾喫水の変化を求めます。",
+    icon: MoveHorizontal,
+    component: "exam/OperationTrimLoad",
   },
   {
     id: "op-gm-period",
     category: "exam-3n-operation",
-    nameJa: "横揺れ周期とGM",
-    nameEn: "GM from Roll Period",
-    iconName: "activity",
-    seoTitle: "横揺れ周期とGM | 航法計算アプリ",
-    seoDescription: "横揺れ周期の変化からGMを推定します。",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
-    borderColor: "border-indigo-600",
-    buttonColor:
-      "from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600",
+    nameJa: "横揺れ周期と GM",
+    nameEn: "GM from Rolling Period",
+    description: "横揺れ周期の変化から GM と船幅を求めます。",
+    icon: Activity,
+    component: "exam/OperationGMPeriod",
   },
   {
     id: "op-density-draft",
     category: "exam-3n-operation",
     nameJa: "比重差と入港喫水",
-    nameEn: "Draft by Density and Consumption",
-    iconName: "droplets",
-    seoTitle: "比重差と入港喫水 | 航法計算アプリ",
-    seoDescription:
-      "消費量と比重差を考慮した入港時の平均喫水・前後喫水を計算します。",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
-    borderColor: "border-indigo-600",
-    buttonColor:
-      "from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600",
+    nameEn: "Arrival Draft by Density and Consumption",
+    description:
+      "燃料・清水の消費と海水比重の差を考慮した入港時の喫水を求めます。",
+    icon: Droplets,
+    component: "exam/OperationDensityDraft",
   },
   {
     id: "op-blind-zone",
     category: "exam-3n-operation",
     nameJa: "見張り死角距離",
     nameEn: "Blind Zone Distance",
-    iconName: "view",
-    seoTitle: "見張り死角距離 | 航法計算アプリ",
-    seoDescription: "見張り員の眼高と船首部材条件から死角距離を計算します。",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
-    borderColor: "border-indigo-600",
-    buttonColor:
-      "from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600",
+    description:
+      "見張りの眼高と船首部の障害物から船首前方の死角距離を求めます。",
+    icon: View,
+    component: "exam/OperationBlindZone",
   },
   {
     id: "op-ballast-transfer",
     category: "exam-3n-operation",
     nameJa: "等喫水化バラスト移送",
     nameEn: "Ballast Transfer for Even Keel",
-    iconName: "arrow-left-right",
-    seoTitle: "等喫水化バラスト移送 | 航法計算アプリ",
-    seoDescription:
-      "前後喫水差とMTCから等喫水化のためのバラスト移送量を計算します。",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
-    borderColor: "border-indigo-600",
-    buttonColor:
-      "from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600",
+    description:
+      "前後喫水差と MTC から等喫水にするためのバラスト移送量を求めます。",
+    icon: ArrowLeftRight,
+    component: "exam/OperationBallastTransfer",
   },
   {
     id: "op-cargo-by-draft",
     category: "exam-3n-operation",
-    nameJa: "前後喫水差から積載重量",
+    nameJa: "前後喫水から積載重量",
     nameEn: "Cargo from End Draft Change",
-    iconName: "package",
-    seoTitle: "前後喫水差から積載重量 | 航法計算アプリ",
-    seoDescription: "積荷前後の船首船尾喫水変化から積載重量を逆算します。",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
-    borderColor: "border-indigo-600",
-    buttonColor:
-      "from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600",
+    description: "積荷前後の船首・船尾喫水から積載重量を逆算します。",
+    icon: Package,
+    component: "exam/OperationCargoByDraft",
   },
   {
     id: "op-density-mean",
     category: "exam-3n-operation",
     nameJa: "比重差による平均喫水",
     nameEn: "Mean Draft by Density",
-    iconName: "waves",
-    seoTitle: "比重差による平均喫水 | 航法計算アプリ",
-    seoDescription: "排水量と比重差から移動後の平均喫水を計算します。",
-    accentColor: "text-indigo-600 dark:text-indigo-400",
-    borderColor: "border-indigo-600",
-    buttonColor:
-      "from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600",
+    description: "排水量と海水比重の差から移動後の平均喫水を求めます。",
+    icon: Waves,
+    component: "exam/OperationDensityMean",
   },
 ];
 
+const calculatorById = new Map(calculators.map((c) => [c.id, c]));
+const categoryById = new Map(categories.map((c) => [c.id, c]));
+
 export function getCalculator(id: string): CalculatorDefinition | undefined {
-  return calculators.find((c) => c.id === id);
+  return calculatorById.get(id);
 }
 
 export function getCategory(id: CategoryId): CategoryDefinition | undefined {
-  return categories.find((c) => c.id === id);
+  return categoryById.get(id);
 }
 
 export function getCalculatorsByCategory(
   categoryId: CategoryId,
 ): CalculatorDefinition[] {
   return calculators.filter((c) => c.category === categoryId);
+}
+
+export function getChildCategories(parentId?: CategoryId) {
+  return categories.filter((c) => c.parentId === parentId);
+}
+
+/** 親カテゴリを根までたどる（自分自身は含まない） */
+export function getAncestorIds(categoryId: CategoryId): CategoryId[] {
+  const result: CategoryId[] = [];
+  let current = categoryById.get(categoryId);
+  while (current?.parentId) {
+    result.push(current.parentId);
+    current = categoryById.get(current.parentId);
+  }
+  return result;
+}
+
+/** カテゴリ配下（子孫含む）の最初の計算機 */
+export function firstCalculatorIn(
+  categoryId: CategoryId,
+): CalculatorDefinition | undefined {
+  const own = getCalculatorsByCategory(categoryId)[0];
+  if (own) return own;
+  for (const child of getChildCategories(categoryId)) {
+    const found = firstCalculatorIn(child.id);
+    if (found) return found;
+  }
+  return undefined;
 }

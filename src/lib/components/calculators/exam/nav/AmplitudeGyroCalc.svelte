@@ -1,96 +1,55 @@
 <script lang="ts">
-  import { calculateAmplitudeGyroError } from '$lib/utils/examNavigation';
+  import CalcForm from '$lib/components/shared/CalcForm.svelte';
+  import SectionCard from '$lib/components/shared/SectionCard.svelte';
+  import DMSInput from '$lib/components/shared/DMSInput.svelte';
+  import NumberInput from '$lib/components/shared/NumberInput.svelte';
+  import Segmented from '$lib/components/shared/Segmented.svelte';
+  import type { DMSValue } from '$lib/types/navigation';
+  import { dmsToDecimal } from '$lib/utils/navigationMath';
+  import { amplitude, compassError } from '$lib/utils/astronomy';
 
   let { onResult }: { onResult: (r: any) => void } = $props();
 
-  let latitudeDeg = $state(31.25);
-  let declinationDeg = $state(-18.8);
-  let compassBearing = $state(261.5);
-  let isRising = $state(false);
+  let lat: DMSValue = $state({ d: 31, m: 15, dir: 1 });
+  let dec: DMSValue = $state({ d: 18, m: 48, dir: -1 });
+  let rising = $state(false);
+  let gyroBearing = $state(246.5);
 
-  function handleCalculate() {
-    const r = calculateAmplitudeGyroError(
-      latitudeDeg,
-      declinationDeg,
-      compassBearing,
-      isRising,
-    );
+  function calculate() {
+    const la = dmsToDecimal(lat);
+    const d = dmsToDecimal(dec);
+    const amp = amplitude(la, d, rising);
     onResult({
-      ...r,
-      latitudeDeg,
-      declinationDeg,
-      compassBearing,
-      isRising,
-      timestamp: new Date().toLocaleTimeString(),
+      lat: la,
+      dec: d,
+      rising,
+      gyroBearing,
+      ...amp,
+      error: compassError(amp.trueBearing, gyroBearing),
     });
   }
 </script>
 
-<div class="space-y-6 p-6">
-  <div
-    class="border-2 border-indigo-300 dark:border-indigo-700 rounded-lg p-4 bg-indigo-50 dark:bg-indigo-900/20"
-  >
-    <h3 class="text-lg font-bold text-indigo-900 dark:text-indigo-100 mb-4">
-      出没方位角・ジャイロ誤差
-    </h3>
-    <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">
-      Z = cos⁻¹(sin d / cos φ)
-    </p>
-    <div class="space-y-4">
-      <div>
-        <label class="text-sm font-bold text-slate-700 dark:text-slate-300"
-          >緯度 φ [度] (S は負)</label
-        >
-        <input
-          type="number"
-          bind:value={latitudeDeg}
-          step="0.01"
-          class="w-full mt-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800"
-        />
-      </div>
-      <div>
-        <label class="text-sm font-bold text-slate-700 dark:text-slate-300"
-          >太陽赤緯 d [度] (S は負)</label
-        >
-        <input
-          type="number"
-          bind:value={declinationDeg}
-          step="0.01"
-          class="w-full mt-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800"
-        />
-      </div>
-      <div>
-        <label class="text-sm font-bold text-slate-700 dark:text-slate-300"
-          >ジャイロコンパス方位 [°]</label
-        >
-        <input
-          type="number"
-          bind:value={compassBearing}
-          step="0.1"
-          min="0"
-          max="360"
-          class="w-full mt-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800"
-        />
-      </div>
-      <div>
-        <label class="text-sm font-bold text-slate-700 dark:text-slate-300"
-          >日出 / 日没</label
-        >
-        <select
-          bind:value={isRising}
-          class="w-full mt-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800"
-        >
-          <option value={true}>日出 (Rising)</option>
-          <option value={false}>日没 (Setting)</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <button
-    onclick={handleCalculate}
-    class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-bold py-3 rounded-lg transition-all transform hover:scale-105"
-  >
-    計算 (Calculate)
-  </button>
-</div>
+<CalcForm onsubmit={calculate}>
+  <SectionCard cols={1}>
+    <Segmented
+      label="現象"
+      bind:value={rising}
+      options={[
+        { value: true, label: '日出 (Rising)' },
+        { value: false, label: '日没 (Setting)' },
+      ]}
+    />
+  </SectionCard>
+  <SectionCard title="緯度・赤緯">
+    <DMSInput label="推測緯度" bind:value={lat} sign="NS" />
+    <DMSInput label="太陽の赤緯" bind:value={dec} sign="NS" />
+  </SectionCard>
+  <SectionCard cols={1}>
+    <NumberInput
+      label="ジャイロコンパスによる方位"
+      bind:value={gyroBearing}
+      unit="°"
+    />
+  </SectionCard>
+</CalcForm>

@@ -1,39 +1,31 @@
 <script lang="ts">
+  import Sheet from '$lib/components/shared/Sheet.svelte';
+  import ResultRows from '$lib/components/shared/ResultRows.svelte';
+  import Highlight from '$lib/components/shared/Highlight.svelte';
+  import { formatHMS } from '$lib/utils/timeConversion';
+
   let { result }: { result: any } = $props();
 </script>
 
-<div class="space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
-  <div class="relative">
-    <h3
-      class="text-sm font-bold bg-rose-700 text-white inline-block px-3 py-1 mb-3"
-    >
-      Decimal → HMS
-    </h3>
-    <div
-      class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 p-6 text-sm shadow-sm space-y-4"
-    >
-      <div class="border-b border-slate-200 dark:border-slate-800 pb-4">
-        <p
-          class="text-slate-500 dark:text-slate-400 text-xs uppercase font-bold mb-2"
-        >
-          Input (Decimal)
-        </p>
-        <p class="text-xl font-mono font-bold text-slate-800 dark:text-white">
-          {result.inputDecimal} hours
-        </p>
-      </div>
-      <div>
-        <p
-          class="text-slate-500 dark:text-slate-400 text-xs uppercase font-bold mb-2"
-        >
-          Result (HMS)
-        </p>
-        <p
-          class="text-3xl font-mono font-bold text-rose-700 dark:text-rose-400"
-        >
-          {result.sign < 0 ? '-' : ''}{result.h}h {result.m}m {result.s}s
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
+<Sheet title={result.mode === 'run' ? 'Running Time' : 'To HMS'}>
+  <ResultRows
+    rows={result.mode === 'run'
+      ? [
+          { label: '航走距離', value: `${result.distance} NM` },
+          { label: '速力', value: `${result.speed} kn` },
+          {
+            label: '時間 = 距離 ÷ 速力',
+            value: `${result.hours.toFixed(4)} h`,
+          },
+        ]
+      : [{ label: '10 進数', value: `${result.hours} h` }]}
+  />
+  <Highlight
+    items={[
+      {
+        label: result.mode === 'run' ? '航走時間' : '時分秒',
+        value: formatHMS(result.hours),
+      },
+    ]}
+  />
+</Sheet>

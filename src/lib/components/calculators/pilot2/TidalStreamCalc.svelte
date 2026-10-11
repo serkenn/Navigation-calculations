@@ -1,97 +1,54 @@
 <script lang="ts">
-  import { RotateCcw } from 'lucide-svelte';
+  import CalcForm from '$lib/components/shared/CalcForm.svelte';
+  import SectionCard from '$lib/components/shared/SectionCard.svelte';
   import NumberInput from '$lib/components/shared/NumberInput.svelte';
+  import TimeInput from '$lib/components/shared/TimeInput.svelte';
+  import type { HMSValue } from '$lib/types/navigation';
+  import { hmsToHours } from '$lib/utils/timeConversion';
   import { tidalStream } from '$lib/utils/tide';
 
-  export interface TidalStreamResult {
-    rate1: number;
-    dir1: number;
-    rate2: number;
-    dir2: number;
-    fraction: number;
-    rate: number;
-    dir: number;
-  }
+  let { onResult }: { onResult: (r: any) => void } = $props();
 
-  let { onResult }: { onResult: (r: TidalStreamResult) => void } = $props();
+  let slack: HMSValue = $state({ h: 7, m: 30, s: 0, sign: 1 });
+  let max: HMSValue = $state({ h: 10, m: 30, s: 0, sign: 1 });
+  let maxRate = $state(4.0);
+  let dir = $state(90);
+  let target: HMSValue = $state({ h: 9, m: 0, s: 0, sign: 1 });
+  let error = $state('');
 
-  let rate1 = $state(1.5);
-  let dir1 = $state(90);
-  let rate2 = $state(2.5);
-  let dir2 = $state(120);
-  let fraction = $state(0.5);
+  const hours = (t: HMSValue) => hmsToHours(t.h, t.m, 0);
 
-  function handleCalculate() {
-    const r = tidalStream(rate1, dir1, rate2, dir2, fraction);
-    onResult({ rate1, dir1, rate2, dir2, fraction, rate: r.rate, dir: r.dir });
+  function calculate() {
+    const r = tidalStream(
+      hours(slack),
+      hours(max),
+      maxRate,
+      dir,
+      hours(target),
+    );
+    if (!r.inRange) {
+      error = '求める時刻は、転流時から次の転流時までの間にしてください。';
+      return;
+    }
+    error = '';
+    onResult({
+      slackTime: hours(slack),
+      maxTime: hours(max),
+      maxRate,
+      targetTime: hours(target),
+      ...r,
+    });
   }
 </script>
 
-<div class="space-y-8 pb-20">
-  <header>
-    <h2
-      class="text-2xl font-bold text-slate-800 dark:text-white border-l-4 border-cyan-600 pl-3"
-    >
-      潮流計算
-    </h2>
-    <p class="text-xs text-slate-400 mt-1 pl-4">
-      2つの潮流データ間の補間計算を行います
-    </p>
-  </header>
-
-  <section
-    class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4 transition-colors"
-  >
-    <div
-      class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2"
-    >
-      データ 1
-    </div>
-    <div class="grid grid-cols-2 gap-4">
-      <NumberInput
-        label="流速 (Rate)"
-        bind:value={rate1}
-        unit="kn"
-        step={0.1}
-      />
-      <NumberInput label="流向 (Dir)" bind:value={dir1} unit="°" step={1} />
-    </div>
-  </section>
-
-  <section
-    class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4 transition-colors"
-  >
-    <div
-      class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2"
-    >
-      データ 2
-    </div>
-    <div class="grid grid-cols-2 gap-4">
-      <NumberInput
-        label="流速 (Rate)"
-        bind:value={rate2}
-        unit="kn"
-        step={0.1}
-      />
-      <NumberInput label="流向 (Dir)" bind:value={dir2} unit="°" step={1} />
-    </div>
-  </section>
-
-  <section
-    class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4 transition-colors"
-  >
-    <NumberInput
-      label="補間比率 (0.0〜1.0)"
-      bind:value={fraction}
-      unit=""
-      step={0.1}
-    />
-  </section>
-
-  <button
-    onclick={handleCalculate}
-    class="w-full py-4 bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex justify-center items-center gap-2"
-  >
-    <RotateCcw size={20} /> 計算実行 (CALC)
-  </button>
-</div>
+<CalcForm onsubmit={calculate} {error}>
+  <SectionCard title="潮流表の値">
+    <TimeInput label="転流時 (Slack)" bind:value={slack} />
+    <TimeInput label="最強時 (Max)" bind:value={max} />
+    <NumberInput label="最強流速 (Max Rate)" bind:value={maxRate} unit="kn" />
+    <NumberInput label="流向 (Direction)" bind:value={dir} unit="°" />
+  </SectionCard>
+  <SectionCard title="求める時刻">
+    <TimeInput label="時刻 (Time)" bind:value={target} />
+  </SectionCard>
+</CalcForm>

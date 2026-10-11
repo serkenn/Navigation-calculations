@@ -1,66 +1,51 @@
 <script lang="ts">
+  import Sheet from '$lib/components/shared/Sheet.svelte';
+  import Step from '$lib/components/shared/Step.svelte';
+  import Highlight from '$lib/components/shared/Highlight.svelte';
+
   let { result }: { result: any } = $props();
 
-  function trimLabel(trimBySternCm: number) {
-    if (Math.abs(trimBySternCm) < 1e-9) return 'トリムなし';
-    return trimBySternCm > 0 ? '船尾トリム' : '船首トリム';
-  }
+  const cm = (v: number) => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(1)} cm`;
+  const trimLabel = (v: number) =>
+    Math.abs(v) < 0.05
+      ? 'トリム変化なし'
+      : v > 0
+        ? `船尾トリム ${v.toFixed(1)} cm`
+        : `船首トリム ${Math.abs(v).toFixed(1)} cm`;
 </script>
 
-<div
-  class="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700 text-sm"
->
-  <div
-    class="print-section border border-slate-300 dark:border-slate-700 rounded-lg p-4 bg-white dark:bg-slate-900"
-  >
-    <div class="print-section-title mb-3">1. 積載位置による喫水変化</div>
-    <div class="print-section-content">
-      <div class="print-row">
-        <span class="print-row-label">平均沈下量</span>
-        <span class="print-row-value">{result.meanSinkCm.toFixed(2)} cm</span>
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">トリム変化</span>
-        <span class="print-row-value"
-          >{Math.abs(result.trimBySternCm).toFixed(2)} cm</span
-        >
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">({trimLabel(result.trimBySternCm)})</span>
-        <span class="print-row-value"></span>
-      </div>
-    </div>
-  </div>
-
-  <div
-    class="print-section border border-slate-300 dark:border-slate-700 rounded-lg p-4 bg-white dark:bg-slate-900"
-  >
-    <div class="print-section-title mb-3">2. 貨物移動によるトリム変化</div>
-    <div class="print-section-content">
-      <div class="print-row">
-        <span class="print-row-label">トリム変化量</span>
-        <span class="print-row-value">{result.trimShiftCm.toFixed(2)} cm</span>
-      </div>
-      <div class="text-xs text-slate-500 mt-2">式: W × d ÷ MTC</div>
-    </div>
-  </div>
-
-  <!-- Final Answer Box -->
-  <div class="print-final-answer">
-    <div class="print-final-answer-title">【最終答案】</div>
-    <div class="print-final-answer-box">
-      <span class="print-answer-label">船首喫水変化</span>
-      <span class="print-answer-value"
-        >{result.forwardChangeCm >= 0
-          ? '+'
-          : ''}{result.forwardChangeCm.toFixed(2)} cm</span
-      >
-    </div>
-    <div class="print-final-answer-box">
-      <span class="print-answer-label">船尾喫水変化</span>
-      <span class="print-answer-value"
-        >{result.aftChangeCm >= 0 ? '+' : ''}{result.aftChangeCm.toFixed(2)} cm</span
-      >
-    </div>
-  </div>
-</div>
+<Sheet title="Trim and End Draft Changes">
+  <Step
+    title="1. 平均沈下量 = w / TPC"
+    lines={[
+      `${result.weight} / ${result.tpc} = ${result.meanSinkCm.toFixed(1)} cm`,
+    ]}
+  />
+  <Step
+    title="2. トリム変化 = w × d / MTC（LCF より前方に積むと船首トリム）"
+    lines={[
+      `${result.weight} × ${result.posFromLcf} / ${result.mtc} = ${Math.abs(result.trimBySternCm).toFixed(1)} cm`,
+      trimLabel(result.trimBySternCm),
+    ]}
+  />
+  <Step
+    title="3. トリム変化の船首・船尾への配分"
+    lines={[
+      `LCF〜船首 ${result.distFwd.toFixed(1)} m　LCF〜船尾 ${result.distAft.toFixed(1)} m`,
+      `船首 = 沈下 − トリム × ${result.distFwd.toFixed(1)}/${result.shipLength} = ${cm(result.forwardChangeCm)}`,
+      `船尾 = 沈下 + トリム × ${result.distAft.toFixed(1)}/${result.shipLength} = ${cm(result.aftChangeCm)}`,
+    ]}
+  />
+  <Highlight
+    items={[
+      { label: '船首喫水の変化', value: cm(result.forwardChangeCm) },
+      { label: '船尾喫水の変化', value: cm(result.aftChangeCm) },
+    ]}
+  />
+  <Step
+    title="（参考）貨物移動によるトリム変化 = w × d / MTC"
+    lines={[
+      `${result.movedWeight} × ${result.moveDistance} / ${result.mtc} = ${result.shiftTrimCm.toFixed(1)} cm`,
+    ]}
+  />
+</Sheet>

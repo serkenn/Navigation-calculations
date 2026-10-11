@@ -1,50 +1,35 @@
 <script lang="ts">
+  import Sheet from '$lib/components/shared/Sheet.svelte';
+  import Step from '$lib/components/shared/Step.svelte';
+  import Highlight from '$lib/components/shared/Highlight.svelte';
+  import {
+    formatLat,
+    formatLon,
+    formatBearing,
+  } from '$lib/utils/navigationMath';
+
   let { result }: { result: any } = $props();
 </script>
 
-<div
-  class="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700 text-sm"
->
-  <div
-    class="print-section border border-slate-300 dark:border-slate-700 rounded-lg p-4 bg-white dark:bg-slate-900"
-  >
-    <div class="print-section-title mb-3">計算過程</div>
-    <div class="print-section-content">
-      <div class="print-row">
-        <span class="print-row-label">第1方位</span>
-        <span class="print-row-value">{result?.bearing1?.toFixed(1)}°</span>
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">第2方位</span>
-        <span class="print-row-value">{result?.bearing2?.toFixed(1)}°</span>
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">真針路</span>
-        <span class="print-row-value">{result?.courseTrue?.toFixed(1)}°</span>
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">航走距離</span>
-        <span class="print-row-value">{result?.distanceRun?.toFixed(2)} nm</span
-        >
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">物標までの距離</span>
-        <span class="print-row-value"
-          >{result?.distanceFromObject?.toFixed(2)} nm</span
-        >
-      </div>
-    </div>
-  </div>
-
-  <div class="print-final-answer">
-    <div class="print-final-answer-title">【最終答案】</div>
-    <div class="print-final-answer-box">
-      <span class="print-answer-label">船位 (緯度)</span>
-      <span class="print-answer-value">{result?.fixLatDMS}</span>
-    </div>
-    <div class="print-final-answer-box">
-      <span class="print-answer-label">船位 (経度)</span>
-      <span class="print-answer-value">{result?.fixLonDMS}</span>
-    </div>
-  </div>
-</div>
+<Sheet title="Running Fix">
+  <Step
+    title="1. 航走距離"
+    lines={[
+      `${result.speed} kn × ${result.minutes} 分 / 60 = ${result.run.toFixed(2)}'（針路 ${formatBearing(result.course)}）`,
+    ]}
+  />
+  <Step
+    title="2. 第 1 方位線を航走分だけ転位し、第 2 方位線との交点を求める"
+    lines={[
+      `第 1 方位 ${formatBearing(result.bearing1)}　第 2 方位 ${formatBearing(result.bearing2)}（交角 ${result.angle.toFixed(1)}°）`,
+      `第 1 測定時の物標距離 ${result.dist1.toFixed(2)}'`,
+      `第 2 測定時の物標距離 ${result.dist2.toFixed(2)}'`,
+    ]}
+  />
+  <Highlight
+    items={[
+      { label: '第 2 測定時の船位 緯度', value: formatLat(result.lat) },
+      { label: '経度', value: formatLon(result.lon) },
+    ]}
+  />
+</Sheet>

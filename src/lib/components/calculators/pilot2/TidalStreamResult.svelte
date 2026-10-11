@@ -1,80 +1,51 @@
 <script lang="ts">
-  import type { TidalStreamResult } from './TidalStreamCalc.svelte';
+  import Sheet from '$lib/components/shared/Sheet.svelte';
+  import InfoGrid from '$lib/components/shared/InfoGrid.svelte';
+  import ResultRows from '$lib/components/shared/ResultRows.svelte';
+  import Highlight from '$lib/components/shared/Highlight.svelte';
+  import {
+    formatBearing,
+    formatClock,
+    formatDuration,
+  } from '$lib/utils/navigationMath';
 
-  let { result }: { result: TidalStreamResult } = $props();
+  let { result }: { result: any } = $props();
 </script>
 
-<div class="space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
-  <div class="relative">
-    <h3
-      class="text-sm font-bold bg-cyan-700 text-white inline-block px-3 py-1 mb-3"
-    >
-      Tidal Stream
-    </h3>
-    <div
-      class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 p-6 text-sm shadow-sm space-y-4"
-    >
-      <div
-        class="grid grid-cols-2 gap-4 border-b border-slate-200 dark:border-slate-800 pb-3"
-      >
-        <div>
-          <p
-            class="text-xs text-slate-500 dark:text-slate-400 uppercase font-bold"
-          >
-            Data 1
-          </p>
-          <p class="font-mono">Rate: {result.rate1.toFixed(1)} kn</p>
-          <p class="font-mono">Dir: {result.dir1.toFixed(1)}&deg;</p>
-        </div>
-        <div>
-          <p
-            class="text-xs text-slate-500 dark:text-slate-400 uppercase font-bold"
-          >
-            Data 2
-          </p>
-          <p class="font-mono">Rate: {result.rate2.toFixed(1)} kn</p>
-          <p class="font-mono">Dir: {result.dir2.toFixed(1)}&deg;</p>
-        </div>
-      </div>
-      <div
-        class="flex justify-between border-b border-slate-200 dark:border-slate-800 pb-3"
-      >
-        <span class="text-slate-500 dark:text-slate-400">補間比率</span>
-        <span class="font-mono font-bold"
-          >{(result.fraction * 100).toFixed(0)}%</span
-        >
-      </div>
-      <div
-        class="bg-cyan-50 dark:bg-cyan-900/40 p-4 text-center border border-cyan-200 dark:border-cyan-800"
-      >
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <p
-              class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1"
-            >
-              Direction
-            </p>
-            <p
-              class="text-3xl font-mono font-bold text-cyan-700 dark:text-cyan-400"
-            >
-              {result.dir.toFixed(1)}&deg;
-            </p>
-          </div>
-          <div>
-            <p
-              class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1"
-            >
-              Rate
-            </p>
-            <p
-              class="text-3xl font-mono font-bold text-cyan-700 dark:text-cyan-400"
-            >
-              {result.rate.toFixed(1)}
-            </p>
-            <p class="text-xs text-slate-500 dark:text-slate-400">kn</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<Sheet title="Tidal Stream">
+  <InfoGrid
+    items={[
+      { label: '転流時 Slack', lines: [formatClock(result.slackTime)] },
+      {
+        label: '最強時 Max',
+        lines: [
+          `${formatClock(result.maxTime)}  ${result.maxRate.toFixed(1)} kn`,
+        ],
+      },
+    ]}
+  />
+  <ResultRows
+    rows={[
+      {
+        label: '転流〜最強の間隔 T',
+        value: formatDuration(result.interval, false),
+      },
+      {
+        label: '転流時からの経過 t',
+        value: formatDuration(result.elapsed, false),
+      },
+      { label: '90° × t / T', value: `${result.angle.toFixed(1)}°` },
+      { label: 'v = Vmax · sin(90° × t / T)', value: '', muted: true },
+    ]}
+  />
+  <Highlight
+    items={[
+      {
+        label: `${formatClock(result.targetTime)} の流速`,
+        value: result.rate.toFixed(1),
+        unit: 'kn',
+      },
+      { label: '流向 Direction', value: formatBearing(result.dir) },
+    ]}
+  />
+</Sheet>

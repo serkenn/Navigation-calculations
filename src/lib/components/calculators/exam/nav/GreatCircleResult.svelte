@@ -1,78 +1,62 @@
 <script lang="ts">
+  import Sheet from '$lib/components/shared/Sheet.svelte';
+  import Step from '$lib/components/shared/Step.svelte';
+  import Highlight from '$lib/components/shared/Highlight.svelte';
+  import {
+    formatLat,
+    formatLon,
+    formatDirectedDMS,
+    formatBearing,
+    toQuadrantBearing,
+  } from '$lib/utils/navigationMath';
+
   let { result }: { result: any } = $props();
+
+  const D = $derived(result.distance / 60);
 </script>
 
-<div
-  class="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700 text-sm"
->
-  <div
-    class="print-section border border-slate-300 dark:border-slate-700 rounded-lg p-4 bg-white dark:bg-slate-900"
-  >
-    <div class="print-section-title mb-3">1. 出発地と到着地</div>
-    <div class="print-section-content">
-      <div class="print-row">
-        <span class="print-row-label">出発地</span>
-        <span class="print-row-value"
-          >{result?.startLat?.toFixed(2)}°, {result?.startLon?.toFixed(
-            2,
-          )}°</span
-        >
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">到着地</span>
-        <span class="print-row-value"
-          >{result?.endLat?.toFixed(2)}°, {result?.endLon?.toFixed(2)}°</span
-        >
-      </div>
-    </div>
-  </div>
-
-  <div
-    class="print-section border border-slate-300 dark:border-slate-700 rounded-lg p-4 bg-white dark:bg-slate-900"
-  >
-    <div class="print-section-title mb-3">2. 大圏航路計算</div>
-    <div class="print-section-content">
-      <div class="print-row">
-        <span class="print-row-label">初期針路 (Initial Course)</span>
-        <span class="print-row-value"
-          >{result?.initialCourse?.toFixed(1) || 'N/A'}°</span
-        >
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">終了針路 (Final Course)</span>
-        <span class="print-row-value"
-          >{result?.finalCourse?.toFixed(1) || 'N/A'}°</span
-        >
-      </div>
-      <div class="print-row">
-        <span class="print-row-label">大圏距離</span>
-        <span class="print-row-value"
-          >{result?.distanceNm?.toFixed(1) || 'N/A'} nm</span
-        >
-      </div>
-    </div>
-  </div>
-
-  <!-- Final Answer Box -->
-  <div class="print-final-answer">
-    <div class="print-final-answer-title">【最終答案】</div>
-    <div class="print-final-answer-box">
-      <span class="print-answer-label">大圏距離</span>
-      <span class="print-answer-value"
-        >{result?.distanceNm?.toFixed(1) || 'N/A'} nm</span
-      >
-    </div>
-    <div class="print-final-answer-box">
-      <span class="print-answer-label">初期針路</span>
-      <span class="print-answer-value"
-        >{result?.initialCourse?.toFixed(1) || 'N/A'}°</span
-      >
-    </div>
-    <div class="print-final-answer-box">
-      <span class="print-answer-label">終了針路</span>
-      <span class="print-answer-value"
-        >{result?.finalCourse?.toFixed(1) || 'N/A'}°</span
-      >
-    </div>
-  </div>
-</div>
+<Sheet title="Great Circle Sailing">
+  <Step
+    title="1. 出発地・到着地と変経"
+    lines={[
+      `出発地 ${formatLat(result.lat1)}  ${formatLon(result.lon1)}`,
+      `到着地 ${formatLat(result.lat2)}  ${formatLon(result.lon2)}`,
+      `D.Long = ${formatDirectedDMS(result.dLon, 'E', 'W')}`,
+    ]}
+  />
+  <Step
+    title="2. 大圏距離"
+    lines={[
+      'cos D = sin l1 sin l2 + cos l1 cos l2 cos D.Long',
+      `D = ${D.toFixed(4)}° → ${result.distance.toFixed(1)}'`,
+    ]}
+  />
+  <Step
+    title="3. 初針路・終針路"
+    lines={[
+      'tan C = sin D.Long / (cos l1 tan l2 − sin l1 cos D.Long)',
+      `初針路 ${formatBearing(result.course)}（${toQuadrantBearing(result.course)}）`,
+      `終針路 ${formatBearing(result.finalCourse)}（${toQuadrantBearing(result.finalCourse)}）`,
+    ]}
+  />
+  {#if result.vertex}
+    <Step
+      title="4. 頂点"
+      lines={[
+        'cos lv = cos l1 sin C',
+        `頂点 ${formatLat(result.vertex.lat)}  ${formatLon(result.vertex.lon)}`,
+      ]}
+    />
+  {/if}
+  <Highlight
+    items={[
+      {
+        label: '大圏距離',
+        value: `${result.distance.toFixed(1)}'`,
+        unit: '海里',
+      },
+      { label: '初針路', value: formatBearing(result.course) },
+      { label: '終針路', value: formatBearing(result.finalCourse) },
+    ]}
+  />
+</Sheet>

@@ -1,126 +1,78 @@
 <script lang="ts">
-  import { formatDMS } from '$lib/utils/navigationMath';
+  import Sheet from '$lib/components/shared/Sheet.svelte';
+  import InfoGrid from '$lib/components/shared/InfoGrid.svelte';
+  import ResultRows from '$lib/components/shared/ResultRows.svelte';
+  import Highlight from '$lib/components/shared/Highlight.svelte';
+  import Note from '$lib/components/shared/Note.svelte';
+  import {
+    formatLat,
+    formatLon,
+    formatBearing,
+  } from '$lib/utils/navigationMath';
 
   let { result }: { result: any } = $props();
+
+  const nm = (v: number) => `${v.toFixed(1)}'`;
+
+  const rows = $derived(
+    result.isComposite
+      ? [
+          { label: '大圏区間 1', value: nm(result.gcDist1) },
+          { label: '変針点 V1 経度', value: formatLon(result.lonV1) },
+          { label: '平行圏区間', value: nm(result.parallelDist) },
+          { label: '変針点 V2 経度', value: formatLon(result.lonV2) },
+          { label: '大圏区間 2', value: nm(result.gcDist2) },
+          {
+            label: '（参考）通常の大圏距離',
+            value: nm(result.distance),
+            muted: true,
+          },
+        ]
+      : [
+          {
+            label: '大圏の頂点緯度',
+            value: result.vertex ? formatLat(result.vertex.lat) : '—',
+          },
+        ],
+  );
 </script>
 
-<div class="space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
-  <div class="relative">
-    <h3
-      class="text-sm font-bold bg-blue-700 text-white inline-block px-3 py-1 mb-3"
+<Sheet title="Composite Sailing">
+  <InfoGrid
+    items={[
+      {
+        label: 'From',
+        lines: [formatLat(result.lat1), formatLon(result.lon1)],
+      },
+      { label: 'To', lines: [formatLat(result.lat2), formatLon(result.lon2)] },
+    ]}
+  />
+  <ResultRows
+    rows={[
+      { label: '制限緯度 Limiting Lat', value: formatLat(result.limitLat) },
+      ...rows,
+    ]}
+  />
+  <Highlight
+    items={[
+      {
+        label: '総航程 Total Distance',
+        value: nm(result.totalDistance),
+        unit: '海里 (NM)',
+      },
+      {
+        label: '初針路 Initial Course',
+        value: formatBearing(result.initialCourse),
+      },
+    ]}
+  />
+  {#if result.error}
+    <Note tone="warn"
+      >{result.error}。通常の大圏航法の結果を表示しています。</Note
     >
-      Composite Sailing
-    </h3>
-    <div
-      class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 p-6 text-sm shadow-sm space-y-4"
+  {:else if !result.isComposite}
+    <Note
+      >大圏の頂点が制限緯度を超えないため、通常の大圏航法で航行できます。</Note
     >
-      <div
-        class="grid grid-cols-2 gap-4 border-b border-slate-200 dark:border-slate-800 pb-4"
-      >
-        <div>
-          <p
-            class="text-slate-500 dark:text-slate-400 text-xs uppercase font-bold"
-          >
-            From
-          </p>
-          <p class="font-mono">{formatDMS(result.lat1, 'lat')}</p>
-          <p class="font-mono">{formatDMS(result.lon1, 'lon')}</p>
-        </div>
-        <div>
-          <p
-            class="text-slate-500 dark:text-slate-400 text-xs uppercase font-bold"
-          >
-            To
-          </p>
-          <p class="font-mono">{formatDMS(result.lat2, 'lat')}</p>
-          <p class="font-mono">{formatDMS(result.lon2, 'lon')}</p>
-        </div>
-      </div>
-      <div
-        class="flex justify-between border-b border-slate-200 dark:border-slate-800 pb-3"
-      >
-        <span class="text-slate-500 dark:text-slate-400">制限緯度</span>
-        <span class="font-mono font-bold"
-          >{result.limitLat.toFixed(1)}&deg;</span
-        >
-      </div>
-      <div class="flex justify-between">
-        <span class="text-slate-500 dark:text-slate-400">集成航法の適用</span>
-        <span
-          class="font-bold {result.isComposite
-            ? 'text-amber-600 dark:text-amber-400'
-            : 'text-green-600 dark:text-green-400'}"
-        >
-          {result.isComposite ? '必要 (Composite)' : '不要 (Pure GC)'}
-        </span>
-      </div>
-      {#if result.isComposite}
-        <div
-          class="space-y-2 border-b border-slate-200 dark:border-slate-800 pb-3"
-        >
-          <div class="flex justify-between">
-            <span class="text-slate-500 dark:text-slate-400">大圏距離 1</span
-            ><span class="font-mono font-bold"
-              >{result.gcDist1.toFixed(1)} NM</span
-            >
-          </div>
-          <div class="flex justify-between">
-            <span class="text-slate-500 dark:text-slate-400">平行圏距離</span
-            ><span class="font-mono font-bold"
-              >{result.parallelDist.toFixed(1)} NM</span
-            >
-          </div>
-          <div class="flex justify-between">
-            <span class="text-slate-500 dark:text-slate-400">大圏距離 2</span
-            ><span class="font-mono font-bold"
-              >{result.gcDist2.toFixed(1)} NM</span
-            >
-          </div>
-          <div class="flex justify-between">
-            <span class="text-slate-500 dark:text-slate-400">変針点 V1</span
-            ><span class="font-mono font-bold"
-              >{formatDMS(result.lonV1, 'lon')}</span
-            >
-          </div>
-          <div class="flex justify-between">
-            <span class="text-slate-500 dark:text-slate-400">変針点 V2</span
-            ><span class="font-mono font-bold"
-              >{formatDMS(result.lonV2, 'lon')}</span
-            >
-          </div>
-        </div>
-      {/if}
-      <div
-        class="bg-blue-50 dark:bg-blue-900/40 p-4 text-center border border-blue-200 dark:border-blue-800"
-      >
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <p
-              class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1"
-            >
-              Total Distance
-            </p>
-            <p
-              class="text-3xl font-mono font-bold text-blue-700 dark:text-blue-400"
-            >
-              {result.totalDistance.toFixed(1)}
-            </p>
-            <p class="text-xs text-slate-500 dark:text-slate-400">NM</p>
-          </div>
-          <div>
-            <p
-              class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1"
-            >
-              Initial Course
-            </p>
-            <p
-              class="text-3xl font-mono font-bold text-blue-700 dark:text-blue-400"
-            >
-              {result.initialCourse.toFixed(1)}&deg;
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+  {/if}
+</Sheet>

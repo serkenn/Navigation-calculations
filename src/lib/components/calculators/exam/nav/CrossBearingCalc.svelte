@@ -1,138 +1,56 @@
 <script lang="ts">
-  import { calculateCrossBearing, formatDMS } from '$lib/utils/examNavigation';
+  import CalcForm from '$lib/components/shared/CalcForm.svelte';
+  import SectionCard from '$lib/components/shared/SectionCard.svelte';
+  import PositionInput from '$lib/components/shared/PositionInput.svelte';
+  import NumberInput from '$lib/components/shared/NumberInput.svelte';
+  import type { DMSValue } from '$lib/types/navigation';
+  import { dmsToDecimal } from '$lib/utils/navigationMath';
+  import { crossBearingFix } from '$lib/utils/examNavigation';
 
   let { onResult }: { onResult: (r: any) => void } = $props();
 
-  let obj1Lat = $state(35.0);
-  let obj1Lon = $state(139.5);
-  let bearing1 = $state(45);
-  let obj2Lat = $state(35.1);
-  let obj2Lon = $state(139.7);
-  let bearing2 = $state(315);
+  let aLat: DMSValue = $state({ d: 35, m: 0, dir: 1 });
+  let aLon: DMSValue = $state({ d: 139, m: 40, dir: 1 });
+  let bearingA = $state(315);
+  let bLat: DMSValue = $state({ d: 35, m: 0, dir: 1 });
+  let bLon: DMSValue = $state({ d: 139, m: 50, dir: 1 });
+  let bearingB = $state(45);
+  let error = $state('');
 
-  function handleCalculate() {
-    const r = calculateCrossBearing(
-      obj1Lat,
-      obj1Lon,
-      bearing1,
-      obj2Lat,
-      obj2Lon,
-      bearing2,
+  function calculate() {
+    const p = {
+      aLat: dmsToDecimal(aLat),
+      aLon: dmsToDecimal(aLon),
+      bLat: dmsToDecimal(bLat),
+      bLon: dmsToDecimal(bLon),
+      bearingA,
+      bearingB,
+    };
+    const r = crossBearingFix(
+      p.aLat,
+      p.aLon,
+      bearingA,
+      p.bLat,
+      p.bLon,
+      bearingB,
     );
-    onResult({
-      ...r,
-      obj1Lat,
-      obj1Lon,
-      bearing1,
-      obj2Lat,
-      obj2Lon,
-      bearing2,
-      shipLatDMS: formatDMS(r.shipLat, 'lat'),
-      shipLonDMS: formatDMS(r.shipLon, 'lon'),
-      timestamp: new Date().toLocaleTimeString(),
-    });
+    if (!r.possible) {
+      error =
+        'この方位の組み合わせでは 2 本の方位線が船の前方で交わりません。方位を確認してください。';
+      return;
+    }
+    error = '';
+    onResult({ ...p, ...r });
   }
 </script>
 
-<div class="space-y-6 p-6">
-  <div
-    class="border-2 border-indigo-300 dark:border-indigo-700 rounded-lg p-4 bg-indigo-50 dark:bg-indigo-900/20"
-  >
-    <h3 class="text-lg font-bold text-indigo-900 dark:text-indigo-100 mb-4">
-      物標A
-    </h3>
-    <div class="space-y-4">
-      <div class="grid grid-cols-2 gap-2">
-        <div>
-          <label class="text-sm font-bold text-slate-700 dark:text-slate-300"
-            >緯度 [度]</label
-          >
-          <input
-            type="number"
-            bind:value={obj1Lat}
-            step="0.001"
-            class="w-full mt-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800"
-          />
-        </div>
-        <div>
-          <label class="text-sm font-bold text-slate-700 dark:text-slate-300"
-            >経度 [度]</label
-          >
-          <input
-            type="number"
-            bind:value={obj1Lon}
-            step="0.001"
-            class="w-full mt-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800"
-          />
-        </div>
-      </div>
-      <div>
-        <label class="text-sm font-bold text-slate-700 dark:text-slate-300"
-          >方位 [°]</label
-        >
-        <input
-          type="number"
-          bind:value={bearing1}
-          step="0.1"
-          min="0"
-          max="360"
-          class="w-full mt-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800"
-        />
-      </div>
-    </div>
-  </div>
-
-  <div
-    class="border-2 border-purple-300 dark:border-purple-700 rounded-lg p-4 bg-purple-50 dark:bg-purple-900/20"
-  >
-    <h3 class="text-lg font-bold text-purple-900 dark:text-purple-100 mb-4">
-      物標B
-    </h3>
-    <div class="space-y-4">
-      <div class="grid grid-cols-2 gap-2">
-        <div>
-          <label class="text-sm font-bold text-slate-700 dark:text-slate-300"
-            >緯度 [度]</label
-          >
-          <input
-            type="number"
-            bind:value={obj2Lat}
-            step="0.001"
-            class="w-full mt-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800"
-          />
-        </div>
-        <div>
-          <label class="text-sm font-bold text-slate-700 dark:text-slate-300"
-            >経度 [度]</label
-          >
-          <input
-            type="number"
-            bind:value={obj2Lon}
-            step="0.001"
-            class="w-full mt-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800"
-          />
-        </div>
-      </div>
-      <div>
-        <label class="text-sm font-bold text-slate-700 dark:text-slate-300"
-          >方位 [°]</label
-        >
-        <input
-          type="number"
-          bind:value={bearing2}
-          step="0.1"
-          min="0"
-          max="360"
-          class="w-full mt-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800"
-        />
-      </div>
-    </div>
-  </div>
-
-  <button
-    onclick={handleCalculate}
-    class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-bold py-3 rounded-lg transition-all transform hover:scale-105"
-  >
-    計算 (Calculate)
-  </button>
-</div>
+<CalcForm onsubmit={calculate} {error}>
+  <SectionCard title="物標 A">
+    <PositionInput bind:lat={aLat} bind:lon={aLon} />
+    <NumberInput label="真方位" bind:value={bearingA} unit="°" />
+  </SectionCard>
+  <SectionCard title="物標 B">
+    <PositionInput bind:lat={bLat} bind:lon={bLon} />
+    <NumberInput label="真方位" bind:value={bearingB} unit="°" />
+  </SectionCard>
+</CalcForm>

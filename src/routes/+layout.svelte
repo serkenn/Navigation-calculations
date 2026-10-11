@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { themeStore } from '$lib/stores/theme.svelte';
   import Sidebar from '$lib/components/layout/Sidebar.svelte';
   import MobileHeader from '$lib/components/layout/MobileHeader.svelte';
@@ -10,18 +10,16 @@
   let { children } = $props();
   let isMenuOpen = $state(false);
 
-  const calcId = $derived($page.params.id ?? '');
+  const calcId = $derived(page.params.id ?? '');
   const calc = $derived(getCalculator(calcId));
-  const seo = $derived(
-    calc
-      ? { title: calc.seoTitle, desc: calc.seoDescription }
-      : { title: '航法計算アプリ', desc: '航海に関する各種計算ツール' },
-  );
 </script>
 
+<!-- 計算機ページの title/description。トップ・ガイド・理論は各ページで設定する -->
 <svelte:head>
-  <title>{seo.title}</title>
-  <meta name="description" content={seo.desc} />
+  {#if calc}
+    <title>{calc.nameJa} | 航法計算アプリ</title>
+    <meta name="description" content={calc.description} />
+  {/if}
 </svelte:head>
 
 <div class={themeStore.current}>
@@ -39,7 +37,6 @@
     <Sidebar
       isOpen={isMenuOpen}
       activeId={calcId}
-      onSelect={() => (isMenuOpen = false)}
       onClose={() => (isMenuOpen = false)}
       theme={themeStore.current}
       onToggleTheme={() => themeStore.toggle()}
