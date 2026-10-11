@@ -96,7 +96,7 @@ export const categories: CategoryDefinition[] = [
     id: "exam",
     nameJa: "海技試験 EXAM",
     nameEn: "Maritime Exam",
-    summary: "3級海技士 航海・運用の計算問題（解答形式）",
+    summary: "3級・2級海技士 航海・運用の計算問題（解答形式）",
     icon: GraduationCap,
     accent: "indigo",
   },
@@ -122,6 +122,22 @@ export const categories: CategoryDefinition[] = [
     nameJa: "運用",
     nameEn: "Operation",
     icon: Briefcase,
+    accent: "indigo",
+  },
+  {
+    id: "exam-2n",
+    parentId: "exam",
+    nameJa: "2N",
+    nameEn: "2N",
+    icon: Layers,
+    accent: "indigo",
+  },
+  {
+    id: "exam-2n-navigation",
+    parentId: "exam-2n",
+    nameJa: "航海",
+    nameEn: "Navigation",
+    icon: Navigation,
     accent: "indigo",
   },
 ];
@@ -577,6 +593,18 @@ export const calculators: CalculatorDefinition[] = [
     description: "排水量と海水比重の差から移動後の平均喫水を求めます。",
     icon: Waves,
     component: "exam/OperationDensityMean",
+  },
+
+  // ── 海技試験 2N 航海 ──
+  {
+    id: "nav2n-celestial-fix",
+    category: "exam-2n-navigation",
+    nameJa: "天体による船位の測定",
+    nameEn: "Celestial Fix (2 Bodies)",
+    description:
+      "2 天体の高度測定から修正差・方位角を求め、航走を転位して後測時の船位を求めます。",
+    icon: Star,
+    component: "exam/nav2n/CelestialFix",
   },
 ];
 

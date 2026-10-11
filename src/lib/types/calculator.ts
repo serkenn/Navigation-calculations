@@ -11,7 +11,9 @@ export type CategoryId =
   | "exam"
   | "exam-3n"
   | "exam-3n-navigation"
-  | "exam-3n-operation";
+  | "exam-3n-operation"
+  | "exam-2n"
+  | "exam-2n-navigation";
 
 // lucide-svelte のアイコンコンポーネント
 export type IconComponent = typeof Icon;
