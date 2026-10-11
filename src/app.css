@@ -292,6 +292,30 @@
     background: #f1f5f9 !important;
   }
 
+  /* ── 答案形式シート (MeripassResult) ── */
+  .exam-sheet {
+    font-size: 8pt !important;
+    line-height: 1.3 !important;
+  }
+  .exam-sheet > * + * {
+    margin-top: 7pt !important;
+  }
+  .exam-sheet table {
+    width: auto !important;
+    margin: 0 auto !important;
+    font-size: 7.5pt !important;
+  }
+  .exam-sheet table.exam-left {
+    margin: 4pt 0 0 !important;
+  }
+  .exam-sheet td,
+  .exam-sheet th {
+    padding: 0.5pt 5pt !important;
+  }
+  .exam-sheet th {
+    font-weight: 400 !important;
+  }
+
   /* ── Misc ── */
   .rounded-xl,
   .rounded-lg,
