@@ -1,5 +1,5 @@
 import type { Icon } from "lucide-svelte";
-import type { Accent } from "$lib/theme/accent";
+import type { Accent } from "#lib/theme/accent.js";
 
 export type CategoryId =
   | "pilot1"

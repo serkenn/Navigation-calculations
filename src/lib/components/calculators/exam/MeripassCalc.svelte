@@ -1,20 +1,20 @@
 <script lang="ts">
-  import CalcForm from '$lib/components/shared/CalcForm.svelte';
-  import SectionCard from '$lib/components/shared/SectionCard.svelte';
-  import PositionInput from '$lib/components/shared/PositionInput.svelte';
-  import DMSInput from '$lib/components/shared/DMSInput.svelte';
-  import NumberInput from '$lib/components/shared/NumberInput.svelte';
-  import TimeInput from '$lib/components/shared/TimeInput.svelte';
-  import type { DMSValue, HMSValue } from '$lib/types/navigation';
-  import { dmsToDecimal, normalize180 } from '$lib/utils/navigationMath';
-  import { middleLatDeadReckoning } from '$lib/utils/mercatorSailing';
+  import CalcForm from '#lib/components/shared/CalcForm.svelte';
+  import SectionCard from '#lib/components/shared/SectionCard.svelte';
+  import PositionInput from '#lib/components/shared/PositionInput.svelte';
+  import DMSInput from '#lib/components/shared/DMSInput.svelte';
+  import NumberInput from '#lib/components/shared/NumberInput.svelte';
+  import TimeInput from '#lib/components/shared/TimeInput.svelte';
+  import type { DMSValue, HMSValue } from '#lib/types/navigation.js';
+  import { dmsToDecimal, normalize180 } from '#lib/utils/navigationMath.js';
+  import { middleLatDeadReckoning } from '#lib/utils/mercatorSailing.js';
   import {
     intercept,
     latitudeByMeridianAltitude,
     localHourAngle,
     meripassLongitudeCorrection,
     sightReduction,
-  } from '$lib/utils/astronomy';
+  } from '#lib/utils/astronomy.js';
 
   let { onResult }: { onResult: (r: any) => void } = $props();
 

@@ -1,10 +1,10 @@
 <script lang="ts">
-  import CalcForm from '$lib/components/shared/CalcForm.svelte';
-  import SectionCard from '$lib/components/shared/SectionCard.svelte';
-  import PositionInput from '$lib/components/shared/PositionInput.svelte';
-  import type { DMSValue } from '$lib/types/navigation';
-  import { dmsToDecimal } from '$lib/utils/navigationMath';
-  import { greatCircleSailing } from '$lib/utils/greatCircle';
+  import CalcForm from '#lib/components/shared/CalcForm.svelte';
+  import SectionCard from '#lib/components/shared/SectionCard.svelte';
+  import PositionInput from '#lib/components/shared/PositionInput.svelte';
+  import type { DMSValue } from '#lib/types/navigation.js';
+  import { dmsToDecimal } from '#lib/utils/navigationMath.js';
+  import { greatCircleSailing } from '#lib/utils/greatCircle.js';
 
   let { onResult }: { onResult: (r: any) => void } = $props();
 

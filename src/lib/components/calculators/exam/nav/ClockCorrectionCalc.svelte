@@ -1,10 +1,10 @@
 <script lang="ts">
-  import CalcForm from '$lib/components/shared/CalcForm.svelte';
-  import SectionCard from '$lib/components/shared/SectionCard.svelte';
-  import DMSInput from '$lib/components/shared/DMSInput.svelte';
-  import type { DMSValue } from '$lib/types/navigation';
-  import { dmsToDecimal } from '$lib/utils/navigationMath';
-  import { clockCorrection } from '$lib/utils/examNavigation';
+  import CalcForm from '#lib/components/shared/CalcForm.svelte';
+  import SectionCard from '#lib/components/shared/SectionCard.svelte';
+  import DMSInput from '#lib/components/shared/DMSInput.svelte';
+  import type { DMSValue } from '#lib/types/navigation.js';
+  import { dmsToDecimal } from '#lib/utils/navigationMath.js';
+  import { clockCorrection } from '#lib/utils/examNavigation.js';
 
   let { onResult }: { onResult: (r: any) => void } = $props();
 

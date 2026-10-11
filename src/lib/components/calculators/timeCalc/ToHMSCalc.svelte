@@ -1,8 +1,8 @@
 <script lang="ts">
-  import CalcForm from '$lib/components/shared/CalcForm.svelte';
-  import SectionCard from '$lib/components/shared/SectionCard.svelte';
-  import NumberInput from '$lib/components/shared/NumberInput.svelte';
-  import Segmented from '$lib/components/shared/Segmented.svelte';
+  import CalcForm from '#lib/components/shared/CalcForm.svelte';
+  import SectionCard from '#lib/components/shared/SectionCard.svelte';
+  import NumberInput from '#lib/components/shared/NumberInput.svelte';
+  import Segmented from '#lib/components/shared/Segmented.svelte';
 
   let { onResult }: { onResult: (r: any) => void } = $props();
 

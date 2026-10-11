@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Sheet from '$lib/components/shared/Sheet.svelte';
-  import Step from '$lib/components/shared/Step.svelte';
-  import Highlight from '$lib/components/shared/Highlight.svelte';
+  import Sheet from '#lib/components/shared/Sheet.svelte';
+  import Step from '#lib/components/shared/Step.svelte';
+  import Highlight from '#lib/components/shared/Highlight.svelte';
   import {
     formatDMS,
     formatLat,
@@ -9,8 +9,8 @@
     formatDirected,
     formatBearing,
     formatClockSeconds,
-  } from '$lib/utils/navigationMath';
-  import { formatHMS } from '$lib/utils/timeConversion';
+  } from '#lib/utils/navigationMath.js';
+  import { formatHMS } from '#lib/utils/timeConversion.js';
 
   let { result }: { result: any } = $props();
 

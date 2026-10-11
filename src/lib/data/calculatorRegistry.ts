@@ -41,7 +41,7 @@ import type {
   CategoryDefinition,
   CategoryId,
   CalculatorDefinition,
-} from "$lib/types/calculator";
+} from "#lib/types/calculator.js";
 
 export const categories: CategoryDefinition[] = [
   {

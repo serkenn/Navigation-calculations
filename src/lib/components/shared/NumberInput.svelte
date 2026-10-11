@@ -1,7 +1,7 @@
 <script lang="ts">
   import Field from './Field.svelte';
   import { boxClass, inputClass, unitClass } from './inputStyles';
-  import { useAccent } from '$lib/theme/accent';
+  import { useAccent } from '#lib/theme/accent.js';
 
   let {
     label,

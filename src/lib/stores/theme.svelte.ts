@@ -1,4 +1,4 @@
-import { browser } from "$app/environment";
+import { browser } from "$app/env";
 
 function createThemeStore() {
   let theme = $state<"light" | "dark">("light");

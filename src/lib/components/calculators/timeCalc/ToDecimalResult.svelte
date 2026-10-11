@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Sheet from '$lib/components/shared/Sheet.svelte';
-  import ResultRows from '$lib/components/shared/ResultRows.svelte';
-  import Highlight from '$lib/components/shared/Highlight.svelte';
-  import { formatHMS } from '$lib/utils/timeConversion';
+  import Sheet from '#lib/components/shared/Sheet.svelte';
+  import ResultRows from '#lib/components/shared/ResultRows.svelte';
+  import Highlight from '#lib/components/shared/Highlight.svelte';
+  import { formatHMS } from '#lib/utils/timeConversion.js';
 
   let { result }: { result: any } = $props();
 

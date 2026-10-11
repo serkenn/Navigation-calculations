@@ -1,12 +1,12 @@
 <script lang="ts">
-  import CalcForm from '$lib/components/shared/CalcForm.svelte';
-  import SectionCard from '$lib/components/shared/SectionCard.svelte';
-  import DMSInput from '$lib/components/shared/DMSInput.svelte';
-  import NumberInput from '$lib/components/shared/NumberInput.svelte';
-  import Segmented from '$lib/components/shared/Segmented.svelte';
-  import type { DMSValue } from '$lib/types/navigation';
-  import { dmsToDecimal } from '$lib/utils/navigationMath';
-  import { altitudeCorrection } from '$lib/utils/sextant';
+  import CalcForm from '#lib/components/shared/CalcForm.svelte';
+  import SectionCard from '#lib/components/shared/SectionCard.svelte';
+  import DMSInput from '#lib/components/shared/DMSInput.svelte';
+  import NumberInput from '#lib/components/shared/NumberInput.svelte';
+  import Segmented from '#lib/components/shared/Segmented.svelte';
+  import type { DMSValue } from '#lib/types/navigation.js';
+  import { dmsToDecimal } from '#lib/utils/navigationMath.js';
+  import { altitudeCorrection } from '#lib/utils/sextant.js';
 
   type BodyType = 'sun_lower' | 'sun_upper' | 'star' | 'planet' | 'moon';
 

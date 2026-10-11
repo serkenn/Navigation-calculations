@@ -1,9 +1,9 @@
 <script lang="ts">
-  import Sheet from '$lib/components/shared/Sheet.svelte';
-  import Step from '$lib/components/shared/Step.svelte';
-  import Highlight from '$lib/components/shared/Highlight.svelte';
-  import { formatLon, formatDirectedDMS } from '$lib/utils/navigationMath';
-  import { formatHMS } from '$lib/utils/timeConversion';
+  import Sheet from '#lib/components/shared/Sheet.svelte';
+  import Step from '#lib/components/shared/Step.svelte';
+  import Highlight from '#lib/components/shared/Highlight.svelte';
+  import { formatLon, formatDirectedDMS } from '#lib/utils/navigationMath.js';
+  import { formatHMS } from '#lib/utils/timeConversion.js';
 
   let { result }: { result: any } = $props();
 

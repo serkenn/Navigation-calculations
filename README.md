@@ -1,9 +1,9 @@
 # NavCalc — 航法計算アプリ
 
 [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](https://unlicense.org/)
-[![SvelteKit](https://img.shields.io/badge/SvelteKit-2-FF3E00?logo=svelte&logoColor=white)](https://kit.svelte.dev/)
+[![SvelteKit](https://img.shields.io/badge/SvelteKit-3-FF3E00?logo=svelte&logoColor=white)](https://kit.svelte.dev/)
 [![Svelte](https://img.shields.io/badge/Svelte-5-FF3E00?logo=svelte&logoColor=white)](https://svelte.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare_Pages-F38020?logo=cloudflarepages&logoColor=white)](https://pages.cloudflare.com/)
 
@@ -201,7 +201,7 @@ Android Studio で `android/` フォルダを開いてビルド・実行する�
 
 ## 技術スタック
 
-- **フレームワーク:** SvelteKit 2 + Svelte 5 + TypeScript
+- **フレームワーク:** SvelteKit 3 + Svelte 5 + Vite 8 + TypeScript 6
 - **ビルドツール:** Vite 6
 - **スタイリング:** Tailwind CSS v4（ダークモード対応）
 - **アイコン:** Lucide Svelte

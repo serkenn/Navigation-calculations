@@ -1,8 +1,8 @@
 <script lang="ts">
-  import CalcForm from '$lib/components/shared/CalcForm.svelte';
-  import SectionCard from '$lib/components/shared/SectionCard.svelte';
-  import NumberInput from '$lib/components/shared/NumberInput.svelte';
-  import { lightRange } from '$lib/utils/examNavigation';
+  import CalcForm from '#lib/components/shared/CalcForm.svelte';
+  import SectionCard from '#lib/components/shared/SectionCard.svelte';
+  import NumberInput from '#lib/components/shared/NumberInput.svelte';
+  import { lightRange } from '#lib/utils/examNavigation.js';
 
   let { onResult }: { onResult: (r: any) => void } = $props();
 

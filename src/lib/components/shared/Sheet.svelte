@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import { useAccent } from '$lib/theme/accent';
+  import { useAccent } from '#lib/theme/accent.js';
 
   /** 結果シートの 1 セクション（見出しバッジ + 枠） */
   let { title, children }: { title: string; children: Snippet } = $props();

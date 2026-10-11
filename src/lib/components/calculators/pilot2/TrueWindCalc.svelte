@@ -1,10 +1,10 @@
 <script lang="ts">
-  import CalcForm from '$lib/components/shared/CalcForm.svelte';
-  import SectionCard from '$lib/components/shared/SectionCard.svelte';
-  import NumberInput from '$lib/components/shared/NumberInput.svelte';
-  import Segmented from '$lib/components/shared/Segmented.svelte';
-  import { trueWind } from '$lib/utils/wind';
-  import { normalize360 } from '$lib/utils/navigationMath';
+  import CalcForm from '#lib/components/shared/CalcForm.svelte';
+  import SectionCard from '#lib/components/shared/SectionCard.svelte';
+  import NumberInput from '#lib/components/shared/NumberInput.svelte';
+  import Segmented from '#lib/components/shared/Segmented.svelte';
+  import { trueWind } from '#lib/utils/wind.js';
+  import { normalize360 } from '#lib/utils/navigationMath.js';
 
   let { onResult }: { onResult: (r: any) => void } = $props();
 

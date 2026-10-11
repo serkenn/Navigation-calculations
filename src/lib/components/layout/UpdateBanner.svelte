@@ -1,6 +1,6 @@
 <script lang="ts">
   import { X, Download } from 'lucide-svelte';
-  import { updateChecker } from '$lib/stores/updateCheck.svelte';
+  import { updateChecker } from '#lib/stores/updateCheck.svelte.js';
 </script>
 
 {#if updateChecker.hasUpdate}

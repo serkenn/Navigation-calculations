@@ -1,14 +1,14 @@
 <script lang="ts">
-  import Sheet from '$lib/components/shared/Sheet.svelte';
-  import InfoGrid from '$lib/components/shared/InfoGrid.svelte';
-  import ResultRows from '$lib/components/shared/ResultRows.svelte';
-  import Highlight from '$lib/components/shared/Highlight.svelte';
-  import Note from '$lib/components/shared/Note.svelte';
+  import Sheet from '#lib/components/shared/Sheet.svelte';
+  import InfoGrid from '#lib/components/shared/InfoGrid.svelte';
+  import ResultRows from '#lib/components/shared/ResultRows.svelte';
+  import Highlight from '#lib/components/shared/Highlight.svelte';
+  import Note from '#lib/components/shared/Note.svelte';
   import {
     formatDMS,
     formatLat,
     formatBearing,
-  } from '$lib/utils/navigationMath';
+  } from '#lib/utils/navigationMath.js';
 
   let { result }: { result: any } = $props();
 </script>

@@ -1,13 +1,13 @@
 <script lang="ts">
-  import CalcForm from '$lib/components/shared/CalcForm.svelte';
-  import SectionCard from '$lib/components/shared/SectionCard.svelte';
-  import PositionInput from '$lib/components/shared/PositionInput.svelte';
-  import NumberInput from '$lib/components/shared/NumberInput.svelte';
-  import TimeInput from '$lib/components/shared/TimeInput.svelte';
-  import type { DMSValue, HMSValue } from '$lib/types/navigation';
-  import { dmsToDecimal } from '$lib/utils/navigationMath';
-  import { hmsToHours } from '$lib/utils/timeConversion';
-  import { middleLatDeadReckoning } from '$lib/utils/mercatorSailing';
+  import CalcForm from '#lib/components/shared/CalcForm.svelte';
+  import SectionCard from '#lib/components/shared/SectionCard.svelte';
+  import PositionInput from '#lib/components/shared/PositionInput.svelte';
+  import NumberInput from '#lib/components/shared/NumberInput.svelte';
+  import TimeInput from '#lib/components/shared/TimeInput.svelte';
+  import type { DMSValue, HMSValue } from '#lib/types/navigation.js';
+  import { dmsToDecimal } from '#lib/utils/navigationMath.js';
+  import { hmsToHours } from '#lib/utils/timeConversion.js';
+  import { middleLatDeadReckoning } from '#lib/utils/mercatorSailing.js';
 
   let { onResult }: { onResult: (r: any) => void } = $props();
 
