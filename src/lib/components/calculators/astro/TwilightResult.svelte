@@ -1,8 +1,12 @@
 <script lang="ts">
-  import Sheet from '$lib/components/shared/Sheet.svelte';
-  import InfoGrid from '$lib/components/shared/InfoGrid.svelte';
-  import Note from '$lib/components/shared/Note.svelte';
-  import { formatLat, formatLon, formatClock } from '$lib/utils/navigationMath';
+  import Sheet from '#lib/components/shared/Sheet.svelte';
+  import InfoGrid from '#lib/components/shared/InfoGrid.svelte';
+  import Note from '#lib/components/shared/Note.svelte';
+  import {
+    formatLat,
+    formatLon,
+    formatClock,
+  } from '#lib/utils/navigationMath.js';
 
   let { result }: { result: any } = $props();
 

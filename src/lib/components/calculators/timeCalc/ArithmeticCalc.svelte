@@ -1,15 +1,15 @@
 <script lang="ts">
-  import CalcForm from '$lib/components/shared/CalcForm.svelte';
-  import SectionCard from '$lib/components/shared/SectionCard.svelte';
-  import NumberInput from '$lib/components/shared/NumberInput.svelte';
-  import TimeInput from '$lib/components/shared/TimeInput.svelte';
-  import Segmented from '$lib/components/shared/Segmented.svelte';
-  import type { HMSValue } from '$lib/types/navigation';
+  import CalcForm from '#lib/components/shared/CalcForm.svelte';
+  import SectionCard from '#lib/components/shared/SectionCard.svelte';
+  import NumberInput from '#lib/components/shared/NumberInput.svelte';
+  import TimeInput from '#lib/components/shared/TimeInput.svelte';
+  import Segmented from '#lib/components/shared/Segmented.svelte';
+  import type { HMSValue } from '#lib/types/navigation.js';
   import {
     applyOperator,
     hmsToHours,
     type Operator,
-  } from '$lib/utils/timeConversion';
+  } from '#lib/utils/timeConversion.js';
 
   let { onResult }: { onResult: (r: any) => void } = $props();
 

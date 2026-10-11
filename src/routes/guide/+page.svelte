@@ -1,7 +1,7 @@
 <script lang="ts">
   import { HelpCircle } from 'lucide-svelte';
-  import { getChildCategories } from '$lib/data/calculatorRegistry';
-  import { accentClasses } from '$lib/theme/accent';
+  import { getChildCategories } from '#lib/data/calculatorRegistry.js';
+  import { accentClasses } from '#lib/theme/accent.js';
 
   const topCategories = getChildCategories(undefined);
 </script>

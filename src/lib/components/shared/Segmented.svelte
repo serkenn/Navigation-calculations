@@ -1,5 +1,5 @@
 <script lang="ts" generics="T extends string | number | boolean">
-  import { useAccent } from '$lib/theme/accent';
+  import { useAccent } from '#lib/theme/accent.js';
 
   /** ボタン型の択一選択 */
   let {

@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { Component } from 'svelte';
   import { FileText, Info, ArrowLeft, Printer } from 'lucide-svelte';
-  import { getCalculator, getCategory } from '$lib/data/calculatorRegistry';
-  import { accentClasses, setAccent } from '$lib/theme/accent';
+  import { getCalculator, getCategory } from '#lib/data/calculatorRegistry.js';
+  import { accentClasses, setAccent } from '#lib/theme/accent.js';
 
   let { data } = $props();
 
@@ -10,7 +10,7 @@
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   type AnyComponent = Component<any>;
   const modules = import.meta.glob<{ default: AnyComponent }>(
-    '$lib/components/calculators/**/*.svelte',
+    '#lib/components/calculators/**/*.svelte',
   );
   const base = '/src/lib/components/calculators/';
 

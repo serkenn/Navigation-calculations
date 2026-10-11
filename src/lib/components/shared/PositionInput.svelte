@@ -1,6 +1,6 @@
 <script lang="ts">
   import DMSInput from './DMSInput.svelte';
-  import type { DMSValue } from '$lib/types/navigation';
+  import type { DMSValue } from '#lib/types/navigation.js';
 
   let {
     lat = $bindable(),

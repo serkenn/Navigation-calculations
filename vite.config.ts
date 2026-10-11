@@ -1,3 +1,5 @@
+import adapter from "@sveltejs/adapter-static";
+import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import { sveltekit } from "@sveltejs/kit/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
@@ -21,8 +23,19 @@ const currentTag = (() => {
 })();
 
 export default defineConfig({
-  plugins: [tailwindcss(), sveltekit()],
-  define: {
-    __APP_VERSION__: JSON.stringify(currentTag),
-  },
+  plugins: [
+    tailwindcss(),
+    sveltekit({
+      preprocess: vitePreprocess(),
+      adapter: adapter({
+        pages: "dist",
+        assets: "dist",
+        fallback: "index.html",
+        precompress: false,
+      }),
+      paths: { relative: false },
+      prerender: { entries: ["*"] },
+    }),
+  ],
+  define: { __APP_VERSION__: JSON.stringify(currentTag) },
 });

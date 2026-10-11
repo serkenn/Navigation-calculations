@@ -6,8 +6,8 @@
     getAncestorIds,
     getCalculator,
     getChildCategories,
-  } from '$lib/data/calculatorRegistry';
-  import type { CategoryId } from '$lib/types/calculator';
+  } from '#lib/data/calculatorRegistry.js';
+  import type { CategoryId } from '#lib/types/calculator.js';
 
   let {
     isOpen,

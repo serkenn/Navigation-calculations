@@ -1,12 +1,12 @@
 <script lang="ts">
-  import CalcForm from '$lib/components/shared/CalcForm.svelte';
-  import SectionCard from '$lib/components/shared/SectionCard.svelte';
-  import PositionInput from '$lib/components/shared/PositionInput.svelte';
-  import DMSInput from '$lib/components/shared/DMSInput.svelte';
-  import DateInput from '$lib/components/shared/DateInput.svelte';
-  import type { DMSValue } from '$lib/types/navigation';
-  import { dmsToDecimal } from '$lib/utils/navigationMath';
-  import { sunEvents } from '$lib/utils/astronomy';
+  import CalcForm from '#lib/components/shared/CalcForm.svelte';
+  import SectionCard from '#lib/components/shared/SectionCard.svelte';
+  import PositionInput from '#lib/components/shared/PositionInput.svelte';
+  import DMSInput from '#lib/components/shared/DMSInput.svelte';
+  import DateInput from '#lib/components/shared/DateInput.svelte';
+  import type { DMSValue } from '#lib/types/navigation.js';
+  import { dmsToDecimal } from '#lib/utils/navigationMath.js';
+  import { sunEvents } from '#lib/utils/astronomy.js';
 
   let { onResult }: { onResult: (r: any) => void } = $props();
 

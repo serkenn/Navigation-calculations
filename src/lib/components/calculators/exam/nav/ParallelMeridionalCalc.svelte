@@ -1,11 +1,14 @@
 <script lang="ts">
-  import CalcForm from '$lib/components/shared/CalcForm.svelte';
-  import SectionCard from '$lib/components/shared/SectionCard.svelte';
-  import DMSInput from '$lib/components/shared/DMSInput.svelte';
-  import Segmented from '$lib/components/shared/Segmented.svelte';
-  import type { DMSValue } from '$lib/types/navigation';
-  import { dmsToDecimal, normalize180 } from '$lib/utils/navigationMath';
-  import { meridianSailing, parallelSailing } from '$lib/utils/examNavigation';
+  import CalcForm from '#lib/components/shared/CalcForm.svelte';
+  import SectionCard from '#lib/components/shared/SectionCard.svelte';
+  import DMSInput from '#lib/components/shared/DMSInput.svelte';
+  import Segmented from '#lib/components/shared/Segmented.svelte';
+  import type { DMSValue } from '#lib/types/navigation.js';
+  import { dmsToDecimal, normalize180 } from '#lib/utils/navigationMath.js';
+  import {
+    meridianSailing,
+    parallelSailing,
+  } from '#lib/utils/examNavigation.js';
 
   let { onResult }: { onResult: (r: any) => void } = $props();
 

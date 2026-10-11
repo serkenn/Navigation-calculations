@@ -1,7 +1,7 @@
 <script lang="ts">
   import Field from './Field.svelte';
   import { boxClass } from './inputStyles';
-  import { useAccent } from '$lib/theme/accent';
+  import { useAccent } from '#lib/theme/accent.js';
 
   /** 日付入力（YYYY-MM-DD 文字列） */
   let {

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { useAccent } from '$lib/theme/accent';
+  import { useAccent } from '#lib/theme/accent.js';
 
   /** 最終答案を大きく表示するボックス */
   let {

@@ -1,11 +1,11 @@
 <script lang="ts">
-  import CalcForm from '$lib/components/shared/CalcForm.svelte';
-  import SectionCard from '$lib/components/shared/SectionCard.svelte';
-  import PositionInput from '$lib/components/shared/PositionInput.svelte';
-  import NumberInput from '$lib/components/shared/NumberInput.svelte';
-  import type { DMSValue } from '$lib/types/navigation';
-  import { dmsToDecimal } from '$lib/utils/navigationMath';
-  import { intersectLOPs } from '$lib/utils/astronomy';
+  import CalcForm from '#lib/components/shared/CalcForm.svelte';
+  import SectionCard from '#lib/components/shared/SectionCard.svelte';
+  import PositionInput from '#lib/components/shared/PositionInput.svelte';
+  import NumberInput from '#lib/components/shared/NumberInput.svelte';
+  import type { DMSValue } from '#lib/types/navigation.js';
+  import { dmsToDecimal } from '#lib/utils/navigationMath.js';
+  import { intersectLOPs } from '#lib/utils/astronomy.js';
 
   let { onResult }: { onResult: (r: any) => void } = $props();
 

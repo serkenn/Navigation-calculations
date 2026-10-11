@@ -1,13 +1,13 @@
 <script lang="ts">
-  import CalcForm from '$lib/components/shared/CalcForm.svelte';
-  import SectionCard from '$lib/components/shared/SectionCard.svelte';
-  import DMSInput from '$lib/components/shared/DMSInput.svelte';
-  import NumberInput from '$lib/components/shared/NumberInput.svelte';
-  import Segmented from '$lib/components/shared/Segmented.svelte';
-  import type { DMSValue } from '$lib/types/navigation';
-  import { dmsToDecimal, normalize360 } from '$lib/utils/navigationMath';
-  import { identifyBody, sightReduction } from '$lib/utils/astronomy';
-  import { navigationStars } from '$lib/data/stars';
+  import CalcForm from '#lib/components/shared/CalcForm.svelte';
+  import SectionCard from '#lib/components/shared/SectionCard.svelte';
+  import DMSInput from '#lib/components/shared/DMSInput.svelte';
+  import NumberInput from '#lib/components/shared/NumberInput.svelte';
+  import Segmented from '#lib/components/shared/Segmented.svelte';
+  import type { DMSValue } from '#lib/types/navigation.js';
+  import { dmsToDecimal, normalize360 } from '#lib/utils/navigationMath.js';
+  import { identifyBody, sightReduction } from '#lib/utils/astronomy.js';
+  import { navigationStars } from '#lib/data/stars.js';
 
   let { onResult }: { onResult: (r: any) => void } = $props();
 

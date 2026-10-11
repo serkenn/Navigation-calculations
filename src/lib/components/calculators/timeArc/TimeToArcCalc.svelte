@@ -1,10 +1,10 @@
 <script lang="ts">
-  import CalcForm from '$lib/components/shared/CalcForm.svelte';
-  import SectionCard from '$lib/components/shared/SectionCard.svelte';
-  import TimeInput from '$lib/components/shared/TimeInput.svelte';
-  import Segmented from '$lib/components/shared/Segmented.svelte';
-  import type { HMSValue } from '$lib/types/navigation';
-  import { hmsToHours, timeToArc } from '$lib/utils/timeConversion';
+  import CalcForm from '#lib/components/shared/CalcForm.svelte';
+  import SectionCard from '#lib/components/shared/SectionCard.svelte';
+  import TimeInput from '#lib/components/shared/TimeInput.svelte';
+  import Segmented from '#lib/components/shared/Segmented.svelte';
+  import type { HMSValue } from '#lib/types/navigation.js';
+  import { hmsToHours, timeToArc } from '#lib/utils/timeConversion.js';
 
   let { onResult }: { onResult: (r: any) => void } = $props();
 

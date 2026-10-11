@@ -1,11 +1,14 @@
 <script lang="ts">
   import { ChevronDown } from 'lucide-svelte';
-  import type { CategoryDefinition, CategoryId } from '$lib/types/calculator';
+  import type {
+    CategoryDefinition,
+    CategoryId,
+  } from '#lib/types/calculator.js';
   import {
     getCalculatorsByCategory,
     getChildCategories,
-  } from '$lib/data/calculatorRegistry';
-  import { accentClasses } from '$lib/theme/accent';
+  } from '#lib/data/calculatorRegistry.js';
+  import { accentClasses } from '#lib/theme/accent.js';
   import SidebarCategory from './SidebarCategory.svelte';
 
   /** カテゴリ 1 つ分（子カテゴリは再帰的に描画） */

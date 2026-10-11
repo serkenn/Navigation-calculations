@@ -1,8 +1,8 @@
 <script lang="ts">
   import Field from './Field.svelte';
   import { boxClass, inputClass, unitClass, selectClass } from './inputStyles';
-  import { useAccent } from '$lib/theme/accent';
-  import type { HMSValue } from '$lib/types/navigation';
+  import { useAccent } from '#lib/theme/accent.js';
+  import type { HMSValue } from '#lib/types/navigation.js';
 
   /** 時・分（・秒）の入力。signed で ± 選択を表示（均時差など） */
   let {

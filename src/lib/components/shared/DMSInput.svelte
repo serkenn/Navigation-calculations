@@ -1,8 +1,8 @@
 <script lang="ts">
   import Field from './Field.svelte';
   import { boxClass, inputClass, unitClass, selectClass } from './inputStyles';
-  import { useAccent } from '$lib/theme/accent';
-  import type { DMSValue } from '$lib/types/navigation';
+  import { useAccent } from '#lib/theme/accent.js';
+  import type { DMSValue } from '#lib/types/navigation.js';
 
   /**
    * 度・分（分は小数可）の入力

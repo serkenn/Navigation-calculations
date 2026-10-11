@@ -7,6 +7,10 @@ updates:
       day: "monday"
       timezone: "Asia/Tokyo"
     open-pull-requests-limit: 10
+    ignore:
+      # SvelteKit 3 は TypeScript ^6 を要求し、svelte-check の TS 7 対応も実験段階のため
+      - dependency-name: "typescript"
+        versions: [">=7"]
     groups:
       minor-and-patch:
         update-types:

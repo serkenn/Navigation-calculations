@@ -1,11 +1,11 @@
 <script lang="ts">
-  import CalcForm from '$lib/components/shared/CalcForm.svelte';
-  import SectionCard from '$lib/components/shared/SectionCard.svelte';
-  import NumberInput from '$lib/components/shared/NumberInput.svelte';
-  import TimeInput from '$lib/components/shared/TimeInput.svelte';
-  import type { HMSValue } from '$lib/types/navigation';
-  import { hmsToHours } from '$lib/utils/timeConversion';
-  import { tideHeight } from '$lib/utils/tide';
+  import CalcForm from '#lib/components/shared/CalcForm.svelte';
+  import SectionCard from '#lib/components/shared/SectionCard.svelte';
+  import NumberInput from '#lib/components/shared/NumberInput.svelte';
+  import TimeInput from '#lib/components/shared/TimeInput.svelte';
+  import type { HMSValue } from '#lib/types/navigation.js';
+  import { hmsToHours } from '#lib/utils/timeConversion.js';
+  import { tideHeight } from '#lib/utils/tide.js';
 
   let { onResult }: { onResult: (r: any) => void } = $props();
 

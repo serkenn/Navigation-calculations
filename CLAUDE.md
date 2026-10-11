@@ -17,7 +17,7 @@ npm run cap:sync            # ビルド + Android へ同期 (Capacitor)
 型チェック（テストスイートは存在しない）:
 
 ```bash
-npx svelte-check         # 全 Svelte/TS ファイルの型チェック
+npm run check            # 型生成 (svelte-kit sync) + 全 Svelte/TS ファイルの型チェック
 ```
 
 ## コード完成後の作業
@@ -52,9 +52,10 @@ npx svelte-check         # 全 Svelte/TS ファイルの型チェック
 
 ### スタック
 
-- **SvelteKit 2 + Svelte 5** — `adapter-static`（完全プリレンダリング SPA、`index.html` フォールバック）
+- **SvelteKit 3 + Svelte 5 + Vite 8** — `adapter-static`（完全プリレンダリング SPA、`index.html` フォールバック）。SvelteKit の設定は `svelte.config.js` ではなく `vite.config.ts` の `sveltekit({...})` に書く
+- `src/lib` は `$lib` ではなく `#lib/...`（package.json の `imports`）で import する。`.ts` モジュールは `#lib/utils/foo.js` のように `.js` 拡張子を付ける
 - **Tailwind CSS v4** — Vite プラグイン経由、`src/app.css` でインポート
-- **TypeScript 5.7**
+- **TypeScript 6**（SvelteKit 3 が `^6` を要求するため TS 7 には上げない）
 - ダークモード: `<html>` に `.dark` クラスを付与（カスタム Tailwind variant `dark`）、`localStorage` に保存
 
 ### ルート構成

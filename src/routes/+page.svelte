@@ -3,8 +3,8 @@
   import {
     firstCalculatorIn,
     getChildCategories,
-  } from '$lib/data/calculatorRegistry';
-  import { accentClasses } from '$lib/theme/accent';
+  } from '#lib/data/calculatorRegistry.js';
+  import { accentClasses } from '#lib/theme/accent.js';
 
   const topCategories = getChildCategories(undefined);
 </script>

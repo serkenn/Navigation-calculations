@@ -1,12 +1,12 @@
 <script lang="ts">
-  import Sheet from '$lib/components/shared/Sheet.svelte';
-  import Step from '$lib/components/shared/Step.svelte';
-  import Highlight from '$lib/components/shared/Highlight.svelte';
+  import Sheet from '#lib/components/shared/Sheet.svelte';
+  import Step from '#lib/components/shared/Step.svelte';
+  import Highlight from '#lib/components/shared/Highlight.svelte';
   import {
     formatBearing,
     formatClock,
     formatDuration,
-  } from '$lib/utils/navigationMath';
+  } from '#lib/utils/navigationMath.js';
 
   let { result }: { result: any } = $props();
 </script>

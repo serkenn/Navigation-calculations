@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import { Calculator } from 'lucide-svelte';
-  import { useAccent } from '$lib/theme/accent';
+  import { useAccent } from '#lib/theme/accent.js';
 
   /** 入力フォーム全体。Enter キーでも計算を実行できる */
   let {

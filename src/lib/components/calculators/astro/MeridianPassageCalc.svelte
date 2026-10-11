@@ -1,15 +1,15 @@
 <script lang="ts">
-  import CalcForm from '$lib/components/shared/CalcForm.svelte';
-  import SectionCard from '$lib/components/shared/SectionCard.svelte';
-  import DMSInput from '$lib/components/shared/DMSInput.svelte';
-  import DateInput from '$lib/components/shared/DateInput.svelte';
-  import Segmented from '$lib/components/shared/Segmented.svelte';
-  import type { DMSValue } from '$lib/types/navigation';
-  import { dmsToDecimal } from '$lib/utils/navigationMath';
+  import CalcForm from '#lib/components/shared/CalcForm.svelte';
+  import SectionCard from '#lib/components/shared/SectionCard.svelte';
+  import DMSInput from '#lib/components/shared/DMSInput.svelte';
+  import DateInput from '#lib/components/shared/DateInput.svelte';
+  import Segmented from '#lib/components/shared/Segmented.svelte';
+  import type { DMSValue } from '#lib/types/navigation.js';
+  import { dmsToDecimal } from '#lib/utils/navigationMath.js';
   import {
     latitudeByMeridianAltitude,
     sunMeridianPassage,
-  } from '$lib/utils/astronomy';
+  } from '#lib/utils/astronomy.js';
 
   let { onResult }: { onResult: (r: any) => void } = $props();
 

@@ -1,15 +1,15 @@
 <script lang="ts">
-  import Sheet from '$lib/components/shared/Sheet.svelte';
-  import InfoGrid from '$lib/components/shared/InfoGrid.svelte';
-  import ResultRows from '$lib/components/shared/ResultRows.svelte';
-  import Highlight from '$lib/components/shared/Highlight.svelte';
+  import Sheet from '#lib/components/shared/Sheet.svelte';
+  import InfoGrid from '#lib/components/shared/InfoGrid.svelte';
+  import ResultRows from '#lib/components/shared/ResultRows.svelte';
+  import Highlight from '#lib/components/shared/Highlight.svelte';
   import {
     formatLat,
     formatLon,
     formatDirected,
     formatBearing,
-  } from '$lib/utils/navigationMath';
-  import { meridionalParts } from '$lib/utils/mercatorSailing';
+  } from '#lib/utils/navigationMath.js';
+  import { meridionalParts } from '#lib/utils/mercatorSailing.js';
 
   let { result }: { result: any } = $props();
 
