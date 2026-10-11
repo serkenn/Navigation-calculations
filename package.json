@@ -13,7 +13,9 @@
     "electron:build": "npm run build && electron-builder --win",
     "electron:build:mac": "npm run build && electron-builder --mac",
     "cap:sync": "npm run build && cap sync android",
-    "cap:build": "npm run build && cap sync android && cd android && ./gradlew assembleRelease"
+    "cap:build": "npm run build && cap sync android && cd android && ./gradlew assembleRelease",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@capacitor/android": "^8.3.0",
@@ -58,6 +60,8 @@
     "@tailwindcss/vite": "^4.1.18",
     "electron": "^41.1.0",
     "electron-builder": "^26.8.1",
+    "prettier": "3.9.10",
+    "prettier-plugin-svelte": "4.1.1",
     "svelte": "^5.20.0",
     "svelte-check": "^4.1.0",
     "tailwindcss": "^4.1.18",

@@ -1,0 +1,10 @@
+node_modules/
+dist/
+build/
+release/
+.svelte-kit/
+android/
+ios/
+NavCalc/
+static/
+package-lock.json
