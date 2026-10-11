@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Anchor, HelpCircle, BookOpen, Sun, Moon } from 'lucide-svelte';
+  import { Anchor, HelpCircle, BookOpen, Sun, Moon } from '@lucide/svelte';
   import { page } from '$app/state';
   import SidebarCategory from './SidebarCategory.svelte';
   import {

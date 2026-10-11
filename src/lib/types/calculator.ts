@@ -1,4 +1,4 @@
-import type { Icon } from "lucide-svelte";
+import type { LucideIcon } from "@lucide/svelte";
 import type { Accent } from "#lib/theme/accent.js";
 
 export type CategoryId =
@@ -15,8 +15,8 @@ export type CategoryId =
   | "exam-2n"
   | "exam-2n-navigation";
 
-// lucide-svelte のアイコンコンポーネント
-export type IconComponent = typeof Icon;
+// @lucide/svelte のアイコンコンポーネント
+export type IconComponent = LucideIcon;
 
 export interface CategoryDefinition {
   id: CategoryId;

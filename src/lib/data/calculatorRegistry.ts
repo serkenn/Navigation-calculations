@@ -36,7 +36,7 @@ import {
   View,
   Waves,
   Wind,
-} from "lucide-svelte";
+} from "@lucide/svelte";
 import type {
   CategoryDefinition,
   CategoryId,

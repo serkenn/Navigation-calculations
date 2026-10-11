@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Anchor, Menu, X, Sun, Moon } from 'lucide-svelte';
+  import { Anchor, Menu, X, Sun, Moon } from '@lucide/svelte';
 
   let {
     isMenuOpen,

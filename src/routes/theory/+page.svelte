@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { BookOpen } from 'lucide-svelte';
+  import { BookOpen } from '@lucide/svelte';
 </script>
 
 <svelte:head>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { HelpCircle } from 'lucide-svelte';
+  import { HelpCircle } from '@lucide/svelte';
   import { getChildCategories } from '#lib/data/calculatorRegistry.js';
   import { accentClasses } from '#lib/theme/accent.js';
 

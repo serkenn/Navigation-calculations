@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Compass, ArrowRight } from 'lucide-svelte';
+  import { Compass, ArrowRight } from '@lucide/svelte';
   import {
     firstCalculatorIn,
     getChildCategories,

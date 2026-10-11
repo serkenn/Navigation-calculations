@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Component } from 'svelte';
-  import { FileText, Info, ArrowLeft, Printer } from 'lucide-svelte';
+  import { FileText, Info, ArrowLeft, Printer } from '@lucide/svelte';
   import { getCalculator, getCategory } from '#lib/data/calculatorRegistry.js';
   import { accentClasses, setAccent } from '#lib/theme/accent.js';
 
