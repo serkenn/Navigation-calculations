@@ -73,85 +73,99 @@
   const circled = ['①', '②'];
 </script>
 
-<Sheet title="Celestial Fix — 2 Bodies">
-  <InfoGrid
-    items={[
-      {
-        label: '推測位置 DR',
-        lines: [formatLat(result.drLat), formatLon(result.drLon)],
-      },
-      {
-        label: '針路・速力',
-        lines: [formatBearing(result.course), `${result.speed} kn`],
-      },
-    ]}
-  />
-  <Note
-    >推測緯度を l、推測経度を L、地方時角を h とし、d・l は N を正・S
-    を負として代入する。</Note
-  >
-</Sheet>
-
-{#each sights as { s, hourAngle, altitude, azimuth, intercept }, i (i)}
-  <Sheet
-    title="{circled[i]} {s.name} の位置の線（{formatClockSeconds(
-      s.time,
-    )} U.T.）"
-  >
-    <Step title="地方時角 h" lines={hourAngle} />
-    <Step title="計算高度 ac" lines={altitude} />
-    <Step title="方位角 Z" lines={azimuth} />
-    <ResultRows rows={intercept} />
+<div class="fix-sheet space-y-8">
+  <Sheet title="Celestial Fix — 2 Bodies">
+    <InfoGrid
+      items={[
+        {
+          label: '推測位置 DR',
+          lines: [formatLat(result.drLat), formatLon(result.drLon)],
+        },
+        {
+          label: '針路・速力',
+          lines: [formatBearing(result.course), `${result.speed} kn`],
+        },
+      ]}
+    />
+    <Note
+      >推測緯度を l、推測経度を L、地方時角を h とし、d・l は N を正・S
+      を負として代入する。</Note
+    >
   </Sheet>
-{/each}
 
-<Sheet title="③ 船位の決定">
-  <ResultRows
-    rows={[
-      {
-        label: '観測時間差',
-        value: formatDuration(result.interval),
-      },
-      {
-        label: `進出距離 ${result.speed} kn × 時間差`,
-        value: `${result.run.toFixed(1)}'`,
-      },
-      {
-        label: `${result.first.name} の位置の線を針路 ${formatBearing(result.course)} へ転位`,
-        value: '',
-        muted: true,
-      },
-      {
-        label: `転位後の修正差（参考）`,
-        value: signedMin(result.transferredIntercept),
-        muted: true,
-      },
-      {
-        label: '位置の線の交角',
-        value: `${result.cutAngle.toFixed(1)}°`,
-        muted: true,
-      },
-    ]}
-  />
-  <CelestialFixPlot {result} />
-  <ResultRows
-    rows={[
-      { label: 'DR. lat', value: formatLat(result.drLat) },
-      { label: 'd. lat', value: formatDirected(result.dLat, "N'ly", "S'ly") },
-      { label: 'Obs. lat', value: formatLat(result.lat), bold: true },
-      { label: 'DR. Lon', value: formatLon(result.drLon) },
-      { label: 'D. Lon', value: formatDirected(result.dLon, "E'ly", "W'ly") },
-      { label: 'Obs. Lon', value: formatLon(result.lon), bold: true },
-    ]}
-  />
-  <Highlight
-    items={[
-      { label: '後測時の船位 Obs. lat', value: formatLat(result.lat) },
-      { label: 'Obs. Lon', value: formatLon(result.lon) },
-    ]}
-  />
-  <Note>
-    先測天体の位置の線を観測時間差の航走分だけ転位し、推測位置を中心とした平面近似（天測位置決定用図と同じ考え方）で交点を求めています。
-    作図による解答とは 0.1' 程度の差が出ることがあります。
-  </Note>
-</Sheet>
+  <div class="fix-pair space-y-8">
+    {#each sights as { s, hourAngle, altitude, azimuth, intercept }, i (i)}
+      <Sheet
+        title="{circled[i]} {s.name} の位置の線（{formatClockSeconds(
+          s.time,
+        )} U.T.）"
+      >
+        <Step title="地方時角 h" lines={hourAngle} />
+        <Step title="計算高度 ac" lines={altitude} />
+        <Step title="方位角 Z" lines={azimuth} />
+        <ResultRows rows={intercept} />
+      </Sheet>
+    {/each}
+  </div>
+
+  <Sheet title="③ 船位の決定">
+    <div class="fix-final space-y-4">
+      <div class="space-y-4">
+        <ResultRows
+          rows={[
+            {
+              label: '観測時間差',
+              value: formatDuration(result.interval),
+            },
+            {
+              label: `進出距離 ${result.speed} kn × 時間差`,
+              value: `${result.run.toFixed(1)}'`,
+            },
+            {
+              label: `${result.first.name} の位置の線を針路 ${formatBearing(result.course)} へ転位`,
+              value: '',
+              muted: true,
+            },
+            {
+              label: `転位後の修正差（参考）`,
+              value: signedMin(result.transferredIntercept),
+              muted: true,
+            },
+            {
+              label: '位置の線の交角',
+              value: `${result.cutAngle.toFixed(1)}°`,
+              muted: true,
+            },
+          ]}
+        />
+        <ResultRows
+          rows={[
+            { label: 'DR. lat', value: formatLat(result.drLat) },
+            {
+              label: 'd. lat',
+              value: formatDirected(result.dLat, "N'ly", "S'ly"),
+            },
+            { label: 'Obs. lat', value: formatLat(result.lat), bold: true },
+            { label: 'DR. Lon', value: formatLon(result.drLon) },
+            {
+              label: 'D. Lon',
+              value: formatDirected(result.dLon, "E'ly", "W'ly"),
+            },
+            { label: 'Obs. Lon', value: formatLon(result.lon), bold: true },
+          ]}
+        />
+        <Highlight
+          items={[
+            { label: '後測時の船位 Obs. lat', value: formatLat(result.lat) },
+            { label: 'Obs. Lon', value: formatLon(result.lon) },
+          ]}
+        />
+      </div>
+      <CelestialFixPlot {result} />
+    </div>
+    <Note>
+      先測天体の位置の線を観測時間差の航走分だけ転位し、推測位置を中心とした平面近似（天測位置決定用図と同じ考え方）で交点を求めています。
+      作図による解答とは 0.1' 程度の差が出ることがあります。
+    </Note>
+  </Sheet>
+</div>

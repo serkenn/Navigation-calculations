@@ -79,6 +79,20 @@
   }
 
   /* ── Layout: full-width sheet ── */
+  /* 画面用の h-screen / overflow-hidden を外さないと、1 ページ目の高さで切り捨てられる */
+  html,
+  body,
+  .app-shell {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  .app-shell {
+    display: block !important;
+  }
+
   main {
     display: block !important;
     width: 100% !important;
@@ -290,6 +304,49 @@
   th {
     font-weight: 700 !important;
     background: #f1f5f9 !important;
+  }
+
+  /* ── 2 天体の船位 (CelestialFixResult): ①② を左右 2 列、③ は作図と結果を並べて A4 1 枚に収める ── */
+  .fix-sheet .fix-pair {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    column-gap: 10pt !important;
+    align-items: start !important;
+  }
+  .fix-sheet .fix-pair > * + * {
+    margin-top: 0 !important;
+  }
+  .fix-sheet .fix-final {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) !important;
+    column-gap: 12pt !important;
+    align-items: start !important;
+  }
+  .fix-sheet .fix-final > * + * {
+    margin-top: 0 !important;
+  }
+  .fix-sheet {
+    font-size: 8.5pt !important;
+    line-height: 1.4 !important;
+  }
+  .fix-sheet .text-xs {
+    font-size: 7pt !important;
+  }
+  .fix-sheet .text-sm {
+    font-size: 8pt !important;
+  }
+  .fix-sheet .sheet-step p {
+    font-size: 7.1pt !important;
+    line-height: 1.35 !important;
+  }
+  .fix-sheet .sheet-highlight .text-2xl {
+    font-size: 12pt !important;
+  }
+  .fix-sheet .position-plot svg {
+    max-width: 78mm !important;
+  }
+  .fix-sheet .position-plot figcaption {
+    font-size: 6.5pt !important;
   }
 
   /* ── 答案形式シート (MeripassResult): A4 1 枚に 3 列で収める ── */

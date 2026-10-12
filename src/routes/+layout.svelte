@@ -34,7 +34,7 @@
 
 <div>
   <div
-    class="flex flex-col lg:flex-row h-screen bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans overflow-hidden transition-colors duration-300"
+    class="app-shell flex flex-col lg:flex-row h-screen bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans overflow-hidden transition-colors duration-300"
     style="padding-left: var(--sal); padding-right: var(--sar); padding-bottom: var(--sab);"
   >
     <MobileHeader
