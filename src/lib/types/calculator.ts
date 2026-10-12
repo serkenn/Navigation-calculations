@@ -13,7 +13,8 @@ export type CategoryId =
   | "exam-3n-navigation"
   | "exam-3n-operation"
   | "exam-2n"
-  | "exam-2n-navigation";
+  | "exam-2n-navigation"
+  | "exam-2n-operation";
 
 // @lucide/svelte のアイコンコンポーネント
 export type IconComponent = LucideIcon;

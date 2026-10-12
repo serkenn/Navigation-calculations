@@ -107,13 +107,85 @@
       </div>
     </section>
 
-    <section>
+    <section class="mb-8">
       <h2 class="text-lg font-bold">出没方位角 (Amplitude)</h2>
       <p>太陽の出没時の方位角からジャイロコンパスの誤差を算出します。</p>
       <div
         class="bg-slate-50 dark:bg-slate-800 p-4 rounded font-serif text-center text-lg italic my-4"
       >
         cos Z = sin d / cos l
+      </div>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-lg font-bold">大圏の頂点と子午線交点 (Vertex)</h2>
+      <p>
+        頂点は大圏上で緯度が最も高い点です。出発緯度 l&#8321; と出発針路 C
+        から頂点の緯度 lv と頂点までの変経を求め、任意の子午線 L
+        と大圏との交点の緯度 l を求めます。
+      </p>
+      <div
+        class="bg-slate-50 dark:bg-slate-800 p-4 rounded font-serif text-center text-lg italic my-4 space-y-2"
+      >
+        <p>cos lv = cos l&#8321; sin C</p>
+        <p>cos DLov = tan l&#8321; / tan lv</p>
+        <p>tan l = tan lv cos(L &minus; Lv)</p>
+      </div>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-lg font-bold">集成大圏航法 (Composite Sailing)</h2>
+      <p>
+        制限緯度 lv を設け、出発点から制限緯度に接する大圏 AV&#8321;、距等圏
+        V&#8321;V&#8322;、到着点へ向かう大圏 V&#8322;B をつないだ航路です。
+      </p>
+      <div
+        class="bg-slate-50 dark:bg-slate-800 p-4 rounded font-serif text-center text-lg italic my-4 space-y-2"
+      >
+        <p>
+          cos L&#8321; = tan l&#8321; / tan lv, cos L&#8322; = tan l&#8322; /
+          tan lv
+        </p>
+        <p>
+          cos AV&#8321; = sin l&#8321; / sin lv, cos BV&#8322; = sin l&#8322; /
+          sin lv
+        </p>
+        <p>V&#8321;V&#8322; = L&#8323; cos lv</p>
+      </div>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-lg font-bold">重心高さと GM (KG and GM)</h2>
+      <p>
+        貨物の積荷（+）・揚荷（&minus;）による基線上の重心高さの変化です。KM
+        が一定なら GM の減少量は KG の上昇量に等しく、最大積載量 w は KG&prime;
+        = KG + &#916;GM として求めます。
+      </p>
+      <div
+        class="bg-slate-50 dark:bg-slate-800 p-4 rounded font-serif text-center text-lg italic my-4 space-y-2"
+      >
+        <p>
+          KG&prime; = (W &middot; KG + &Sigma; w &middot; Kg) / (W + &Sigma; w)
+        </p>
+        <p>GM = KM &minus; KG</p>
+        <p>w = W (KG&prime; &minus; KG) / (Kg &minus; KG&prime;)</p>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-bold">TPC・MTC とトリム (TPC, MTC and Trim)</h2>
+      <p>
+        毎 cm 排水トン数 TPC は水線面積 Aw と水の密度 &rho; から、毎 cm
+        トリムモーメント MTC は排水量 W・縦メタセンタ高さ GML・垂線間長 L
+        から求めます。重量 w を船首尾方向に d
+        移動させたときのトリム変化、および各タンクの重量変化によるトリムモーメントの合計から所要の移送量を求めます。
+      </p>
+      <div
+        class="bg-slate-50 dark:bg-slate-800 p-4 rounded font-serif text-center text-lg italic my-4 space-y-2"
+      >
+        <p>TPC = Aw &middot; &rho; / 100</p>
+        <p>MTC = W &middot; GML / (100 L)</p>
+        <p>t = w &middot; d / MTC</p>
       </div>
     </section>
   </div>

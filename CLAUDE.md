@@ -69,7 +69,7 @@ src/routes/
   theory/+page.svelte     # 計算理論・公式
 ```
 
-`calc/[id]/+page.svelte` がコア。レジストリの `component` パスから `import.meta.glob` で `*Calc.svelte` / `*Result.svelte` を遅延読み込みし、見出し（名称・説明）もレジストリから描画する。カテゴリ色は `setAccent()` でコンテキストに流し、共通コンポーネントが `useAccent()` で参照する。**新しい計算機を追加する手順**: ① `calculatorRegistry.ts` に登録（`component: "カテゴリ/Name"`）→ ② `src/lib/components/calculators/カテゴリ/` に `NameCalc.svelte` + `NameResult.svelte` を作成。ルート側の変更は不要。
+`calc/[id]/+page.svelte` がコア。レジストリの `component` パスから `import.meta.glob` で `*Calc.svelte` / `*Result.svelte` を遅延読み込みし、見出し（名称・説明）もレジストリから描画する。カテゴリ色は `setAccent()` でコンテキストに流し、共通コンポーネントが `useAccent()` で参照する。**新しい計算機を追加する手順**: ① `calculatorRegistry.ts` に登録（`component: "カテゴリ/Name"`）→ ② `src/lib/components/calculators/カテゴリ/` に `NameCalc.svelte` + `NameResult.svelte` を作成。ルート側の変更は不要。試験カテゴリのコンポーネントは級・科目ごとに `exam/nav/`（3N 航海）、`exam/op/`（3N 運用）、`exam/nav2n/`（2N 航海）、`exam/op2n/`（2N 運用）に分ける。
 
 ### 計算機コンポーネントの規約
 
@@ -91,20 +91,22 @@ src/routes/
 
 `src/lib/utils/` に純粋関数として実装（副作用なし）:
 
-| ファイル             | 内容                                                                    |
-| -------------------- | ----------------------------------------------------------------------- |
-| `navigationMath.ts`  | 基本ヘルパー: `rad/deg`、角度正規化、度分・時刻・方位の表記フォーマット |
-| `mercatorSailing.ts` | 中分緯度航法・漸長緯度航法（漸長緯度は WGS84）                          |
-| `greatCircle.ts`     | 大圏航法（頂点含む）・集成大圏航法                                      |
-| `astronomy.ts`       | 高度方位角、薄明・日出没、出没方位角、正中時、LOP の交点、天体の同定    |
-| `ephemeris.ts`       | 太陽 GHA・赤緯・均時差の簡易計算                                        |
-| `tide.ts`            | 潮高（cos 補間法）、潮流（正弦法）                                      |
-| `wind.ts`            | 真風向・風速ベクトル                                                    |
-| `currentVector.ts`   | CMG/SMG、視針路、流向・流速                                             |
-| `sextant.ts`         | 測高度改正、垂直角による距離、光達距離                                  |
-| `timeConversion.ts`  | 時間⇔弧度、時分秒の分解・表記、四則演算                                 |
-| `examNavigation.ts`  | 海技試験 3N 航海の試験固有計算（クロス方位・両測方位・時計改正など）    |
-| `examOperation.ts`   | 海技試験 3N 運用の計算                                                  |
+| ファイル              | 内容                                                                                   |
+| --------------------- | -------------------------------------------------------------------------------------- |
+| `navigationMath.ts`   | 基本ヘルパー: `rad/deg`、角度正規化、度分・時刻・方位の表記フォーマット                |
+| `mercatorSailing.ts`  | 中分緯度航法・漸長緯度航法（漸長緯度は WGS84）                                         |
+| `greatCircle.ts`      | 大圏航法（頂点含む）・集成大圏航法                                                     |
+| `astronomy.ts`        | 高度方位角、薄明・日出没、出没方位角、正中時、LOP の交点、天体の同定                   |
+| `ephemeris.ts`        | 太陽 GHA・赤緯・均時差の簡易計算                                                       |
+| `tide.ts`             | 潮高（cos 補間法）、潮流（正弦法）                                                     |
+| `wind.ts`             | 真風向・風速ベクトル                                                                   |
+| `currentVector.ts`    | CMG/SMG、視針路、流向・流速                                                            |
+| `sextant.ts`          | 測高度改正、垂直角による距離、光達距離                                                 |
+| `timeConversion.ts`   | 時間⇔弧度、時分秒の分解・表記、四則演算                                                |
+| `examNavigation.ts`   | 海技試験 3N 航海の試験固有計算（クロス方位・両測方位・時計改正など）                   |
+| `examOperation.ts`    | 海技試験 3N 運用の計算                                                                 |
+| `exam2nNavigation.ts` | 海技試験 2N 航海の試験固有計算（2 天体による船位）                                     |
+| `exam2nOperation.ts`  | 海技試験 2N 運用（航海力学）: TPC/MTC の公式、KG′、GM 減少量と最大積載量、タンク間移送 |
 
 PILOT/ASTRO と同じ計算は試験側でも同じ関数を使う（試験用に再実装しない）。
 

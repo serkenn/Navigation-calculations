@@ -82,10 +82,10 @@ export function celestialFix(
     transferredIntercept,
     possible: fix.possible,
     lat: fix.lat,
-    lon: fix.lon,
+    lon: normalize180(fix.lon),
     dLat: fix.dLat,
     dep: fix.dep,
-    dLon: (fix.lon - drLon) * 60,
+    dLon: normalize180(fix.lon - drLon) * 60,
     cutAngle: Math.abs(normalize180(second.azimuth - first.azimuth)),
   };
 }

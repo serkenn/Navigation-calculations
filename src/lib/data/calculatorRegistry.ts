@@ -140,6 +140,14 @@ export const categories: CategoryDefinition[] = [
     icon: Navigation,
     accent: "indigo",
   },
+  {
+    id: "exam-2n-operation",
+    parentId: "exam-2n",
+    nameJa: "運用（航海力学）",
+    nameEn: "Operation (Ship Mechanics)",
+    icon: Briefcase,
+    accent: "indigo",
+  },
 ];
 
 export const calculators: CalculatorDefinition[] = [
@@ -402,7 +410,7 @@ export const calculators: CalculatorDefinition[] = [
     description:
       "午前の太陽観測と正午の子午線高度から正午位置を求めます（3 級海技士 航海）。",
     icon: GraduationCap,
-    component: "exam/Meripass",
+    component: "exam/nav/Meripass",
   },
   {
     id: "nav-parallel-meridional",
@@ -525,7 +533,7 @@ export const calculators: CalculatorDefinition[] = [
     description:
       "箱形船の TPC、積載後の平均喫水、喫水変化からの積載重量を求めます。",
     icon: Ship,
-    component: "exam/OperationTPCDraft",
+    component: "exam/op/TPCDraft",
   },
   {
     id: "op-trim-load",
@@ -535,7 +543,7 @@ export const calculators: CalculatorDefinition[] = [
     description:
       "貨物の積載・移動による平均沈下・トリム・船首尾喫水の変化を求めます。",
     icon: MoveHorizontal,
-    component: "exam/OperationTrimLoad",
+    component: "exam/op/TrimLoad",
   },
   {
     id: "op-gm-period",
@@ -544,7 +552,7 @@ export const calculators: CalculatorDefinition[] = [
     nameEn: "GM from Rolling Period",
     description: "横揺れ周期の変化から GM と船幅を求めます。",
     icon: Activity,
-    component: "exam/OperationGMPeriod",
+    component: "exam/op/GMPeriod",
   },
   {
     id: "op-density-draft",
@@ -554,7 +562,7 @@ export const calculators: CalculatorDefinition[] = [
     description:
       "燃料・清水の消費と海水比重の差を考慮した入港時の喫水を求めます。",
     icon: Droplets,
-    component: "exam/OperationDensityDraft",
+    component: "exam/op/DensityDraft",
   },
   {
     id: "op-blind-zone",
@@ -564,7 +572,7 @@ export const calculators: CalculatorDefinition[] = [
     description:
       "見張りの眼高と船首部の障害物から船首前方の死角距離を求めます。",
     icon: View,
-    component: "exam/OperationBlindZone",
+    component: "exam/op/BlindZone",
   },
   {
     id: "op-ballast-transfer",
@@ -574,7 +582,7 @@ export const calculators: CalculatorDefinition[] = [
     description:
       "前後喫水差と MTC から等喫水にするためのバラスト移送量を求めます。",
     icon: ArrowLeftRight,
-    component: "exam/OperationBallastTransfer",
+    component: "exam/op/BallastTransfer",
   },
   {
     id: "op-cargo-by-draft",
@@ -583,7 +591,7 @@ export const calculators: CalculatorDefinition[] = [
     nameEn: "Cargo from End Draft Change",
     description: "積荷前後の船首・船尾喫水から積載重量を逆算します。",
     icon: Package,
-    component: "exam/OperationCargoByDraft",
+    component: "exam/op/CargoByDraft",
   },
   {
     id: "op-density-mean",
@@ -592,7 +600,7 @@ export const calculators: CalculatorDefinition[] = [
     nameEn: "Mean Draft by Density",
     description: "排水量と海水比重の差から移動後の平均喫水を求めます。",
     icon: Waves,
-    component: "exam/OperationDensityMean",
+    component: "exam/op/DensityMean",
   },
 
   // ── 海技試験 2N 航海 ──
@@ -605,6 +613,68 @@ export const calculators: CalculatorDefinition[] = [
       "2 天体の高度測定から修正差・方位角を求め、航走を転位して後測時の船位を求めます。",
     icon: Star,
     component: "exam/nav2n/CelestialFix",
+  },
+  {
+    id: "nav2n-great-circle",
+    category: "exam-2n-navigation",
+    nameJa: "大圏航法（頂点・子午線交点）",
+    nameEn: "Great Circle with Vertex",
+    description:
+      "大圏距離・出発針路・到着針路と頂点の位置、指定子午線と大圏との交点の緯度を解答形式で求めます。",
+    icon: Globe,
+    component: "exam/nav2n/GreatCircleVertex",
+  },
+  {
+    id: "nav2n-composite-sailing",
+    category: "exam-2n-navigation",
+    nameJa: "集成大圏航法",
+    nameEn: "Composite Sailing",
+    description:
+      "制限緯度の距等圏に接する 2 つの頂点の経度と集成大圏航路の距離を解答形式で求めます。",
+    icon: Globe,
+    component: "exam/nav2n/CompositeSailing",
+  },
+
+  // ── 海技試験 2N 運用（航海力学） ──
+  {
+    id: "op2n-tpc-mtc",
+    category: "exam-2n-operation",
+    nameJa: "TPC・MTC の公式",
+    nameEn: "TPC and MTC",
+    description:
+      "水線面積から毎 cm 排水トン数 (TPC)、排水量と縦メタセンタ高さから毎 cm トリムモーメント (MTC) を求めます。",
+    icon: Ship,
+    component: "exam/op2n/TPCMTC",
+  },
+  {
+    id: "op2n-kg-after-loading",
+    category: "exam-2n-operation",
+    nameJa: "積載後の重心高さ (KG′) と GM",
+    nameEn: "KG and GM after Loading",
+    description:
+      "複数の貨物の積荷・揚荷による重心高さの変化と、積載後の GM を求めます。",
+    icon: Layers,
+    component: "exam/op2n/KGAfterLoading",
+  },
+  {
+    id: "op2n-gm-max-cargo",
+    category: "exam-2n-operation",
+    nameJa: "GM 減少量と最大積載量",
+    nameEn: "Maximum Cargo for GM Reduction",
+    description:
+      "GM の減少量を一定以内に抑えて上甲板に積載できる貨物の最大重量を求めます。",
+    icon: Package,
+    component: "exam/op2n/GMMaxCargo",
+  },
+  {
+    id: "op2n-tank-transfer-trim",
+    category: "exam-2n-operation",
+    nameJa: "海峡通過時のタンク間移送",
+    nameEn: "Tank Transfer for Required Trim",
+    description:
+      "燃料消費・張水を考慮し、通峡時に所要のトリムとするための貨物油タンク間の移送量を求めます。",
+    icon: ArrowLeftRight,
+    component: "exam/op2n/TankTransferTrim",
   },
 ];
 

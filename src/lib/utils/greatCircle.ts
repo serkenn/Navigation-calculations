@@ -110,6 +110,9 @@ export function compositeSailing(
     gcDist1: gc.distance,
     gcDist2: 0,
     parallelDist: 0,
+    dLo1: NaN,
+    dLo2: NaN,
+    parallelDLo: NaN,
     lonV1: NaN,
     lonV2: NaN,
   };
@@ -164,7 +167,24 @@ export function compositeSailing(
     gcDist1: a.d,
     gcDist2: b.d,
     parallelDist,
+    dLo1: a.dLo,
+    dLo2: b.dLo,
+    parallelDLo,
     lonV1,
     lonV2,
   };
+}
+
+/**
+ * 頂点が分かっている大圏と、指定した子午線との交点の緯度
+ * tan l = tan lv · cos(経度 − 頂点経度)
+ */
+export function latitudeOnGreatCircle(
+  vertexLat: number,
+  vertexLon: number,
+  lon: number,
+) {
+  const dLon = normalize180(lon - vertexLon);
+  const lat = deg(Math.atan(Math.tan(rad(vertexLat)) * Math.cos(rad(dLon))));
+  return { dLon, lat };
 }
