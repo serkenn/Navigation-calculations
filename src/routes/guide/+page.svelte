@@ -41,8 +41,8 @@
         {/each}
       </ul>
       <p class="text-xs">
-        カテゴリ構成と名称は TAMAYA 航法計算機 NC-2200
-        の機能一覧に準拠しています。
+        カテゴリ構成と名称は、航法計算機 TAMAYA NC-2200
+        の機能一覧を参考にしています（同社とは無関係です）。
       </p>
     </section>
 
@@ -73,6 +73,18 @@
           rel="noopener noreferrer"
           class="text-blue-600 dark:text-blue-400 hover:underline">GitHub</a
         >
+      </p>
+      <p>
+        ライセンス: Apache License 2.0（v2.6.7 までは
+        Unlicense）。同梱している第三者ソフトウェアの表示は
+        <a
+          href="/THIRD-PARTY-NOTICES.txt"
+          data-sveltekit-reload
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-blue-600 dark:text-blue-400 hover:underline"
+          >THIRD-PARTY-NOTICES.txt</a
+        > を参照してください。
       </p>
       <p>
         作者: <a

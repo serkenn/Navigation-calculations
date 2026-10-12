@@ -1,6 +1,6 @@
 # NavCalc — 航法計算アプリ
 
-[![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](https://unlicense.org/)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![SvelteKit](https://img.shields.io/badge/SvelteKit-3-FF3E00?logo=svelte&logoColor=white)](https://kit.svelte.dev/)
 [![Svelte](https://img.shields.io/badge/Svelte-5-FF3E00?logo=svelte&logoColor=white)](https://svelte.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -13,7 +13,7 @@
 
 ## 機能一覧
 
-カテゴリ構成と名称は [TAMAYA 航法計算機 NC-2200](https://tamaya-technics.com/navigation/) の機能一覧に準拠しています。
+カテゴリ構成と名称は、航法計算機 [TAMAYA NC-2200](https://tamaya-technics.com/navigation/) の機能一覧を参考にしています（製造元の Tamaya Technics とは無関係です）。
 
 ### 航海計画 PILOT 1
 
@@ -295,4 +295,8 @@ docs/                          # 各計算機能の詳細ドキュメント
 
 ## ライセンス
 
-[Unlicense](LICENSE) — パブリックドメイン。自由にご利用ください。
+[Apache License 2.0](LICENSE) — Copyright 2026 Kentaro Yamamoto (serkenn)。商用・非商用を問わず利用・改変・再配布できます（著作権表示と `NOTICE` の保持が条件）。
+
+v2.6.7 までのリリースは [Unlicense](https://unlicense.org/)（パブリックドメイン）で公開しており、その扱いは変わりません。v2.7.0 以降が Apache-2.0 です。
+
+同梱している第三者ソフトウェアのライセンスは、ビルド時に生成される `THIRD-PARTY-NOTICES.txt` にまとめています（`npm run build` で `dist/` にも出力されます）。

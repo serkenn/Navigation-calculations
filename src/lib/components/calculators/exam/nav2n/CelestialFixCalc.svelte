@@ -26,27 +26,27 @@
     dec: DMSValue;
   }
 
-  // 初期値は 2304〜2502 出題の例題
-  let lat: DMSValue = $state({ d: 11, m: 20, dir: 1 });
-  let lon: DMSValue = $state({ d: 60, m: 42, dir: 1 });
-  let course = $state(100);
-  let speed = $state(18);
+  // 初期値は自作の例題（房総沖、夕方の薄明時に Capella と Procyon を観測）
+  let lat: DMSValue = $state({ d: 34, m: 40, dir: 1 });
+  let lon: DMSValue = $state({ d: 140, m: 20, dir: 1 });
+  let course = $state(50);
+  let speed = $state(12);
   let sights: SightInput[] = $state([
     {
       name: 'Capella',
-      time: { h: 15, m: 15, s: 23, sign: 1 },
-      hs: { d: 55, m: 17.0, dir: 1 },
-      corr: -9.6,
-      gha: { d: 294, m: 42.2, dir: 1 },
-      dec: { d: 46, m: 0.7, dir: 1 },
+      time: { h: 9, m: 12, s: 40, sign: 1 },
+      hs: { d: 43, m: 42.7, dir: 1 },
+      corr: -8.9,
+      gha: { d: 280, m: 24.0, dir: 1 },
+      dec: { d: 46, m: 0.0, dir: 1 },
     },
     {
-      name: 'Sirius',
-      time: { h: 15, m: 21, s: 33, sign: 1 },
-      hs: { d: 52, m: 43.7, dir: 1 },
-      corr: -9.6,
-      gha: { d: 274, m: 14.8, dir: 1 },
-      dec: { d: 16, m: 44.6, dir: -1 },
+      name: 'Procyon',
+      time: { h: 9, m: 19, s: 10, sign: 1 },
+      hs: { d: 51, m: 31.6, dir: 1 },
+      corr: -8.9,
+      gha: { d: 246, m: 37.8, dir: 1 },
+      dec: { d: 5, m: 12.0, dir: 1 },
     },
   ]);
   let error = $state('');

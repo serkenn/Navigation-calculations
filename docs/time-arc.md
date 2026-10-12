@@ -1,8 +1,8 @@
 # 時間と弧度 TIME & ARC / 四則計算と時変換 TIME Calculations
 
-航海計算で頻繁に使う、時間と弧度の換算、時分秒の計算です。NC-2200 の「時間と弧度 TIME & ARC」「四則計算と時変換 TIME Calculations」に対応しています。実装は `timeConversion.ts` です。
+航海計算で頻繁に使う、時間と弧度の換算、時分秒の計算です。航法計算機 TAMAYA NC-2200 の「時間と弧度 TIME & ARC」「四則計算と時変換 TIME Calculations」を参考にした構成です。実装は `timeConversion.ts` です。
 
-| カテゴリ         | 計算機                           | NC-2200 の機能名    |
+| カテゴリ         | 計算機                           | NC-2200 での機能名  |
 | ---------------- | -------------------------------- | ------------------- |
 | 時間と弧度       | 時間計算と弧度換算               | Time Computation    |
 | 時間と弧度       | 角度計算と時間換算               | Arc Computation     |

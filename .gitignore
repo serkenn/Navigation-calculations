@@ -1,4 +1,6 @@
 node_modules/
+# ビルド時に scripts/third-party-notices.js が生成する（控えはリポジトリ直下に commit）
+static/THIRD-PARTY-NOTICES.txt
 dist/
 .svelte-kit/
 .env

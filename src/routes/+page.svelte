@@ -61,7 +61,7 @@
     </div>
 
     <p class="text-xs text-slate-400 dark:text-slate-600 mt-8 text-center">
-      カテゴリ構成は TAMAYA 航法計算機 NC-2200 の機能一覧に準拠しています
+      カテゴリ構成は航法計算機 TAMAYA NC-2200 の機能一覧を参考にしています
     </p>
   </div>
 </div>

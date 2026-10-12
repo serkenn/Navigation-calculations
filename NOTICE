@@ -1,0 +1,17 @@
+NavCalc - 航法計算アプリ
+Copyright 2026 Kentaro Yamamoto (serkenn)
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Versions up to and including v2.6.7 were released under the Unlicense
+(public domain dedication). That dedication remains in effect for those
+versions. The Apache License applies to v2.7.0 and later.
+
+This product includes third-party open source software. The applicable
+license texts and copyright notices are listed in THIRD-PARTY-NOTICES.txt,
+which is generated at build time and shipped with every distribution.
+
+"NC-2200" and "TAMAYA" are product names of Tamaya Technics (tamaya-technics.com).
+They are referred to only to describe the feature set this application
+was modeled on. This project is not affiliated with or endorsed by
+Tamaya Technics.

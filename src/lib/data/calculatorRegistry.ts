@@ -1,6 +1,6 @@
 /**
  * 全計算機のメタデータ（唯一の正）
- * カテゴリ構成と名称は TAMAYA 航法計算機 NC-2200 の機能一覧に準拠する
+ * カテゴリ構成と名称は航法計算機 TAMAYA NC-2200 の機能一覧を参考にしている（同社とは無関係）
  * https://tamaya-technics.com/navigation/
  */
 import {

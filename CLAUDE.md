@@ -85,7 +85,7 @@ src/routes/
 
 表記は `navigationMath.ts` の `formatLat` / `formatLon` / `formatBearing` / `formatDirected` / `formatClock` などを使い、各コンポーネントで独自に整形しない。
 
-カテゴリ構成・名称は TAMAYA 航法計算機 NC-2200（https://tamaya-technics.com/navigation/）の機能一覧に準拠させる。
+カテゴリ構成・名称は航法計算機 TAMAYA NC-2200（https://tamaya-technics.com/navigation/）の機能一覧を参考にする。「準拠」「公認」など提携を思わせる表現は使わない（同社とは無関係）。
 
 ### 計算ロジック
 
@@ -115,6 +115,10 @@ PILOT/ASTRO と同じ計算は試験側でも同じ関数を使う（試験用�
 ### 印刷スタイル
 
 `src/app.css` に `@media print` ルールを一括管理。印刷時は左パネルとサイドバーを非表示にし、右パネルを A4 全幅で展開、全スペーシング・フォントサイズを圧縮して1ページに収める。印刷 CSS は `.calc-input-panel` / `.calc-sheet` / `.sheet-header` / `.sheet-section` / `.sheet-highlight` などのクラスを対象にしている。
+
+### ライセンス
+
+v2.7.0 以降は Apache-2.0（`LICENSE`・`NOTICE`）。v2.6.7 までは Unlicense で公開済みで、それは取り消せない。配布物に同梱する第三者ソフトウェアの表示は `scripts/third-party-notices.js` が `npm run build` の最初に生成する（`static/` 経由で `dist/` へ。控えをリポジトリ直下にも出力するので差分があれば commit する）。実行時に配布物へ入るパッケージを増やしたら `RUNTIME_PACKAGES` に追加する。
 
 ### アプリバージョン
 
