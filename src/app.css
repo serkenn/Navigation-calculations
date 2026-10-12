@@ -301,7 +301,7 @@
     display: grid !important;
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     column-gap: 14pt !important;
-    row-gap: 12pt !important;
+    row-gap: 9pt !important;
   }
   .exam-sheet .exam-grid > section {
     break-inside: avoid !important;
@@ -349,6 +349,19 @@
   }
   .exam-sheet .border-t-\[1\.5px\] {
     border-top: 1pt solid #1e293b !important;
+  }
+  /* 天測位置決定用図は列幅に収め、凡例は小さく */
+  .exam-sheet .exam-plot {
+    max-width: 118pt !important;
+    margin-top: 4pt !important;
+  }
+  .exam-sheet .exam-plot figcaption {
+    font-size: 6.5pt !important;
+    line-height: 1.25 !important;
+    margin-top: 2pt !important;
+  }
+  .exam-sheet .exam-plot figcaption span {
+    background: #1e293b !important;
   }
 
   /* ── Misc ── */

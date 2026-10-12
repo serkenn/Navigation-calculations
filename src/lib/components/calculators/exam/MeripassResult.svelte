@@ -4,6 +4,8 @@
    * 値はすべて MeripassCalc が共通関数（astronomy / mercatorSailing）で求めたもの
    * 画面が広いとき・印刷時は答案用紙と同じ 3 列構成、狭いときは 1 列に積む
    */
+  import PositionPlot from '#lib/components/shared/PositionPlot.svelte';
+
   let { result }: { result: any } = $props();
 
   type Row = [string, string];
@@ -329,6 +331,28 @@
         = ({paren(r.a1)}·cosec {r.z1.toFixed(1)}° − {paren(r.deltaLat)}·cot {r.z1.toFixed(
           1,
         )}°)·sec {dm(run.lat2)}
+      </div>
+      <!-- 天測位置決定用図: Noon の推測位置を中心に、午前の位置の線と正午の緯度線の交点が船位 -->
+      <div class="exam-plot mt-3 max-w-[16rem]">
+        <PositionPlot
+          azimuths={[{ z: r.z1, label: `☉ ${halfAz(r.z1)}` }]}
+          lops={[{ z: r.z1, a: r.a1, color: '#e11d48' }]}
+          latLine={{ north: r.deltaLat, color: '#2563eb' }}
+          fix={{ east: r.depCorr, north: r.deltaLat }}
+        >
+          <p>
+            <span class="inline-block w-3 h-0.5 align-middle bg-[#e11d48]"
+            ></span>
+            午前の位置の線（I {signed(r.a1)}
+            {mins(r.a1)}）
+          </p>
+          <p>
+            <span class="inline-block w-3 h-0.5 align-middle bg-[#2563eb]"
+            ></span>
+            Noon の位置の線（lat {lat(r.noonLat)}）
+          </p>
+          <p>◎ 視正午の船位　円の中心 = Noon の推測位置</p>
+        </PositionPlot>
       </div>
     </section>
 
